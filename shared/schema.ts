@@ -14,6 +14,7 @@ export const profiles = pgTable("profiles", {
   relation: text("relation").notNull(),
   notes: text("notes").default(''),
   voiceModelStatus: voiceModelStatusEnum("voice_model_status").default('not_submitted'),
+  elevenLabsVoiceId: varchar("elevenlabs_voice_id", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
