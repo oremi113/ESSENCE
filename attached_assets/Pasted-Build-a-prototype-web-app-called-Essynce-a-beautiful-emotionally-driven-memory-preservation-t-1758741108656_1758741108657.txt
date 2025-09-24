@@ -1,0 +1,44 @@
+Build a prototype web app called **Essynce** — a beautiful, emotionally-driven memory preservation tool that captures a person’s voice and enables the generation of new content using AI in that voice.
+
+The app’s purpose is to allow people to create a lasting voice legacy (e.g., a father reading bedtime stories, heartfelt letters, or future birthday messages in his voice, even after he’s passed).
+
+### 🔧 MVP Functionality (Phase 1 Prototype)
+
+1. **Voice Capture Module**
+- Allow the user to read a **pre-generated training script** (e.g., “The quick brown fox jumps over the lazy dog,” and other phonetically rich lines).
+- Record each line separately, storing labeled clips (e.g., Line 1, Line 2).
+- Optional: show progress (e.g., "5/20 lines recorded").
+
+2. **Voice Cloning Prep (Placeholder for AI)**
+- Simulate or prep data that would be sent to a backend voice synthesis API like:
+  - **ElevenLabs**, **Resemble.ai**, or **PlayHT**
+- Create a dummy or commented-out section that explains:
+  - Where voice data would be uploaded
+  - How the voice model ID would be saved
+
+3. **Message Creation Interface**
+- Text input: “What do you want your voice to say?”
+- Generate an audio message using placeholder synthesized audio (for now, a dummy MP3 or “This is where your future voice will speak your words”)
+
+4. **Playback Library**
+- Display a list of saved AI-generated messages (mock or real)
+- Each with a title, timestamp, and Play/Delete option
+
+### 💄 UI/UX Vibe
+- Soft, minimal, emotionally warm interface (like Calm or Notion)
+- Clean serif + sans-serif font pair (e.g., Playfair + Inter)
+- Gentle transitions and animations (hover glow, slide-ins)
+- Onboarding screen: “Capture your voice. Preserve your essence.”
+
+### 🚧 Tech Stack (Client-Side for Now)
+- HTML, CSS, Vanilla JS (or React)
+- Use MediaRecorder API for voice
+- Simulate voice synthesis via mockup or explain the backend handoff
+- Use LocalStorage or IndexedDB for storing clips and metadata (for now)
+
+### 🌱 Optional Stretch Goals
+- Add text-to-speech using a generic TTS voice for preview
+- Use audio waveform visualizer (like wavesurfer.js)
+- Prep backend callouts (commented) for AI voice APIs
+
+Include detailed comments in the code explaining where to eventually connect to AI services like ElevenLabs or Resemble. This is a prototype but should feel thoughtful, emotionally engaging, and clean.

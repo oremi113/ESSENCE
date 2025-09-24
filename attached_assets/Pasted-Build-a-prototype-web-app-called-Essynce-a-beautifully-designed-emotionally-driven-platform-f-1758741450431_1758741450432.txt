@@ -1,0 +1,59 @@
+Build a prototype web app called **Essynce** — a beautifully designed, emotionally-driven platform for capturing a person's voice and using AI to generate custom spoken messages in that voice.
+
+The purpose is to preserve the essence of someone (like a father, grandparent, etc.) by training a model on their voice and later using it to create legacy audio messages (e.g., birthday wishes, life advice, bedtime stories) — even after they've passed.
+
+### 🎯 MVP Features to Include
+
+1. **Voice Recording with Training Script**
+- Load a pre-written script of 20+ phonetically rich sentences
+- Display one line at a time
+- Allow user to record, re-record, and playback each line
+- Show progress tracker (e.g., “5/20 lines recorded”)
+- Store each clip labeled by line ID
+
+2. **Voice Model Prep (AI Placeholder)**
+- Simulate or comment placeholder for sending audio to a voice cloning API (e.g., ElevenLabs or Resemble.ai)
+- Display training status: “Not submitted” → “In training” → “Ready”
+- (No actual API calls needed, just simulate flow with dummy data for now)
+
+3. **Message Creation Interface**
+- Text input field: “Type what you want your voice to say”
+- Submit button simulates sending to AI
+- Output: placeholder audio clip and/or “Your voice would say this...” message
+- Add title and save to playback library
+
+4. **Playback Library**
+- Show list of AI-generated messages
+- Each item includes title, timestamp, play and delete buttons
+
+5. **Voice Quality Feedback**
+- Optional: validate mic input volume, duration, or basic waveform
+- Prompt user if a clip is too short or unclear
+
+6. **Emotionally Warm UI**
+- Use soft, modern fonts (Playfair Display for headings, Inter for body)
+- Gentle transitions and animations
+- Warm, calm color palette (e.g., cream, soft pink, dusty blue)
+- App starts with onboarding screen: *“Capture your voice. Preserve your essence.”*
+
+7. **Local Storage**
+- Use IndexedDB or localStorage to save training clips and messages (no backend yet)
+- Allow user to download/export audio clips as a ZIP (optional)
+
+8. **Profiles (Optional/Stretch Goal)**
+- Let users create simple profiles (name, relation, notes)
+- Helps support multi-user use (e.g., record Mom, Dad, Grandpa)
+
+---
+
+### 🛠 Tech Stack
+
+- HTML / CSS (or Tailwind) / JavaScript
+- Use MediaRecorder API for in-browser audio capture
+- Use dummy audio or open-source TTS (like ResponsiveVoice or a public MP3) as a stand-in for AI voice
+- Organize code into modular files (e.g., `index.html`, `script.js`, `style.css`)
+- Include comments to guide where future backend/API logic should be added
+
+---
+
+This is a prototype — focus on emotional clarity, ease of use, and a beautiful interface. Treat the AI voice synthesis steps as simulated for now, but lay the groundwork for future API integration.
