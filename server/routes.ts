@@ -160,10 +160,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const allRecordings = await storage.getVoiceRecordingsByProfile(profileId);
           
           // Convert base64 audio data to buffers for ElevenLabs
-          const audioFiles = allRecordings.map((recording, index) => ({
-            name: `sample_${index + 1}.wav`,
-            data: elevenLabsService.convertBase64ToBuffer(recording.audioData)
-          }));
+          const audioFiles = allRecordings.map((recording, index) => {
+            const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
+            return {
+              name: `sample_${index + 1}`,
+              data: buffer,
+              mimeType
+            };
+          });
           
           // Create voice in ElevenLabs
           elevenLabsVoiceId = await elevenLabsService.createVoice(
@@ -211,11 +215,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update profile voice model status
       const recordingCount = await storage.getRecordingCount(profileId);
+      const currentProfile = await storage.getProfile(profileId);
       
       let voiceModelStatus: 'not_submitted' | 'training' | 'ready' = 'not_submitted';
       if (recordingCount > 0 && recordingCount < TOTAL_TRAINING_PHRASES) {
         voiceModelStatus = 'training';
-      } else if (recordingCount >= TOTAL_TRAINING_PHRASES) {
+      } else if (recordingCount >= TOTAL_TRAINING_PHRASES && currentProfile?.elevenLabsVoiceId) {
+        // Only mark as ready if we have both enough recordings AND a voice model
         voiceModelStatus = 'ready';
       }
       
@@ -225,6 +231,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting recording:", error);
       res.status(500).json({ error: "Failed to delete recording" });
+    }
+  });
+
+  // Speech preview route (generates audio without saving message)
+  app.post("/api/profiles/:profileId/tts", async (req, res) => {
+    try {
+      const { profileId } = req.params;
+      
+      // Check if profile exists
+      const profile = await storage.getProfile(profileId);
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      
+      // Check if profile has a ready voice model
+      if (profile.voiceModelStatus !== 'ready' || !profile.elevenLabsVoiceId) {
+        return res.status(400).json({ 
+          error: "Voice model not ready. Complete voice training first." 
+        });
+      }
+      
+      const { content } = req.body;
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Content is required for speech generation" });
+      }
+      
+      try {
+        console.log(`Generating preview speech for profile ${profile.name}...`);
+        
+        // Generate speech using ElevenLabs
+        const audioBuffer = await elevenLabsService.generateSpeech(
+          content.trim(),
+          profile.elevenLabsVoiceId
+        );
+        
+        // Convert to base64 for frontend
+        const audioData = elevenLabsService.convertBufferToBase64(audioBuffer, 'audio/mpeg');
+        
+        // Estimate duration (rough calculation: ~150 words per minute, ~5 chars per word)
+        const estimatedWords = content.length / 5;
+        const duration = Math.max(Math.floor((estimatedWords / 150) * 60), 5); // Min 5 seconds
+        
+        console.log(`Preview speech generated successfully. Duration: ${duration}s`);
+        
+        res.json({ audioData, duration });
+        
+      } catch (error) {
+        console.error('Failed to generate preview speech:', error);
+        return res.status(500).json({ 
+          error: "Failed to generate speech. Please try again." 
+        });
+      }
+      
+    } catch (error) {
+      console.error("Error in TTS preview:", error);
+      res.status(500).json({ error: "Failed to process TTS request" });
     }
   });
 

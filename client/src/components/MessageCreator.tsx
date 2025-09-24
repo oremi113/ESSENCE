@@ -37,28 +37,33 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
     setAudioDuration(0);
     
     try {
-      // Create a temporary message to generate speech
-      const response = await fetch(`/api/profiles/${currentProfileId}/messages`, {
+      // Use preview endpoint to generate speech without saving message
+      const response = await fetch(`/api/profiles/${currentProfileId}/tts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          title: title || 'Preview Message',
-          content: content.trim(),
-          category: selectedCategory
+          content: content.trim()
         })
       });
       
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Failed to generate voice');
+        const errorText = await response.text();
+        let errorMsg = 'Failed to generate voice';
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMsg = errorJson.error || errorMsg;
+        } catch {
+          // Use default message if response isn't JSON
+        }
+        throw new Error(errorMsg);
       }
       
-      const message = await response.json();
+      const result = await response.json();
       
-      if (message.audioData) {
-        setGeneratedAudio(message.audioData);
-        setAudioDuration(message.duration || 30);
-        console.log('ElevenLabs voice generation completed');
+      if (result.audioData) {
+        setGeneratedAudio(result.audioData);
+        setAudioDuration(result.duration || 30);
+        console.log('ElevenLabs preview generation completed');
       } else {
         throw new Error('No audio data received');
       }

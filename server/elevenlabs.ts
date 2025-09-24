@@ -41,8 +41,14 @@ export class ElevenLabsService {
     });
 
     if (!response.ok) {
-      const error = await response.json() as ElevenLabsError;
-      throw new Error(`ElevenLabs API error: ${error.detail?.message || response.statusText}`);
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json() as ElevenLabsError;
+        errorMessage = errorData.detail?.message || errorMessage;
+      } catch {
+        // Response isn't JSON, use status text
+      }
+      throw new Error(`ElevenLabs API error: ${errorMessage}`);
     }
 
     return response;
@@ -51,15 +57,20 @@ export class ElevenLabsService {
   /**
    * Create a new voice from training samples
    */
-  async createVoice(name: string, description: string, files: { name: string; data: Buffer }[]): Promise<string> {
+  async createVoice(name: string, description: string, files: { name: string; data: Buffer; mimeType?: string }[]): Promise<string> {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     
-    // Add each audio file
+    // Add each audio file with proper MIME type
     files.forEach((file, index) => {
-      const blob = new Blob([file.data], { type: 'audio/wav' });
-      formData.append('files', blob, file.name);
+      const mimeType = file.mimeType || 'audio/wav';
+      const extension = mimeType.includes('webm') ? 'webm' : 
+                      mimeType.includes('mp3') ? 'mp3' : 'wav';
+      const fileName = file.name.replace(/\.\w+$/, `.${extension}`);
+      
+      const blob = new Blob([file.data], { type: mimeType });
+      formData.append('files', blob, fileName);
     });
 
     const response = await fetch(`${this.baseUrl}/voices/add`, {
@@ -71,8 +82,14 @@ export class ElevenLabsService {
     });
 
     if (!response.ok) {
-      const error = await response.json() as ElevenLabsError;
-      throw new Error(`Failed to create voice: ${error.detail?.message || response.statusText}`);
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json() as ElevenLabsError;
+        errorMessage = errorData.detail?.message || errorMessage;
+      } catch {
+        // Response isn't JSON, use status text
+      }
+      throw new Error(`Failed to create voice: ${errorMessage}`);
     }
 
     const result = await response.json() as { voice_id: string };
@@ -88,22 +105,30 @@ export class ElevenLabsService {
       headers: {
         'xi-api-key': this.apiKey,
         'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
       },
       body: JSON.stringify({
         text,
-        model_id: 'eleven_monolingual_v1',
+        model_id: 'eleven_multilingual_v2',
         voice_settings: {
           stability: 0.5,
           similarity_boost: 0.8,
           style: 0.0,
           use_speaker_boost: true
-        }
+        },
+        output_format: 'mp3_44100_128'
       }),
     });
 
     if (!response.ok) {
-      const error = await response.json() as ElevenLabsError;
-      throw new Error(`Failed to generate speech: ${error.detail?.message || response.statusText}`);
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json() as ElevenLabsError;
+        errorMessage = errorData.detail?.message || errorMessage;
+      } catch {
+        // Response isn't JSON, use status text
+      }
+      throw new Error(`Failed to generate speech: ${errorMessage}`);
     }
 
     return Buffer.from(await response.arrayBuffer());
@@ -137,11 +162,18 @@ export class ElevenLabsService {
 
   /**
    * Convert base64 audio data to Buffer for API calls
+   * Returns buffer and extracted MIME type
    */
-  convertBase64ToBuffer(base64Data: string): Buffer {
-    // Remove data:audio/wav;base64, prefix if present
-    const cleanBase64 = base64Data.replace(/^data:audio\/[a-z]+;base64,/, '');
-    return Buffer.from(cleanBase64, 'base64');
+  convertBase64ToBuffer(base64Data: string): { buffer: Buffer; mimeType: string } {
+    // Extract MIME type from data URL
+    const mimeMatch = base64Data.match(/^data:(audio\/[a-z0-9+]+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'audio/wav';
+    
+    // Remove data URL prefix if present
+    const cleanBase64 = base64Data.replace(/^data:audio\/[a-z0-9+]+;base64,/, '');
+    const buffer = Buffer.from(cleanBase64, 'base64');
+    
+    return { buffer, mimeType };
   }
 
   /**
