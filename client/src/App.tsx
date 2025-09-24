@@ -1,9 +1,10 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 // Components
 import WelcomeOnboarding from "@/components/WelcomeOnboarding";
@@ -59,7 +60,24 @@ const TRAINING_SCRIPT = [
   "Itsy bitsy spider climbed up the water spout in the garden."
 ];
 
+// Utility function to convert Blob to base64
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove the data URL prefix to get just the base64 data
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 function Router() {
+  const { toast } = useToast();
+  
   // Application state
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [currentView, setCurrentView] = useState<'training' | 'create' | 'library' | 'profiles'>('training');
@@ -89,6 +107,49 @@ function Router() {
   ]);
   const [currentProfile, setCurrentProfile] = useState<Profile>(profiles[0]);
 
+  // Load existing recordings for current profile
+  const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
+    queryKey: ['/api/profiles', currentProfile.id, 'recordings'],
+    queryFn: async () => {
+      const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`);
+      if (!response.ok) throw new Error('Failed to load recordings');
+      return response.json();
+    }
+  });
+
+  // Save recording mutation
+  const saveRecordingMutation = useMutation({
+    mutationFn: async ({ audioBlob, phraseIndex }: { audioBlob: Blob, phraseIndex: number }) => {
+      const audioData = await blobToBase64(audioBlob);
+      const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phraseIndex,
+          phraseText: TRAINING_SCRIPT[phraseIndex],
+          audioData
+        })
+      });
+      if (!response.ok) throw new Error('Failed to save recording');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile.id, 'recordings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      toast({
+        title: "Recording saved",
+        description: "Your voice recording has been saved successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error saving recording",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   // Messages state
   const [messages, setMessages] = useState<Message[]>([]);
   const [playingMessageId, setPlayingMessageId] = useState<string>();
@@ -110,6 +171,25 @@ function Router() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  // Load recordings from backend when they're fetched
+  useEffect(() => {
+    if (existingRecordings) {
+      const newRecordings = new Array(TRAINING_SCRIPT.length).fill(null);
+      existingRecordings.forEach((recording: any) => {
+        // Convert base64 back to Blob for local playback
+        const byteCharacters = atob(recording.audioData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'audio/wav' });
+        newRecordings[recording.phraseIndex] = blob;
+      });
+      setRecordings(newRecordings);
+    }
+  }, [existingRecordings]);
 
   // Update current profile's recording count when recordings change
   useEffect(() => {
@@ -140,12 +220,13 @@ function Router() {
   };
 
   const handleRecordingComplete = (audioBlob: Blob, index: number) => {
+    // Update local state immediately for responsive UI
     const newRecordings = [...recordings];
     newRecordings[index] = audioBlob;
     setRecordings(newRecordings);
     
-    // TODO: In real implementation, upload to server for voice model training
-    console.log(`Recording ${index + 1} completed`);
+    // Save to backend
+    saveRecordingMutation.mutate({ audioBlob, phraseIndex: index });
   };
 
   const handleCreateMessage = (title: string, content: string) => {
