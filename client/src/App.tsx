@@ -502,6 +502,7 @@ function Router() {
         {currentView === 'create' && (
           <MessageCreator
             voiceModelStatus={voiceModelStatus}
+            currentProfileId={currentProfile?.id || ''}
             onCreateMessage={handleCreateMessage}
           />
         )}

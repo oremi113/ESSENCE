@@ -10,10 +10,11 @@ import { Loader2, Sparkles, Play, Save, Volume2, Heart, MessageSquare } from "lu
 
 interface MessageCreatorProps {
   voiceModelStatus: 'not_submitted' | 'training' | 'ready';
+  currentProfileId: string;
   onCreateMessage: (title: string, content: string, category: string, audioData?: string, duration?: number) => void;
 }
 
-export default function MessageCreator({ voiceModelStatus, onCreateMessage }: MessageCreatorProps) {
+export default function MessageCreator({ voiceModelStatus, currentProfileId, onCreateMessage }: MessageCreatorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -32,20 +33,43 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
     if (!content.trim() || voiceModelStatus !== 'ready') return;
     
     setIsGenerating(true);
+    setGeneratedAudio(null);
+    setAudioDuration(0);
     
-    // Simulate AI voice generation with actual audio data
-    // In a real implementation, this would call an AI voice service
-    setTimeout(() => {
-      // Create a simple audio data URL for demonstration
-      // This would be replaced with actual AI-generated audio
-      const mockAudioData = `data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAK...`;
-      const mockDuration = Math.floor(content.length / 10) + 10; // Rough duration based on text length
+    try {
+      // Create a temporary message to generate speech
+      const response = await fetch(`/api/profiles/${currentProfileId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          title: title || 'Preview Message',
+          content: content.trim(),
+          category: selectedCategory
+        })
+      });
       
-      setGeneratedAudio(mockAudioData);
-      setAudioDuration(mockDuration);
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Failed to generate voice');
+      }
+      
+      const message = await response.json();
+      
+      if (message.audioData) {
+        setGeneratedAudio(message.audioData);
+        setAudioDuration(message.duration || 30);
+        console.log('ElevenLabs voice generation completed');
+      } else {
+        throw new Error('No audio data received');
+      }
+      
+    } catch (error) {
+      console.error('Voice generation failed:', error);
+      // Show user-friendly error
+      alert('Voice generation failed. Please try again.');
+    } finally {
       setIsGenerating(false);
-      console.log('AI voice generation triggered for:', content);
-    }, 3000);
+    }
   };
 
   const handlePlay = async () => {
@@ -55,33 +79,19 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
     console.log('Playing generated audio');
     
     try {
-      // Since we're using mock audio data, we'll simulate playback with Web Audio API
-      // In a real implementation, this would play the actual AI-generated audio
+      // Create and play the actual generated audio
+      const audio = new Audio(generatedAudio);
       
-      // Create a simple tone to indicate preview playback
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Create a simple pleasant tone
-      oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
-      oscillator.type = 'sine';
-      
-      // Fade in and out
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1.5);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 1.5);
-      
-      // Stop playback after tone ends
-      setTimeout(() => {
+      audio.onended = () => {
         setIsPlaying(false);
-      }, 1500);
+      };
+      
+      audio.onerror = () => {
+        console.error('Error playing generated audio');
+        setIsPlaying(false);
+      };
+      
+      await audio.play();
       
     } catch (error) {
       console.error('Error playing preview audio:', error);
