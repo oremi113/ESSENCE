@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         voiceModelStatus = 'training';
       } else if (recordingCount >= TOTAL_TRAINING_PHRASES) {
         // Training complete - create ElevenLabs voice model if it doesn't exist
-        if (!profile.elevenLabsVoiceId && voiceModelStatus !== 'ready') {
+        if (!profile.elevenLabsVoiceId) {
           try {
             console.log(`Creating ElevenLabs voice for profile ${profile.name}...`);
             
