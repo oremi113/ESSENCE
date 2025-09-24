@@ -1,38 +1,190 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { 
+  type User, 
+  type InsertUser,
+  type Profile,
+  type InsertProfile,
+  type VoiceRecording,
+  type InsertVoiceRecording,
+  type Message,
+  type InsertMessage,
+  profiles,
+  voiceRecordings,
+  messages,
+  users
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc, count } from "drizzle-orm";
 
-// modify the interface with any CRUD methods
-// you might need
-
+// Voice recording interface for ESSENCE
 export interface IStorage {
+  // Legacy user methods (keeping for compatibility)
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // Profile methods
+  getProfile(id: string): Promise<Profile | undefined>;
+  getAllProfiles(): Promise<Profile[]>;
+  createProfile(profile: InsertProfile): Promise<Profile>;
+  updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | undefined>;
+  deleteProfile(id: string): Promise<boolean>;
+  
+  // Voice recording methods
+  getVoiceRecording(profileId: string, phraseIndex: number): Promise<VoiceRecording | undefined>;
+  getVoiceRecordingsByProfile(profileId: string): Promise<VoiceRecording[]>;
+  saveVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
+  deleteVoiceRecording(profileId: string, phraseIndex: number): Promise<boolean>;
+  getRecordingCount(profileId: string): Promise<number>;
+  
+  // Message methods
+  getMessage(id: string): Promise<Message | undefined>;
+  getMessagesByProfile(profileId: string): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  deleteMessage(id: string): Promise<boolean>;
+  getMessageCount(profileId: string): Promise<number>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
+  // Legacy user methods
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
+  }
+
+  // Profile methods
+  async getProfile(id: string): Promise<Profile | undefined> {
+    const [profile] = await db.select().from(profiles).where(eq(profiles.id, id));
+    return profile || undefined;
+  }
+
+  async getAllProfiles(): Promise<Profile[]> {
+    return await db.select().from(profiles).orderBy(desc(profiles.createdAt));
+  }
+
+  async createProfile(insertProfile: InsertProfile): Promise<Profile> {
+    const [profile] = await db
+      .insert(profiles)
+      .values(insertProfile)
+      .returning();
+    return profile;
+  }
+
+  async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | undefined> {
+    const [profile] = await db
+      .update(profiles)
+      .set(updates)
+      .where(eq(profiles.id, id))
+      .returning();
+    return profile || undefined;
+  }
+
+  async deleteProfile(id: string): Promise<boolean> {
+    const result = await db.delete(profiles).where(eq(profiles.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // Voice recording methods
+  async getVoiceRecording(profileId: string, phraseIndex: number): Promise<VoiceRecording | undefined> {
+    const [recording] = await db
+      .select()
+      .from(voiceRecordings)
+      .where(and(
+        eq(voiceRecordings.profileId, profileId),
+        eq(voiceRecordings.phraseIndex, phraseIndex)
+      ));
+    return recording || undefined;
+  }
+
+  async getVoiceRecordingsByProfile(profileId: string): Promise<VoiceRecording[]> {
+    return await db
+      .select()
+      .from(voiceRecordings)
+      .where(eq(voiceRecordings.profileId, profileId))
+      .orderBy(voiceRecordings.phraseIndex);
+  }
+
+  async saveVoiceRecording(insertRecording: InsertVoiceRecording): Promise<VoiceRecording> {
+    // Use upsert to atomically insert or update recording
+    const [recording] = await db
+      .insert(voiceRecordings)
+      .values(insertRecording)
+      .onConflictDoUpdate({
+        target: [voiceRecordings.profileId, voiceRecordings.phraseIndex],
+        set: {
+          phraseText: insertRecording.phraseText,
+          audioData: insertRecording.audioData,
+          createdAt: new Date()
+        }
+      })
+      .returning();
+    return recording;
+  }
+
+  async deleteVoiceRecording(profileId: string, phraseIndex: number): Promise<boolean> {
+    const result = await db
+      .delete(voiceRecordings)
+      .where(and(
+        eq(voiceRecordings.profileId, profileId),
+        eq(voiceRecordings.phraseIndex, phraseIndex)
+      ));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getRecordingCount(profileId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(voiceRecordings)
+      .where(eq(voiceRecordings.profileId, profileId));
+    return result.count;
+  }
+
+  // Message methods
+  async getMessage(id: string): Promise<Message | undefined> {
+    const [message] = await db.select().from(messages).where(eq(messages.id, id));
+    return message || undefined;
+  }
+
+  async getMessagesByProfile(profileId: string): Promise<Message[]> {
+    return await db
+      .select()
+      .from(messages)
+      .where(eq(messages.profileId, profileId))
+      .orderBy(desc(messages.createdAt));
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async deleteMessage(id: string): Promise<boolean> {
+    const result = await db.delete(messages).where(eq(messages.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getMessageCount(profileId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(messages)
+      .where(eq(messages.profileId, profileId));
+    return result.count;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
