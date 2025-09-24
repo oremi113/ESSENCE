@@ -76,7 +76,7 @@ export default function Navigation({
           <div className="flex items-center space-x-8">
             <div>
               <h1 className="text-2xl font-serif font-bold text-foreground">
-                Essynce
+                ESSENCE
               </h1>
               <p className="text-xs text-muted-foreground">
                 Voice Preservation

@@ -14,7 +14,7 @@ export default function WelcomeOnboarding({ onStart }: WelcomeOnboardingProps) {
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground tracking-tight">
-              Essynce
+              ESSENCE
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground font-light">
               Capture your voice. Preserve your essence.
