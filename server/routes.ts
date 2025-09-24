@@ -94,6 +94,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/profiles/:id", async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // Get profile to check for ElevenLabs voice
+      const profile = await storage.getProfile(id);
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      
+      // Clean up ElevenLabs voice if it exists
+      if (profile.elevenLabsVoiceId) {
+        try {
+          console.log(`Deleting ElevenLabs voice ${profile.elevenLabsVoiceId} for profile ${profile.name}`);
+          await elevenLabsService.deleteVoice(profile.elevenLabsVoiceId);
+        } catch (error) {
+          console.warn(`Failed to delete ElevenLabs voice ${profile.elevenLabsVoiceId}:`, error);
+          // Continue with profile deletion even if voice deletion fails
+        }
+      }
+      
       const deleted = await storage.deleteProfile(id);
       
       if (!deleted) {
@@ -152,37 +170,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (recordingCount > 0 && recordingCount < TOTAL_TRAINING_PHRASES) {
         voiceModelStatus = 'training';
       } else if (recordingCount >= TOTAL_TRAINING_PHRASES) {
-        // Training complete - create ElevenLabs voice model
-        try {
-          console.log(`Creating ElevenLabs voice for profile ${profile.name}...`);
-          
-          // Get all recordings for this profile
-          const allRecordings = await storage.getVoiceRecordingsByProfile(profileId);
-          
-          // Convert base64 audio data to buffers for ElevenLabs
-          const audioFiles = allRecordings.map((recording, index) => {
-            const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
-            return {
-              name: `sample_${index + 1}`,
-              data: buffer,
-              mimeType
-            };
-          });
-          
-          // Create voice in ElevenLabs
-          elevenLabsVoiceId = await elevenLabsService.createVoice(
-            `${profile.name} Voice`,
-            `Custom voice for ${profile.name} (${profile.relation})`,
-            audioFiles
-          );
-          
+        // Training complete - create ElevenLabs voice model if it doesn't exist
+        if (!profile.elevenLabsVoiceId && voiceModelStatus !== 'ready') {
+          try {
+            console.log(`Creating ElevenLabs voice for profile ${profile.name}...`);
+            
+            // Get all recordings for this profile
+            const allRecordings = await storage.getVoiceRecordingsByProfile(profileId);
+            
+            // Convert base64 audio data to buffers for ElevenLabs
+            const audioFiles = allRecordings.map((recording, index) => {
+              const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
+              return {
+                name: `sample_${index + 1}`,
+                data: buffer,
+                mimeType
+              };
+            });
+            
+            // Create voice in ElevenLabs
+            elevenLabsVoiceId = await elevenLabsService.createVoice(
+              `${profile.name} Voice`,
+              `Custom voice for ${profile.name} (${profile.relation})`,
+              audioFiles
+            );
+            
+            voiceModelStatus = 'ready';
+            console.log(`ElevenLabs voice created successfully: ${elevenLabsVoiceId}`);
+            
+          } catch (error) {
+            console.error('Failed to create ElevenLabs voice:', error);
+            // Keep status as training if voice creation fails
+            voiceModelStatus = 'training';
+          }
+        } else {
+          // Voice already exists, mark as ready
           voiceModelStatus = 'ready';
-          console.log(`ElevenLabs voice created successfully: ${elevenLabsVoiceId}`);
-          
-        } catch (error) {
-          console.error('Failed to create ElevenLabs voice:', error);
-          // Keep status as training if voice creation fails
-          voiceModelStatus = 'training';
         }
       }
       
@@ -218,14 +241,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentProfile = await storage.getProfile(profileId);
       
       let voiceModelStatus: 'not_submitted' | 'training' | 'ready' = 'not_submitted';
+      let updateData: any = { voiceModelStatus };
+      
       if (recordingCount > 0 && recordingCount < TOTAL_TRAINING_PHRASES) {
         voiceModelStatus = 'training';
+        
+        // If we dropped below threshold and had a voice, clean it up
+        if (currentProfile?.elevenLabsVoiceId) {
+          try {
+            console.log(`Cleaning up ElevenLabs voice ${currentProfile.elevenLabsVoiceId} (below threshold)`);
+            await elevenLabsService.deleteVoice(currentProfile.elevenLabsVoiceId);
+          } catch (error) {
+            console.warn(`Failed to delete ElevenLabs voice ${currentProfile.elevenLabsVoiceId}:`, error);
+          }
+          updateData.elevenLabsVoiceId = null;
+        }
+        
       } else if (recordingCount >= TOTAL_TRAINING_PHRASES && currentProfile?.elevenLabsVoiceId) {
         // Only mark as ready if we have both enough recordings AND a voice model
         voiceModelStatus = 'ready';
+      } else if (recordingCount === 0) {
+        // No recordings left, clean up voice if exists
+        if (currentProfile?.elevenLabsVoiceId) {
+          try {
+            console.log(`Cleaning up ElevenLabs voice ${currentProfile.elevenLabsVoiceId} (no recordings)`);
+            await elevenLabsService.deleteVoice(currentProfile.elevenLabsVoiceId);
+          } catch (error) {
+            console.warn(`Failed to delete ElevenLabs voice ${currentProfile.elevenLabsVoiceId}:`, error);
+          }
+          updateData.elevenLabsVoiceId = null;
+        }
       }
       
-      await storage.updateProfile(profileId, { voiceModelStatus });
+      await storage.updateProfile(profileId, updateData);
       
       res.json({ success: true });
     } catch (error) {
@@ -255,6 +303,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { content } = req.body;
       if (!content || !content.trim()) {
         return res.status(400).json({ error: "Content is required for speech generation" });
+      }
+      
+      // Enforce content length limit (2000 chars = ~13 minute TTS at 150 WPM)
+      if (content.trim().length > 2000) {
+        return res.status(413).json({ 
+          error: "Content too long. Maximum 2000 characters allowed." 
+        });
       }
       
       try {
@@ -329,6 +384,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { content } = req.body;
         if (!content || !content.trim()) {
           return res.status(400).json({ error: "Content is required for speech generation" });
+        }
+        
+        // Enforce content length limit for messages too
+        if (content.trim().length > 2000) {
+          return res.status(413).json({ 
+            error: "Content too long. Maximum 2000 characters allowed." 
+          });
         }
         
         // Generate speech using ElevenLabs

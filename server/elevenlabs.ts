@@ -62,11 +62,21 @@ export class ElevenLabsService {
     formData.append('name', name);
     formData.append('description', description);
     
-    // Add each audio file with proper MIME type
+    // Add each audio file with proper MIME type and validation
     files.forEach((file, index) => {
       const mimeType = file.mimeType || 'audio/wav';
+      
+      // Check if MIME type is supported by ElevenLabs
+      const supportedFormats = ['audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/m4a', 'audio/flac'];
+      if (!supportedFormats.some(format => mimeType.includes(format.split('/')[1]))) {
+        console.warn(`Potentially unsupported audio format: ${mimeType}. May cause voice creation issues.`);
+      }
+      
       const extension = mimeType.includes('webm') ? 'webm' : 
-                      mimeType.includes('mp3') ? 'mp3' : 'wav';
+                      mimeType.includes('mp3') ? 'mp3' :
+                      mimeType.includes('mpeg') ? 'mp3' :
+                      mimeType.includes('m4a') ? 'm4a' :
+                      mimeType.includes('flac') ? 'flac' : 'wav';
       const fileName = file.name.replace(/\.\w+$/, `.${extension}`);
       
       const blob = new Blob([file.data], { type: mimeType });
@@ -165,12 +175,12 @@ export class ElevenLabsService {
    * Returns buffer and extracted MIME type
    */
   convertBase64ToBuffer(base64Data: string): { buffer: Buffer; mimeType: string } {
-    // Extract MIME type from data URL
-    const mimeMatch = base64Data.match(/^data:(audio\/[a-z0-9+]+);base64,/);
+    // Extract MIME type from data URL with robust regex that handles parameters
+    const mimeMatch = base64Data.match(/^data:(audio\/[^;,]+)(?:[^,]*)?;base64,/i);
     const mimeType = mimeMatch ? mimeMatch[1] : 'audio/wav';
     
-    // Remove data URL prefix if present
-    const cleanBase64 = base64Data.replace(/^data:audio\/[a-z0-9+]+;base64,/, '');
+    // Remove data URL prefix if present (handles various formats)
+    const cleanBase64 = base64Data.replace(/^data:[^,]+,/, '');
     const buffer = Buffer.from(cleanBase64, 'base64');
     
     return { buffer, mimeType };
