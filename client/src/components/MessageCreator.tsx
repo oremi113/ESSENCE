@@ -48,15 +48,44 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
     }, 3000);
   };
 
-  const handlePlay = () => {
-    if (generatedAudio) {
-      setIsPlaying(true);
-      console.log('Playing generated audio');
+  const handlePlay = async () => {
+    if (!generatedAudio) return;
+    
+    setIsPlaying(true);
+    console.log('Playing generated audio');
+    
+    try {
+      // Since we're using mock audio data, we'll simulate playback with Web Audio API
+      // In a real implementation, this would play the actual AI-generated audio
       
-      // Simulate audio playback
+      // Create a simple tone to indicate preview playback
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Create a simple pleasant tone
+      oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
+      oscillator.type = 'sine';
+      
+      // Fade in and out
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 1.5);
+      
+      // Stop playback after tone ends
       setTimeout(() => {
         setIsPlaying(false);
-      }, 2000);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error playing preview audio:', error);
+      setIsPlaying(false);
     }
   };
 
