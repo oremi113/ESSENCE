@@ -92,34 +92,36 @@ function Router() {
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState(0);
   const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(TRAINING_SCRIPT.length).fill(null));
   
-  // Profiles state
-  const [profiles, setProfiles] = useState<Profile[]>([
-    {
-      id: '1',
-      name: 'My Voice',
-      relation: 'Self',
-      notes: 'Primary voice profile for creating legacy messages',
-      createdAt: new Date(),
-      voiceModelStatus: 'not_submitted',
-      recordingsCount: 0,
-      messagesCount: 0
+  // Load profiles from backend
+  const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
+    queryKey: ['/api/profiles'],
+    queryFn: async () => {
+      const response = await fetch('/api/profiles');
+      if (!response.ok) throw new Error('Failed to load profiles');
+      return response.json();
     }
-  ]);
-  const [currentProfile, setCurrentProfile] = useState<Profile>(profiles[0]);
+  });
+
+  // Set current profile to first profile if available
+  const [currentProfileId, setCurrentProfileId] = useState<string>('1');
+  const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
 
   // Load existing recordings for current profile
   const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
-    queryKey: ['/api/profiles', currentProfile.id, 'recordings'],
+    queryKey: ['/api/profiles', currentProfile?.id, 'recordings'],
     queryFn: async () => {
+      if (!currentProfile?.id) return [];
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`);
       if (!response.ok) throw new Error('Failed to load recordings');
       return response.json();
-    }
+    },
+    enabled: !!currentProfile?.id
   });
 
   // Save recording mutation
   const saveRecordingMutation = useMutation({
     mutationFn: async ({ audioBlob, phraseIndex }: { audioBlob: Blob, phraseIndex: number }) => {
+      if (!currentProfile?.id) throw new Error('No profile selected');
       const audioData = await blobToBase64(audioBlob);
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, {
         method: 'POST',
@@ -134,7 +136,7 @@ function Router() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile.id, 'recordings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'recordings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       toast({
         title: "Recording saved",
@@ -150,18 +152,16 @@ function Router() {
     }
   });
 
-  // Messages state
-  const [messages, setMessages] = useState<Message[]>([]);
   const [playingMessageId, setPlayingMessageId] = useState<string>();
 
   // Derived state
   const completedRecordings = recordings.filter(r => r !== null).length;
   const isVoiceTrainingComplete = completedRecordings === TRAINING_SCRIPT.length;
   
-  // Voice model status based on training progress
-  const voiceModelStatus: 'not_submitted' | 'training' | 'ready' = 
-    completedRecordings === 0 ? 'not_submitted' :
-    completedRecordings < TRAINING_SCRIPT.length ? 'training' : 'ready';
+  // Voice model status from current profile or derived from recordings
+  const voiceModelStatus = currentProfile?.voiceModelStatus || 
+    (completedRecordings === 0 ? 'not_submitted' :
+     completedRecordings < TRAINING_SCRIPT.length ? 'training' : 'ready');
 
   // Theme handling
   useEffect(() => {
@@ -191,24 +191,19 @@ function Router() {
     }
   }, [existingRecordings]);
 
-  // Update current profile's recording count when recordings change
-  useEffect(() => {
-    setProfiles(prev => prev.map(p => 
-      p.id === currentProfile.id 
-        ? { ...p, recordingsCount: completedRecordings, voiceModelStatus }
-        : p
-    ));
-  }, [completedRecordings, currentProfile.id, voiceModelStatus]);
+  // No longer needed since profiles come from backend
 
-  // Update current profile's message count when messages change
-  useEffect(() => {
-    const currentProfileMessages = messages.filter(m => m.id.startsWith(currentProfile.id));
-    setProfiles(prev => prev.map(p => 
-      p.id === currentProfile.id 
-        ? { ...p, messagesCount: currentProfileMessages.length }
-        : p
-    ));
-  }, [messages.length, currentProfile.id]);
+  // Load messages from backend for current profile
+  const { data: messages = [], isLoading: loadingMessages } = useQuery({
+    queryKey: ['/api/profiles', currentProfile?.id, 'messages'],
+    queryFn: async () => {
+      if (!currentProfile?.id) return [];
+      const response = await fetch(`/api/profiles/${currentProfile.id}/messages`);
+      if (!response.ok) throw new Error('Failed to load messages');
+      return response.json();
+    },
+    enabled: !!currentProfile?.id
+  });
 
   // Handlers
   const handleStartOnboarding = () => {
@@ -229,21 +224,37 @@ function Router() {
     saveRecordingMutation.mutate({ audioBlob, phraseIndex: index });
   };
 
+  // Create message mutation
+  const createMessageMutation = useMutation({
+    mutationFn: async ({ title, content, category = 'other' }: { title: string, content: string, category?: string }) => {
+      if (!currentProfile?.id) throw new Error('No profile selected');
+      const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content, category })
+      });
+      if (!response.ok) throw new Error('Failed to create message');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      toast({
+        title: "Message created",
+        description: "Your message has been created successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating message",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleCreateMessage = (title: string, content: string) => {
-    const newMessage: Message = {
-      id: `${currentProfile.id}-${Date.now()}`,
-      title,
-      content,
-      createdAt: new Date(),
-      category: 'other', // TODO: Add category selection in UI
-      duration: Math.floor(Math.random() * 120) + 30, // Mock duration
-      // audioUrl: placeholder - will be generated by AI service
-    };
-    
-    setMessages(prev => [...prev, newMessage]);
-    console.log('Message created:', newMessage);
-    
-    // TODO: In real implementation, send to voice synthesis API
+    createMessageMutation.mutate({ title, content });
   };
 
   const handlePlayMessage = (id: string) => {
@@ -261,50 +272,175 @@ function Router() {
     }
   };
 
+  // Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      const response = await fetch(`/api/messages/${messageId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete message');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      toast({
+        title: "Message deleted",
+        description: "Your message has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error deleting message",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleDeleteMessage = (id: string) => {
-    setMessages(prev => prev.filter(m => m.id !== id));
-    console.log('Message deleted:', id);
+    deleteMessageMutation.mutate(id);
   };
 
-  const handleCreateProfile = (profileData: Omit<Profile, 'id' | 'createdAt' | 'voiceModelStatus' | 'recordingsCount' | 'messagesCount'>) => {
-    const newProfile: Profile = {
-      ...profileData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      voiceModelStatus: 'not_submitted',
-      recordingsCount: 0,
-      messagesCount: 0
-    };
-    setProfiles(prev => [...prev, newProfile]);
-    console.log('Profile created:', newProfile);
+  // Create profile mutation
+  const createProfileMutation = useMutation({
+    mutationFn: async (profileData: { name: string, relation: string, notes: string }) => {
+      const response = await fetch('/api/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+      });
+      if (!response.ok) throw new Error('Failed to create profile');
+      return response.json();
+    },
+    onSuccess: (newProfile) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      setCurrentProfileId(newProfile.id);
+      toast({
+        title: "Profile created",
+        description: "Your new profile has been created successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleCreateProfile = (profileData: { name: string, relation: string, notes: string }) => {
+    createProfileMutation.mutate(profileData);
   };
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string, updates: Partial<Profile> }) => {
+      const response = await fetch(`/api/profiles/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete profile mutation
+  const deleteProfileMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/profiles/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete profile');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      // Switch to first remaining profile if current was deleted
+      if (currentProfile?.id === currentProfileId) {
+        const remainingProfiles = profiles.filter((p: Profile) => p.id !== currentProfileId);
+        if (remainingProfiles.length > 0) {
+          setCurrentProfileId(remainingProfiles[0].id);
+        }
+      }
+      toast({
+        title: "Profile deleted",
+        description: "Your profile has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error deleting profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   const handleUpdateProfile = (id: string, updates: Partial<Profile>) => {
-    setProfiles(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-    console.log('Profile updated:', id, updates);
+    updateProfileMutation.mutate({ id, updates });
   };
 
   const handleDeleteProfile = (id: string) => {
-    setProfiles(prev => prev.filter(p => p.id !== id));
-    // Switch to first remaining profile
-    if (currentProfile.id === id) {
-      const remainingProfiles = profiles.filter(p => p.id !== id);
-      if (remainingProfiles.length > 0) {
-        setCurrentProfile(remainingProfiles[0]);
-      }
-    }
-    console.log('Profile deleted:', id);
+    deleteProfileMutation.mutate(id);
   };
 
   const handleSelectProfile = (profile: Profile) => {
-    setCurrentProfile(profile);
-    // TODO: Load profile-specific data (recordings, messages)
-    console.log('Profile selected:', profile.name);
+    setCurrentProfileId(profile.id);
+    setCurrentRecordingIndex(0); // Reset to first phrase
   };
 
   // Show onboarding if user hasn't completed it
   if (!hasOnboarded) {
     return <WelcomeOnboarding onStart={handleStartOnboarding} />;
+  }
+
+  // Show loading while profiles are being fetched
+  if (loadingProfiles) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading ESSENCE...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no profiles exist
+  if (!currentProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md">
+          <h2 className="text-2xl font-serif mb-4">Welcome to ESSENCE</h2>
+          <p className="text-muted-foreground mb-6">
+            No profiles found. Let's create your first voice profile to get started.
+          </p>
+          <button
+            onClick={() => handleCreateProfile({ name: 'My Voice', relation: 'Self', notes: 'Primary voice profile' })}
+            className="px-6 py-3 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90"
+          >
+            Create First Profile
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
