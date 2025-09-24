@@ -5,11 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, Play, Save, Volume2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Sparkles, Play, Save, Volume2, Heart, MessageSquare } from "lucide-react";
 
 interface MessageCreatorProps {
   voiceModelStatus: 'not_submitted' | 'training' | 'ready';
-  onCreateMessage: (title: string, content: string) => void;
+  onCreateMessage: (title: string, content: string, category: string, audioData?: string, duration?: number) => void;
 }
 
 export default function MessageCreator({ voiceModelStatus, onCreateMessage }: MessageCreatorProps) {
@@ -17,6 +18,8 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
   const [content, setContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
+  const [audioDuration, setAudioDuration] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<string>("other");
   const [isPlaying, setIsPlaying] = useState(false);
 
   const statusConfig = {
@@ -30,9 +33,16 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
     
     setIsGenerating(true);
     
-    // Simulate AI voice generation (replace with real API call)
+    // Simulate AI voice generation with actual audio data
+    // In a real implementation, this would call an AI voice service
     setTimeout(() => {
-      setGeneratedAudio("placeholder-audio-url");
+      // Create a simple audio data URL for demonstration
+      // This would be replaced with actual AI-generated audio
+      const mockAudioData = `data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAK...`;
+      const mockDuration = Math.floor(content.length / 10) + 10; // Rough duration based on text length
+      
+      setGeneratedAudio(mockAudioData);
+      setAudioDuration(mockDuration);
       setIsGenerating(false);
       console.log('AI voice generation triggered for:', content);
     }, 3000);
@@ -52,12 +62,14 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
 
   const handleSave = () => {
     if (title.trim() && content.trim() && generatedAudio) {
-      onCreateMessage(title.trim(), content.trim());
+      onCreateMessage(title.trim(), content.trim(), selectedCategory, generatedAudio, audioDuration);
       
       // Reset form
       setTitle("");
       setContent("");
       setGeneratedAudio(null);
+      setAudioDuration(0);
+      setSelectedCategory("other");
     }
   };
 
@@ -100,6 +112,23 @@ export default function MessageCreator({ voiceModelStatus, onCreateMessage }: Me
               disabled={isDisabled}
               data-testid="input-message-title"
             />
+          </div>
+
+          {/* Message Category */}
+          <div className="space-y-2">
+            <Label htmlFor="message-category">Category</Label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={isDisabled}>
+              <SelectTrigger data-testid="select-category">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="birthday">🎂 Birthday</SelectItem>
+                <SelectItem value="advice">💡 Advice</SelectItem>
+                <SelectItem value="story">📖 Story</SelectItem>
+                <SelectItem value="love">❤️ Love</SelectItem>
+                <SelectItem value="other">✨ Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Message Content */}

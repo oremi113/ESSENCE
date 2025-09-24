@@ -226,12 +226,18 @@ function Router() {
 
   // Create message mutation
   const createMessageMutation = useMutation({
-    mutationFn: async ({ title, content, category = 'other' }: { title: string, content: string, category?: string }) => {
+    mutationFn: async ({ title, content, category = 'other', audioData, duration }: { 
+      title: string, 
+      content: string, 
+      category?: string,
+      audioData?: string | null,
+      duration?: number
+    }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
       const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, category })
+        body: JSON.stringify({ title, content, category, audioData, duration })
       });
       if (!response.ok) throw new Error('Failed to create message');
       return response.json();
@@ -253,22 +259,47 @@ function Router() {
     }
   });
 
-  const handleCreateMessage = (title: string, content: string) => {
-    createMessageMutation.mutate({ title, content });
+  const handleCreateMessage = (title: string, content: string, category: string, audioData?: string, duration?: number) => {
+    createMessageMutation.mutate({ 
+      title, 
+      content, 
+      category: category as 'birthday' | 'advice' | 'story' | 'love' | 'other',
+      audioData: audioData || null,
+      duration: duration || 30
+    });
   };
 
-  const handlePlayMessage = (id: string) => {
+  const handlePlayMessage = async (id: string) => {
     if (playingMessageId === id) {
       setPlayingMessageId(undefined);
       console.log('Pausing message:', id);
-    } else {
-      setPlayingMessageId(id);
-      console.log('Playing message:', id);
-      
-      // Simulate audio playback ending
-      setTimeout(() => {
+      return;
+    }
+
+    // Find the message to get its audio data
+    const message = messages?.find((m: any) => m.id === id);
+    if (!message || !message.audioData) {
+      console.log('No audio data available for message:', id);
+      return;
+    }
+
+    setPlayingMessageId(id);
+    console.log('Playing message:', id);
+    
+    try {
+      // Create and play audio element
+      const audio = new Audio(message.audioData);
+      audio.onended = () => {
         setPlayingMessageId(undefined);
-      }, 3000);
+      };
+      audio.onerror = () => {
+        console.error('Error playing audio for message:', id);
+        setPlayingMessageId(undefined);
+      };
+      await audio.play();
+    } catch (error) {
+      console.error('Failed to play audio:', error);
+      setPlayingMessageId(undefined);
     }
   };
 
