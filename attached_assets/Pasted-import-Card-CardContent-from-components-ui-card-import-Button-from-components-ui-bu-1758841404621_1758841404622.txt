@@ -1,0 +1,97 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+
+export default function TemplateSelector() {
+  const [selectedRelationship, setSelectedRelationship] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  const relationships = ["Spouse", "Daughter", "Son", "Parent", "Friend"];
+
+  const templates = {
+    Spouse: [
+      "Love Letter",
+      "Thank You for Everything",
+      "Our Favorite Memory"
+    ],
+    Daughter: [
+      "Letter for Her 18th Birthday",
+      "When You Miss Me",
+      "What I Hope for You"
+    ],
+    Son: [
+      "Story Time Adventure",
+      "You Are So Brave",
+      "Dad's Secret Mission"
+    ],
+    Parent: [
+      "Thank You for Your Wisdom",
+      "What You Taught Me",
+      "I’m Okay Now"
+    ],
+    Friend: [
+      "You Were Always There",
+      "My Message to You",
+      "Laughter I’ll Never Forget"
+    ]
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">Create a Voice Message</h1>
+
+      <div className="mb-6">
+        <label className="block mb-2 text-sm font-semibold">Select Relationship</label>
+        <div className="flex gap-2 flex-wrap">
+          {relationships.map((rel) => (
+            <Button
+              key={rel}
+              variant={selectedRelationship === rel ? "default" : "outline"}
+              onClick={() => {
+                setSelectedRelationship(rel);
+                setSelectedTemplate(null);
+              }}
+            >
+              {rel}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {selectedRelationship && (
+        <div className="mb-6">
+          <label className="block mb-2 text-sm font-semibold">Select a Template</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {templates[selectedRelationship].map((temp) => (
+              <Card
+                key={temp}
+                onClick={() => setSelectedTemplate(temp)}
+                className={`cursor-pointer transition-shadow hover:shadow-md p-4 border ${
+                  selectedTemplate === temp ? "border-blue-500" : "border-gray-200"
+                }`}
+              >
+                <CardContent className="p-0 font-medium">{temp}</CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {selectedTemplate && (
+        <div className="mb-6">
+          <label className="block mb-2 text-sm font-semibold">Record Your Message</label>
+          <Textarea
+            rows={5}
+            placeholder={`Speak from the heart or use this prompt: "${selectedTemplate}"`}
+          />
+        </div>
+      )}
+
+      <div className="flex justify-end">
+        <Button disabled={!selectedTemplate}>Save Message</Button>
+      </div>
+    </div>
+  );
+}
