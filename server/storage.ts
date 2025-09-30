@@ -17,9 +17,9 @@ import { eq, and, desc, count } from "drizzle-orm";
 
 // Voice recording interface for ESSENCE
 export interface IStorage {
-  // Legacy user methods (keeping for compatibility)
+  // User methods
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   // Profile methods
@@ -30,11 +30,13 @@ export interface IStorage {
   deleteProfile(id: string): Promise<boolean>;
   
   // Voice recording methods
-  getVoiceRecording(profileId: string, phraseIndex: number): Promise<VoiceRecording | undefined>;
+  getVoiceRecording(userId: string, actNumber: '1' | '2' | '3'): Promise<VoiceRecording | undefined>;
   getVoiceRecordingsByProfile(profileId: string): Promise<VoiceRecording[]>;
+  getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]>;
   saveVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
-  deleteVoiceRecording(profileId: string, phraseIndex: number): Promise<boolean>;
+  deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3'): Promise<boolean>;
   getRecordingCount(profileId: string): Promise<number>;
+  getRecordingCountByUser(userId: string): Promise<number>;
   
   // Message methods
   getMessage(id: string): Promise<Message | undefined>;
@@ -45,14 +47,14 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // Legacy user methods
+  // User methods
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
@@ -97,13 +99,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Voice recording methods
-  async getVoiceRecording(profileId: string, phraseIndex: number): Promise<VoiceRecording | undefined> {
+  async getVoiceRecording(userId: string, actNumber: '1' | '2' | '3'): Promise<VoiceRecording | undefined> {
     const [recording] = await db
       .select()
       .from(voiceRecordings)
       .where(and(
-        eq(voiceRecordings.profileId, profileId),
-        eq(voiceRecordings.phraseIndex, phraseIndex)
+        eq(voiceRecordings.userId, userId),
+        eq(voiceRecordings.actNumber, actNumber)
       ));
     return recording || undefined;
   }
@@ -113,7 +115,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(voiceRecordings)
       .where(eq(voiceRecordings.profileId, profileId))
-      .orderBy(voiceRecordings.phraseIndex);
+      .orderBy(voiceRecordings.actNumber);
+  }
+
+  async getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]> {
+    return await db
+      .select()
+      .from(voiceRecordings)
+      .where(eq(voiceRecordings.userId, userId))
+      .orderBy(voiceRecordings.actNumber);
   }
 
   async saveVoiceRecording(insertRecording: InsertVoiceRecording): Promise<VoiceRecording> {
@@ -122,10 +132,11 @@ export class DatabaseStorage implements IStorage {
       .insert(voiceRecordings)
       .values(insertRecording)
       .onConflictDoUpdate({
-        target: [voiceRecordings.profileId, voiceRecordings.phraseIndex],
+        target: [voiceRecordings.profileId, voiceRecordings.actNumber],
         set: {
-          phraseText: insertRecording.phraseText,
+          passageText: insertRecording.passageText,
           audioData: insertRecording.audioData,
+          qualityStatus: insertRecording.qualityStatus,
           createdAt: new Date()
         }
       })
@@ -133,12 +144,12 @@ export class DatabaseStorage implements IStorage {
     return recording;
   }
 
-  async deleteVoiceRecording(profileId: string, phraseIndex: number): Promise<boolean> {
+  async deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3'): Promise<boolean> {
     const result = await db
       .delete(voiceRecordings)
       .where(and(
         eq(voiceRecordings.profileId, profileId),
-        eq(voiceRecordings.phraseIndex, phraseIndex)
+        eq(voiceRecordings.actNumber, actNumber)
       ));
     return (result.rowCount ?? 0) > 0;
   }
@@ -148,6 +159,14 @@ export class DatabaseStorage implements IStorage {
       .select({ count: count() })
       .from(voiceRecordings)
       .where(eq(voiceRecordings.profileId, profileId));
+    return result.count;
+  }
+
+  async getRecordingCountByUser(userId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(voiceRecordings)
+      .where(eq(voiceRecordings.userId, userId));
     return result.count;
   }
 

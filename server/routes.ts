@@ -140,6 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/profiles/:profileId/recordings", async (req, res) => {
     try {
       const { profileId } = req.params;
+      const { phraseIndex, phraseText, audioData } = req.body;
       
       // Check if profile exists
       const profile = await storage.getProfile(profileId);
@@ -147,17 +148,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Profile not found" });
       }
       
-      const recordingData = insertVoiceRecordingSchema.parse({
-        ...req.body,
-        profileId
-      });
-      
-      // Validate phrase index range
-      if (recordingData.phraseIndex < 0 || recordingData.phraseIndex >= TOTAL_TRAINING_PHRASES) {
+      // Validate act index (0-2 for 3 acts)
+      if (phraseIndex < 0 || phraseIndex >= TOTAL_TRAINING_PHRASES) {
         return res.status(400).json({ 
-          error: `Invalid phrase index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
+          error: `Invalid act index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
         });
       }
+      
+      // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
+      const actNumber = String(phraseIndex + 1) as '1' | '2' | '3';
+      
+      // Create recording data (userId optional until auth is implemented)
+      const recordingData = insertVoiceRecordingSchema.parse({
+        profileId,
+        actNumber,
+        passageText: phraseText,
+        audioData,
+        qualityStatus: 'good'
+      });
       
       const recording = await storage.saveVoiceRecording(recordingData);
       
@@ -230,7 +238,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/profiles/:profileId/recordings/:phraseIndex", async (req, res) => {
     try {
       const { profileId, phraseIndex } = req.params;
-      const deleted = await storage.deleteVoiceRecording(profileId, parseInt(phraseIndex));
+      const actIndex = parseInt(phraseIndex);
+      
+      // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
+      const actNumber = String(actIndex + 1) as '1' | '2' | '3';
+      
+      const deleted = await storage.deleteVoiceRecording(profileId, actNumber);
       
       if (!deleted) {
         return res.status(404).json({ error: "Recording not found" });

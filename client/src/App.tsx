@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { TRAINING_SCRIPT, TOTAL_TRAINING_PHRASES } from "@shared/constants";
 
 // Components
 import WelcomeOnboarding from "@/components/WelcomeOnboarding";
@@ -35,30 +36,6 @@ interface Message {
   audioUrl?: string;
   duration: number;
 }
-
-// Training script data
-const TRAINING_SCRIPT = [
-  "The quick brown fox jumps over the lazy dog.",
-  "She sells seashells by the seashore while the sun shines brightly.",
-  "How much wood would a woodchuck chuck if a woodchuck could chuck wood?",
-  "Peter Piper picked a peck of pickled peppers from the patch.",
-  "A gentle breeze whispered through the tall oak trees in the meadow.",
-  "The five boxing wizards jump quickly over the narrow bridge.",
-  "Jack and Jill went up the hill to fetch a pail of crystal clear water.",
-  "Mary had a little lamb whose fleece was white as fresh snow.",
-  "Humpty Dumpty sat on a wall and watched the world go by peacefully.",
-  "Twinkle, twinkle, little star, how I wonder what you are up above.",
-  "Rain, rain, go away, come again another sunny day in May.",
-  "Hickory dickory dock, the mouse ran up the grandfather clock.",
-  "Old MacDonald had a farm with many animals running around happily.",
-  "Row, row, row your boat gently down the sparkling stream.",
-  "London Bridge is falling down, my fair lady of great beauty.",
-  "Ring around the rosie, a pocket full of posies in springtime.",
-  "Hot cross buns, hot cross buns, one a penny, two a penny treats.",
-  "Baa, baa, black sheep, have you any wool for the winter?",
-  "Three blind mice, see how they run through the farmer's field.",
-  "Itsy bitsy spider climbed up the water spout in the garden."
-];
 
 // Utility function to convert Blob to base64
 const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -178,14 +155,27 @@ function Router() {
       const newRecordings = new Array(TRAINING_SCRIPT.length).fill(null);
       existingRecordings.forEach((recording: any) => {
         // Convert base64 back to Blob for local playback
-        const byteCharacters = atob(recording.audioData);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // Strip data URL prefix if present (e.g., "data:audio/webm;base64,")
+        let base64Data = recording.audioData;
+        if (base64Data.includes(',')) {
+          base64Data = base64Data.split(',')[1];
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'audio/wav' });
-        newRecordings[recording.phraseIndex] = blob;
+        
+        try {
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'audio/wav' });
+          
+          // Direct 1:1 mapping: Act 1→index 0, Act 2→index 1, Act 3→index 2
+          const index = parseInt(recording.actNumber) - 1;
+          newRecordings[index] = blob;
+        } catch (error) {
+          console.error('Failed to decode recording:', error, recording);
+        }
       });
       setRecordings(newRecordings);
     }

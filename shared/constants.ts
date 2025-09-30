@@ -1,25 +1,14 @@
-// Voice training constants for ESSENCE
-export const TOTAL_TRAINING_PHRASES = 20;
+// Voice training constants for ESSENCE - 3-Act System
+export const TOTAL_TRAINING_PHRASES = 3;
 
+// 3-Act voice training passages
 export const TRAINING_SCRIPT = [
-  "The quick brown fox jumps over the lazy dog.",
-  "She sells seashells by the seashore while the sun shines brightly.",
-  "How much wood would a woodchuck chuck if a woodchuck could chuck wood?",
-  "Peter Piper picked a peck of pickled peppers from the patch.",
-  "A gentle breeze whispered through the tall oak trees in the meadow.",
-  "The five boxing wizards jump quickly over the narrow bridge.",
-  "Jack and Jill went up the hill to fetch a pail of crystal clear water.",
-  "Mary had a little lamb whose fleece was white as fresh snow.",
-  "Humpty Dumpty sat on a wall and watched the world go by peacefully.",
-  "Twinkle, twinkle, little star, how I wonder what you are up above.",
-  "Rain, rain, go away, come again another sunny day in May.",
-  "Hickory dickory dock, the mouse ran up the grandfather clock.",
-  "Old MacDonald had a farm with many animals running around happily.",
-  "Row, row, row your boat gently down the sparkling stream.",
-  "London Bridge is falling down, my fair lady of great beauty.",
-  "Ring around the rosie, a pocket full of posies in springtime.",
-  "Hot cross buns, hot cross buns, one a penny, two a penny treats.",
-  "Baa, baa, black sheep, have you any wool for the winter?",
-  "Three blind mice, see how they run through the farmer's field.",
-  "Itsy bitsy spider climbed up the water spout in the garden."
+  // Act 1: Your Speaking Voice (Natural conversation)
+  "Hello! I hope this message finds you well. Today I want to share something meaningful with you. Life has taught me many lessons, and one of the most important is to cherish every moment we have together. Remember that I'm always thinking of you, and my love for you grows stronger with each passing day.",
+  
+  // Act 2: Your Storytelling Voice (Choose your story)
+  "Let me tell you about a memory that always makes me smile. It was a beautiful sunny morning, and we were all gathered together, laughing and sharing stories. The warmth of that moment, the joy in everyone's eyes, and the love that filled the air - these are the treasures I hold dear in my heart. That day reminded me of what truly matters in life: the connections we build and the love we share.",
+  
+  // Act 3: Your Emotional Range (Full vocal expression)
+  "I love you more than words can express. When I think about all the wonderful times we've shared, my heart fills with gratitude and joy. You mean the world to me! Life is precious, and every moment with you is a gift I treasure. Thank you for being such an important part of my life. Remember, no matter what happens, you are loved, you are valued, and you are never alone."
 ];

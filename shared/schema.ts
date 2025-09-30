@@ -33,15 +33,15 @@ export const profiles = pgTable("profiles", {
 
 export const voiceRecordings = pgTable("voice_recordings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  profileId: varchar("profile_id").references(() => profiles.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }), // Optional until auth is implemented
+  profileId: varchar("profile_id").notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   actNumber: actNumberEnum("act_number").notNull(),
   passageText: text("passage_text").notNull(), // The text that was read
   audioData: text("audio_data").notNull(), // Base64 encoded audio blob
   qualityStatus: text("quality_status").default('good'), // good, needs_improvement, excellent
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
-  userActUnique: unique().on(table.userId, table.actNumber),
+  profileActUnique: unique().on(table.profileId, table.actNumber),
 }));
 
 export const messages = pgTable("messages", {
