@@ -1,0 +1,300 @@
+APP NAME: ESSENCE - Voice Legacy Platform
+
+CORE CONCEPT:
+A voice preservation and memory platform that lets users train an AI model on their real voice, then generate new meaningful messages in their voice for loved ones - even after they're gone.
+
+---
+
+DESIGN & BRAND:
+
+Visual Style: Skylight Serenity
+- Soft pastel color palette: sky blue (#E8F4FF), periwinkle (#F4E8FF), rose cream (#FFF4F8), dusk blue accent (#6B7B9B)
+- Hopeful and uplifting emotional tone
+- Clean, modern interface with gentle gradients
+- Mobile-first responsive design
+- Soft shadows and rounded corners (16px border radius)
+- Large, touch-friendly buttons (minimum 44px height)
+
+Typography & Tone:
+- Warm, conversational copy throughout
+- Clear expectations ("This takes 10 minutes")
+- Emotionally intelligent without being heavy
+- Use emojis sparingly for warmth (🎙️ ✨ 💙)
+
+---
+
+USER JOURNEY:
+
+1. LANDING PAGE (Pre-Login)
+   - Compelling hero section explaining ESSENCE
+   - "Preserve Your Voice Forever" headline
+   - Clear value proposition
+   - Social proof placeholder (testimonials section)
+   - Primary CTA: "Start Free"
+   - Simple, clean design
+
+2. SIGNUP/LOGIN
+   - Email + password authentication
+   - Simple form, no complexity
+   - "Create Account" and "Log In" options
+
+3. FIRST LOGIN - PROGRESSIVE ONBOARDING
+   - No overlay tutorial
+   - Hero card with clear first action:
+     * Headline: "Let's Preserve Your Voice"
+     * Subtext: "Train AI on your voice in 10 minutes"
+     * Large primary button: "Start Voice Training"
+     * Small optional link: "How does this work?" (opens info modal)
+
+4. VOICE TRAINING MODULE (CRITICAL - MUST BE EXCELLENT)
+
+   Introduction Screen:
+   - Title: "🎭 Let's Capture Your Voice"
+   - Explanation: "This takes about 10 minutes. Find a quiet spot, relax, and let's preserve your voice forever."
+   - Show 3 acts overview:
+     * 🎬 ACT 1: Your Speaking Voice
+     * 💭 ACT 2: Your Storytelling Voice  
+     * ❤️ ACT 3: Your Emotional Voice
+   - Button: "Let's Begin"
+
+   ACT 1: Your Speaking Voice (3 minutes)
+   - Header: "🎬 ACT 1: Your Speaking Voice"
+   - Instructions: "Read this paragraph naturally, like you're talking to a friend"
+   - Display passage to read:
+     "I remember the kitchen table where we shared our morning coffee. The way the light came through the window and made everything feel warm. Those quiet moments were my favorite - no agenda, just us, just being together in comfortable silence."
+   - Tip: "💡 Tip: Speak slowly, like you're telling a memory"
+   - Recording interface with waveform visualization
+   - Progress indicator: "▓▓▓░░░░░░ 1 of 3"
+   - After recording: options to [Listen Back] [Re-record] [Continue]
+
+   ACT 2: Your Storytelling Voice (4 minutes)
+   - Header: "💭 ACT 2: Your Storytelling Voice"
+   - Instructions: "Now read with a little more life! Show your personality."
+   - "Choose what resonates with you:"
+   - Three options to choose from:
+     
+     Option A: "📖 A Letter to My Child"
+     Passage: "My dear one, There are so many things I want you to know. First, that you are loved beyond measure. Every day I spent with you was a gift I never took for granted. When life gets hard—and it will—remember that you come from a long line of people who didn't give up. You have that same strength in you. Be kind to yourself. Laugh often. Take risks. And know that wherever I am, I'm cheering you on. All my love, always."
+     
+     Option B: "🎉 A Celebration Memory"
+     Passage: "I'll never forget the time we all gathered around that table, laughing until our sides hurt. Someone told a terrible joke—I can't even remember what it was—but we couldn't stop laughing. That's what I want you to remember about our family. We knew how to find joy in the simple things. A meal together. A stupid joke. The warmth of being surrounded by people who know you and love you anyway. Hold onto those moments. Make more of them. They're what matter most."
+     
+     Option C: "💪 Words of Wisdom"
+     Passage: "If I could give you one piece of advice, it would be this: Don't wait for the perfect moment. It doesn't exist. I wasted too many years waiting to be ready, waiting to be sure, waiting for conditions to be just right. But life doesn't work that way. The perfect moment is the one you're in right now. Say the thing. Take the chance. Forgive the person. Book the trip. Make the call. Life is shorter than you think, and the people you love need to hear it today, not someday."
+
+   - User selects one option, then records
+   - Same recording interface as Act 1
+   - Progress: "▓▓▓▓▓▓░░░ 2 of 3"
+
+   ACT 3: Your Emotional Range (3 minutes)
+   - Header: "❤️ ACT 3: Your Full Voice"
+   - Instructions: "Last one! Read this passage—it has different emotions to help capture your full vocal range."
+   - Display passage with tone guidance:
+     "[Gentle, warm tone:] When I think about you, I smile. It's automatic.
+     
+     [Excited, energetic:] Remember when we drove to the coast with no plan? We sang terrible songs at the top of our lungs and didn't care who heard!
+     
+     [Serious, heartfelt:] But I also want you to know that life isn't always easy. There were times I struggled, times I felt lost. That's okay. It's part of being human.
+     
+     [Hopeful, loving:] What matters is that we keep showing up for each other. I showed up for you. And I hope you'll show up for others the way I showed up for you."
+   
+   - Recording interface
+   - Progress: "▓▓▓▓▓▓▓▓▓ 3 of 3 ✨"
+
+   Processing Screen (while AI trains voice - 2-3 minutes):
+   - Animation/loading indicator
+   - "✨ Creating Your Voice..."
+   - Progress bar
+   - Helpful text while waiting:
+     * "We're training AI on your voice. This takes about 2-3 minutes."
+     * "💡 Your voice will sound just like you"
+     * "🔒 Only you control who hears it"
+     * "♾️ You can generate unlimited new messages"
+   - Option: "Check back in 2 minutes or we'll email you when ready!"
+
+5. VOICE TRAINING COMPLETE - SUCCESS & PREVIEW
+
+   Success Screen:
+   - Celebration header: "🎉 Your Voice is Ready!"
+   - Automatically generate emotional preview message using their voice:
+     "If you're hearing this, it means my voice lives on. I want you to know how much you mean to me. Let's create your first message together."
+   - Audio player to hear the preview
+   - Large primary CTA: "Create Your First Message"
+   - Secondary option: "Download Voice Model"
+
+6. MESSAGE CREATION - MEMORY MOMENTS
+
+   Category Selection:
+   - Header: "Who is this message for?"
+   - Display 5 categories as cards:
+     * 👨‍👩‍👧 For My Children
+     * 💑 For My Partner
+     * 👵 For My Parents
+     * 🪞 For Future Me
+     * 👥 For Family & Friends
+   
+   After selecting category, show relevant prompts:
+   - Display 8-10 curated prompts for that category
+   - Each prompt shows as a card with title and preview
+   - Example prompts for "My Children":
+     * "Advice for your daughter's wedding day"
+     * "Tell them about a time you failed and what you learned"
+     * "What you hope they remember about you"
+     * "A family tradition you want them to continue"
+     * "Your proudest moment as their parent"
+
+   Message Generation:
+   - User selects prompt
+   - Show the full prompt text
+   - Option to edit/customize the text
+   - Button: "Generate in My Voice"
+   - Processing (15-30 seconds): "Creating your message..."
+   - Playback of generated audio message
+   - Options: [Save to Library] [Regenerate] [Edit & Try Again]
+
+7. CONTENT LIBRARY
+
+   Main view:
+   - Header: "Your Messages"
+   - Filter by category tabs across top
+   - Grid/list of saved messages showing:
+     * Title/prompt
+     * Category icon
+     * Date created
+     * Duration
+   - Each message card has:
+     * [▶️ Play]
+     * [✏️ Edit]
+     * [🔗 Share] - opens "Coming Soon" modal
+   
+   Empty state (when no messages):
+   - "You haven't created any messages yet"
+   - Illustration or icon
+   - [Create Your First Message] button
+
+   Share "Coming Soon" Modal:
+   - "🎁 Sharing Coming Soon!"
+   - "We're working on the perfect way to share messages with loved ones."
+   - "Want to help us design this?"
+   - [Yes, I'd Share Messages] (tracks interest)
+   - [No, I prefer private]
+
+8. USER PROFILE
+
+   Basic profile page with:
+   - Name
+   - Email
+   - Age (optional)
+   - Relationships (who might messages be for)
+   - Voice training status
+   - Account created date
+
+9. SETTINGS
+
+   Simple settings page:
+   - Privacy controls explanation
+   - Voice data security info
+   - Option to download voice model
+   - Delete account option
+   - Clear, friendly copy about data protection
+
+10. PAYMENT SETUP (COMING SOON STATE)
+
+   - Stripe integration set up in backend
+   - "Upgrade" or "Premium" section exists but shows:
+     "🎁 Free Beta - All features unlocked while we perfect ESSENCE"
+   - Coming soon messaging
+   - Email capture for launch notification
+
+---
+
+DATABASE STRUCTURE:
+
+Users table:
+- user_id
+- email
+- password (hashed)
+- name
+- age
+- created_date
+- voice_model_id (from ElevenLabs)
+- voice_training_complete (boolean)
+
+Messages table:
+- message_id
+- user_id (creator)
+- category (children/partner/parents/future_me/family)
+- prompt_text
+- generated_text
+- audio_url (S3 or external storage)
+- created_date
+- is_private (boolean, default true)
+- share_interest_expressed (boolean, for tracking)
+
+Voice_Recordings table:
+- recording_id
+- user_id
+- act_number (1, 2, or 3)
+- audio_file_url
+- recorded_date
+- quality_status
+
+---
+
+KEY FEATURES:
+
+✅ Email/password authentication
+✅ Responsive web app (mobile-first)
+✅ Voice recording interface with waveform visualization
+✅ File upload to external storage (not Bubble storage)
+✅ ElevenLabs API integration for voice cloning
+✅ Message generation using cloned voice
+✅ Content library with filtering
+✅ Private messages by default
+✅ "Share" button with validation modal (not functional yet)
+✅ Stripe setup (dormant, showing "free beta")
+✅ Progressive onboarding (no tutorial overlay)
+✅ Empty states guide users
+✅ Contextual success messages
+
+❌ No overlay tutorials
+❌ No functional sharing yet
+❌ No payment collection yet
+❌ No dead man's switch yet
+❌ No admin dashboard yet
+❌ No recipient access control yet
+
+---
+
+TECHNICAL NOTES:
+
+- Store audio files externally (AWS S3 or Cloudflare R2), not in Bubble
+- Use API Connector for ElevenLabs integration
+- Voice training should trigger background workflow (not block UI)
+- Use Bubble's scheduling for checking voice training completion
+- All audio playback should be inline players
+- Mobile-optimized recording interface (request microphone permissions)
+- Graceful error handling for failed recordings or API calls
+
+---
+
+USER EXPERIENCE PRIORITIES:
+
+1. Voice training must be engaging and easy (MOST IMPORTANT)
+2. First message creation should feel magical
+3. Clear progress indicators throughout
+4. Warm, conversational tone in all copy
+5. Zero confusion about what to do next
+6. Mobile experience is smooth and intuitive
+7. Fast load times, responsive interactions
+
+---
+
+COPY TONE:
+
+- Conversational and warm
+- Clear and direct (no jargon)
+- Emotionally intelligent without being heavy
+- Hopeful and uplifting
+- Example: "Let's preserve your voice" not "Begin voice training process"
+- Example: "Your voice is ready!" not "Training complete"
