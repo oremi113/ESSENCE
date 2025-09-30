@@ -15,6 +15,13 @@ import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
+// Profile creation schema - only validates fields from request body (userId comes from session)
+const createProfileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  relation: z.string().min(1, "Relation is required"),
+  notes: z.string().optional().default(''),
+});
+
 // Safe profile update schema - only allow certain fields (voiceModelStatus is server-controlled)
 const updateProfileSchema = z.object({
   name: z.string().optional(),
@@ -154,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/profiles", requireAuth, async (req, res) => {
     try {
       const userId = getUserId(req);
-      const profileData = insertProfileSchema.parse(req.body);
+      const profileData = createProfileSchema.parse(req.body);
       const profile = await storage.createProfile({ ...profileData, userId });
       res.json({
         ...profile,
