@@ -4,11 +4,16 @@ import { storage } from "./storage";
 import { 
   insertProfileSchema, 
   insertVoiceRecordingSchema, 
-  insertMessageSchema 
+  insertMessageSchema,
+  insertUserSchema
 } from "@shared/schema";
 import { TOTAL_TRAINING_PHRASES } from "@shared/constants";
 import { z } from "zod";
 import { elevenLabsService } from "./elevenlabs";
+import { passport, hashPassword, requireAuth } from "./auth";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 // Safe profile update schema - only allow certain fields (voiceModelStatus is server-controlled)
 const updateProfileSchema = z.object({
@@ -17,18 +22,118 @@ const updateProfileSchema = z.object({
   notes: z.string().optional(),
 });
 
+// Helper to get authenticated user ID from request
+function getUserId(req: any): string {
+  if (!req.user || !req.user.id) {
+    throw new Error('User not authenticated');
+  }
+  return req.user.id;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Profile routes
-  app.get("/api/profiles", async (req, res) => {
+  // Authentication routes
+  app.post("/api/signup", async (req, res, next) => {
     try {
-      const profiles = await storage.getAllProfiles();
+      const { email, password, name, age } = req.body;
+      
+      // Validate input
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
+      }
+      
+      // Check if user already exists
+      const [existingUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email.toLowerCase()))
+        .limit(1);
+      
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+      
+      // Create user
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          email: email.toLowerCase(),
+          password: hashedPassword,
+          name: name || null,
+          age: age || null,
+        })
+        .returning();
+      
+      // Log in the user automatically
+      const { password: _, ...userWithoutPassword } = newUser;
+      req.login(userWithoutPassword, (err) => {
+        if (err) {
+          return next(err);
+        }
+        
+        res.json({ user: userWithoutPassword });
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ error: "Failed to create account" });
+    }
+  });
+  
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) {
+        return next(err);
+      }
+      
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "Invalid credentials" });
+      }
+      
+      req.login(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        
+        res.json({ user });
+      });
+    })(req, res, next);
+  });
+  
+  app.post("/api/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.json({ success: true });
+    });
+  });
+  
+  app.get("/api/user", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ user: req.user });
+    } else {
+      res.json({ user: null });
+    }
+  });
+
+  // Profile routes (all protected)
+  app.get("/api/profiles", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const profiles = await storage.getAllProfiles(userId);
       
       // Get counts for each profile
       const profilesWithCounts = await Promise.all(
         profiles.map(async (profile) => {
           const [recordingsCount, messagesCount] = await Promise.all([
-            storage.getRecordingCount(profile.id),
-            storage.getMessageCount(profile.id)
+            storage.getRecordingCount(profile.id, userId),
+            storage.getMessageCount(profile.id, userId)
           ]);
           
           return {
@@ -46,10 +151,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/profiles", async (req, res) => {
+  app.post("/api/profiles", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const profileData = insertProfileSchema.parse(req.body);
-      const profile = await storage.createProfile(profileData);
+      const profile = await storage.createProfile({ ...profileData, userId });
       res.json({
         ...profile,
         recordingsCount: 0,
@@ -65,19 +171,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/profiles/:id", async (req, res) => {
+  app.put("/api/profiles/:id", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { id } = req.params;
       const updates = updateProfileSchema.parse(req.body);
-      const profile = await storage.updateProfile(id, updates);
+      const profile = await storage.updateProfile(id, userId, updates);
       
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
       
       const [recordingsCount, messagesCount] = await Promise.all([
-        storage.getRecordingCount(profile.id),
-        storage.getMessageCount(profile.id)
+        storage.getRecordingCount(profile.id, userId),
+        storage.getMessageCount(profile.id, userId)
       ]);
       
       res.json({
@@ -91,12 +198,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/profiles/:id", async (req, res) => {
+  app.delete("/api/profiles/:id", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { id } = req.params;
       
       // Get profile to check for ElevenLabs voice
-      const profile = await storage.getProfile(id);
+      const profile = await storage.getProfile(id, userId);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
@@ -112,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const deleted = await storage.deleteProfile(id);
+      const deleted = await storage.deleteProfile(id, userId);
       
       if (!deleted) {
         return res.status(404).json({ error: "Profile not found" });
@@ -125,11 +233,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Voice recording routes
-  app.get("/api/profiles/:profileId/recordings", async (req, res) => {
+  // Voice recording routes (all protected)
+  app.get("/api/profiles/:profileId/recordings", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
-      const recordings = await storage.getVoiceRecordingsByProfile(profileId);
+      const recordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
       res.json(recordings);
     } catch (error) {
       console.error("Error fetching recordings:", error);
@@ -137,13 +246,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/profiles/:profileId/recordings", async (req, res) => {
+  app.post("/api/profiles/:profileId/recordings", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
       const { phraseIndex, phraseText, audioData } = req.body;
       
       // Check if profile exists
-      const profile = await storage.getProfile(profileId);
+      const profile = await storage.getProfile(profileId, userId);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
@@ -158,19 +268,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
       const actNumber = String(phraseIndex + 1) as '1' | '2' | '3';
       
-      // Create recording data (userId optional until auth is implemented)
+      // Create recording data with userId
       const recordingData = insertVoiceRecordingSchema.parse({
         profileId,
         actNumber,
         passageText: phraseText,
         audioData,
-        qualityStatus: 'good'
+        qualityStatus: 'good',
+        userId
       });
       
       const recording = await storage.saveVoiceRecording(recordingData);
       
       // Update profile voice model status based on recording count
-      const recordingCount = await storage.getRecordingCount(profileId);
+      const recordingCount = await storage.getRecordingCount(profileId, userId);
       
       let voiceModelStatus: 'not_submitted' | 'training' | 'ready' = 'not_submitted';
       let elevenLabsVoiceId: string | undefined;
@@ -184,7 +295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`Creating ElevenLabs voice for profile ${profile.name}...`);
             
             // Get all recordings for this profile
-            const allRecordings = await storage.getVoiceRecordingsByProfile(profileId);
+            const allRecordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
             
             // Convert base64 audio data to buffers for ElevenLabs
             const audioFiles = allRecordings.map((recording, index) => {
@@ -222,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.elevenLabsVoiceId = elevenLabsVoiceId;
       }
       
-      await storage.updateProfile(profileId, updateData);
+      await storage.updateProfile(profileId, userId, updateData);
       
       res.json(recording);
     } catch (error) {
@@ -235,23 +346,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/profiles/:profileId/recordings/:phraseIndex", async (req, res) => {
+  app.delete("/api/profiles/:profileId/recordings/:phraseIndex", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId, phraseIndex } = req.params;
       const actIndex = parseInt(phraseIndex);
       
       // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
       const actNumber = String(actIndex + 1) as '1' | '2' | '3';
       
-      const deleted = await storage.deleteVoiceRecording(profileId, actNumber);
+      const deleted = await storage.deleteVoiceRecording(profileId, actNumber, userId);
       
       if (!deleted) {
         return res.status(404).json({ error: "Recording not found" });
       }
       
       // Update profile voice model status
-      const recordingCount = await storage.getRecordingCount(profileId);
-      const currentProfile = await storage.getProfile(profileId);
+      const recordingCount = await storage.getRecordingCount(profileId, userId);
+      const currentProfile = await storage.getProfile(profileId, userId);
       
       let voiceModelStatus: 'not_submitted' | 'training' | 'ready' = 'not_submitted';
       let updateData: any = { voiceModelStatus };
@@ -286,7 +398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      await storage.updateProfile(profileId, updateData);
+      await storage.updateProfile(profileId, userId, updateData);
       
       res.json({ success: true });
     } catch (error) {
@@ -295,13 +407,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Speech preview route (generates audio without saving message)
-  app.post("/api/profiles/:profileId/tts", async (req, res) => {
+  // Speech preview route (generates audio without saving message) - protected
+  app.post("/api/profiles/:profileId/tts", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
       
       // Check if profile exists
-      const profile = await storage.getProfile(profileId);
+      const profile = await storage.getProfile(profileId, userId);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
@@ -358,11 +471,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Message routes
-  app.get("/api/profiles/:profileId/messages", async (req, res) => {
+  // Message routes (all protected)
+  app.get("/api/profiles/:profileId/messages", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
-      const messages = await storage.getMessagesByProfile(profileId);
+      const messages = await storage.getMessagesByProfile(profileId, userId);
       res.json(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -370,12 +484,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/profiles/:profileId/messages", async (req, res) => {
+  app.post("/api/profiles/:profileId/messages", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
       
       // Check if profile exists
-      const profile = await storage.getProfile(profileId);
+      const profile = await storage.getProfile(profileId, userId);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
@@ -440,7 +555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Creating message with data:', { title, content, category, audioData: audioData ? 'present' : 'null', duration, profileId });
       
       const messageData = insertMessageSchema.parse({
-        userId: null, // Optional until auth is implemented
+        userId,
         profileId,
         title,
         category,
@@ -465,10 +580,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/messages/:id", async (req, res) => {
+  app.delete("/api/messages/:id", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { id } = req.params;
-      const deleted = await storage.deleteMessage(id);
+      const deleted = await storage.deleteMessage(id, userId);
       
       if (!deleted) {
         return res.status(404).json({ error: "Message not found" });
@@ -481,17 +597,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Voice model status route
-  app.get("/api/profiles/:profileId/voice-status", async (req, res) => {
+  // Voice model status route - protected
+  app.get("/api/profiles/:profileId/voice-status", requireAuth, async (req, res) => {
     try {
+      const userId = getUserId(req);
       const { profileId } = req.params;
-      const profile = await storage.getProfile(profileId);
+      const profile = await storage.getProfile(profileId, userId);
       
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
       
-      const recordingCount = await storage.getRecordingCount(profileId);
+      const recordingCount = await storage.getRecordingCount(profileId, userId);
       
       res.json({
         voiceModelStatus: profile.voiceModelStatus,

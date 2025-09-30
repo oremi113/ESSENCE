@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,6 +14,10 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import MessageCreator from "@/components/MessageCreator";
 import PlaybackLibrary from "@/components/PlaybackLibrary";
 import UserProfiles from "@/components/UserProfiles";
+
+// Auth Pages
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 
 // Types
 interface Profile {
@@ -54,6 +58,25 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
 
 function Router() {
   const { toast } = useToast();
+  const [location, setLocation] = useLocation();
+  
+  // Check authentication status
+  const { data: authData, isLoading: authLoading, refetch: refetchAuth } = useQuery({
+    queryKey: ['/api/user'],
+    queryFn: async () => {
+      const response = await fetch('/api/user');
+      if (!response.ok) throw new Error('Failed to check auth');
+      return response.json();
+    },
+    retry: false
+  });
+
+  const user = authData?.user;
+  const isAuthenticated = !!user;
+
+  const handleAuthSuccess = () => {
+    refetchAuth();
+  };
   
   // Application state
   const [hasOnboarded, setHasOnboarded] = useState(false);
@@ -426,6 +449,32 @@ function Router() {
     setCurrentProfileId(profile.id);
     setCurrentRecordingIndex(0); // Reset to first phrase
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login/signup if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Switch>
+        <Route path="/signup">
+          <Signup onSignup={handleAuthSuccess} />
+        </Route>
+        <Route path="/">
+          <Login onLogin={handleAuthSuccess} />
+        </Route>
+      </Switch>
+    );
+  }
 
   // Show onboarding if user hasn't completed it
   if (!hasOnboarded) {

@@ -23,6 +23,7 @@ export const users = pgTable("users", {
 // Tables
 export const profiles = pgTable("profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: text("name").notNull(),
   relation: text("relation").notNull(),
   notes: text("notes").default(''),
@@ -33,7 +34,7 @@ export const profiles = pgTable("profiles", {
 
 export const voiceRecordings = pgTable("voice_recordings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }), // Optional until auth is implemented
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   profileId: varchar("profile_id").notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   actNumber: actNumberEnum("act_number").notNull(),
   passageText: text("passage_text").notNull(), // The text that was read
@@ -46,7 +47,7 @@ export const voiceRecordings = pgTable("voice_recordings", {
 
 export const messages = pgTable("messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }), // Optional until auth is implemented
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   profileId: varchar("profile_id").references(() => profiles.id, { onDelete: 'cascade' }),
   title: text("title").notNull(),
   category: messageCategoryEnum("category").default('other'),
@@ -61,11 +62,16 @@ export const messages = pgTable("messages", {
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
+  profiles: many(profiles),
   voiceRecordings: many(voiceRecordings),
   messages: many(messages),
 }));
 
-export const profilesRelations = relations(profiles, ({ many }) => ({
+export const profilesRelations = relations(profiles, ({ one, many }) => ({
+  user: one(users, {
+    fields: [profiles.userId],
+    references: [users.id],
+  }),
   voiceRecordings: many(voiceRecordings),
   messages: many(messages),
 }));
@@ -94,6 +100,7 @@ export const messagesRelations = relations(messages, ({ one }) => ({
 
 // Insert schemas
 export const insertProfileSchema = createInsertSchema(profiles).pick({
+  userId: true,
   name: true,
   relation: true,
   notes: true,

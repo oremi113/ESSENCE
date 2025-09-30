@@ -22,28 +22,28 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
-  // Profile methods
-  getProfile(id: string): Promise<Profile | undefined>;
-  getAllProfiles(): Promise<Profile[]>;
+  // Profile methods (all scoped by userId)
+  getProfile(id: string, userId: string): Promise<Profile | undefined>;
+  getAllProfiles(userId: string): Promise<Profile[]>;
   createProfile(profile: InsertProfile): Promise<Profile>;
-  updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | undefined>;
-  deleteProfile(id: string): Promise<boolean>;
+  updateProfile(id: string, userId: string, updates: Partial<Profile>): Promise<Profile | undefined>;
+  deleteProfile(id: string, userId: string): Promise<boolean>;
   
-  // Voice recording methods
+  // Voice recording methods (scoped by userId)
   getVoiceRecording(userId: string, actNumber: '1' | '2' | '3'): Promise<VoiceRecording | undefined>;
-  getVoiceRecordingsByProfile(profileId: string): Promise<VoiceRecording[]>;
+  getVoiceRecordingsByProfile(profileId: string, userId: string): Promise<VoiceRecording[]>;
   getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]>;
   saveVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
-  deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3'): Promise<boolean>;
-  getRecordingCount(profileId: string): Promise<number>;
+  deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3', userId: string): Promise<boolean>;
+  getRecordingCount(profileId: string, userId: string): Promise<number>;
   getRecordingCountByUser(userId: string): Promise<number>;
   
-  // Message methods
-  getMessage(id: string): Promise<Message | undefined>;
-  getMessagesByProfile(profileId: string): Promise<Message[]>;
+  // Message methods (scoped by userId)
+  getMessage(id: string, userId: string): Promise<Message | undefined>;
+  getMessagesByProfile(profileId: string, userId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
-  deleteMessage(id: string): Promise<boolean>;
-  getMessageCount(profileId: string): Promise<number>;
+  deleteMessage(id: string, userId: string): Promise<boolean>;
+  getMessageCount(profileId: string, userId: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -67,13 +67,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Profile methods
-  async getProfile(id: string): Promise<Profile | undefined> {
-    const [profile] = await db.select().from(profiles).where(eq(profiles.id, id));
+  async getProfile(id: string, userId: string): Promise<Profile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(profiles)
+      .where(and(
+        eq(profiles.id, id),
+        eq(profiles.userId, userId)
+      ));
     return profile || undefined;
   }
 
-  async getAllProfiles(): Promise<Profile[]> {
-    return await db.select().from(profiles).orderBy(desc(profiles.createdAt));
+  async getAllProfiles(userId: string): Promise<Profile[]> {
+    return await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.userId, userId))
+      .orderBy(desc(profiles.createdAt));
   }
 
   async createProfile(insertProfile: InsertProfile): Promise<Profile> {
@@ -84,17 +94,25 @@ export class DatabaseStorage implements IStorage {
     return profile;
   }
 
-  async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | undefined> {
+  async updateProfile(id: string, userId: string, updates: Partial<Profile>): Promise<Profile | undefined> {
     const [profile] = await db
       .update(profiles)
       .set(updates)
-      .where(eq(profiles.id, id))
+      .where(and(
+        eq(profiles.id, id),
+        eq(profiles.userId, userId)
+      ))
       .returning();
     return profile || undefined;
   }
 
-  async deleteProfile(id: string): Promise<boolean> {
-    const result = await db.delete(profiles).where(eq(profiles.id, id));
+  async deleteProfile(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(profiles)
+      .where(and(
+        eq(profiles.id, id),
+        eq(profiles.userId, userId)
+      ));
     return (result.rowCount ?? 0) > 0;
   }
 
@@ -110,11 +128,14 @@ export class DatabaseStorage implements IStorage {
     return recording || undefined;
   }
 
-  async getVoiceRecordingsByProfile(profileId: string): Promise<VoiceRecording[]> {
+  async getVoiceRecordingsByProfile(profileId: string, userId: string): Promise<VoiceRecording[]> {
     return await db
       .select()
       .from(voiceRecordings)
-      .where(eq(voiceRecordings.profileId, profileId))
+      .where(and(
+        eq(voiceRecordings.profileId, profileId),
+        eq(voiceRecordings.userId, userId)
+      ))
       .orderBy(voiceRecordings.actNumber);
   }
 
@@ -144,21 +165,25 @@ export class DatabaseStorage implements IStorage {
     return recording;
   }
 
-  async deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3'): Promise<boolean> {
+  async deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3', userId: string): Promise<boolean> {
     const result = await db
       .delete(voiceRecordings)
       .where(and(
         eq(voiceRecordings.profileId, profileId),
-        eq(voiceRecordings.actNumber, actNumber)
+        eq(voiceRecordings.actNumber, actNumber),
+        eq(voiceRecordings.userId, userId)
       ));
     return (result.rowCount ?? 0) > 0;
   }
 
-  async getRecordingCount(profileId: string): Promise<number> {
+  async getRecordingCount(profileId: string, userId: string): Promise<number> {
     const [result] = await db
       .select({ count: count() })
       .from(voiceRecordings)
-      .where(eq(voiceRecordings.profileId, profileId));
+      .where(and(
+        eq(voiceRecordings.profileId, profileId),
+        eq(voiceRecordings.userId, userId)
+      ));
     return result.count;
   }
 
@@ -171,16 +196,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Message methods
-  async getMessage(id: string): Promise<Message | undefined> {
-    const [message] = await db.select().from(messages).where(eq(messages.id, id));
+  async getMessage(id: string, userId: string): Promise<Message | undefined> {
+    const [message] = await db
+      .select()
+      .from(messages)
+      .where(and(
+        eq(messages.id, id),
+        eq(messages.userId, userId)
+      ));
     return message || undefined;
   }
 
-  async getMessagesByProfile(profileId: string): Promise<Message[]> {
+  async getMessagesByProfile(profileId: string, userId: string): Promise<Message[]> {
     return await db
       .select()
       .from(messages)
-      .where(eq(messages.profileId, profileId))
+      .where(and(
+        eq(messages.profileId, profileId),
+        eq(messages.userId, userId)
+      ))
       .orderBy(desc(messages.createdAt));
   }
 
@@ -192,16 +226,24 @@ export class DatabaseStorage implements IStorage {
     return message;
   }
 
-  async deleteMessage(id: string): Promise<boolean> {
-    const result = await db.delete(messages).where(eq(messages.id, id));
+  async deleteMessage(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(messages)
+      .where(and(
+        eq(messages.id, id),
+        eq(messages.userId, userId)
+      ));
     return (result.rowCount ?? 0) > 0;
   }
 
-  async getMessageCount(profileId: string): Promise<number> {
+  async getMessageCount(profileId: string, userId: string): Promise<number> {
     const [result] = await db
       .select({ count: count() })
       .from(messages)
-      .where(eq(messages.profileId, profileId));
+      .where(and(
+        eq(messages.profileId, profileId),
+        eq(messages.userId, userId)
+      ));
     return result.count;
   }
 }
