@@ -1,0 +1,78 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 import \{ useState, useRef \} from 'react';\
+\
+export function VoiceRecorder() \{\
+  const [isRecording, setIsRecording] = useState(false);\
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);\
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);\
+  const chunksRef = useRef<Blob[]>([]);\
+\
+  const startRecording = async () => \{\
+    try \{\
+      const stream = await navigator.mediaDevices.getUserMedia(\{ audio: true \});\
+      const mediaRecorder = new MediaRecorder(stream);\
+      mediaRecorderRef.current = mediaRecorder;\
+      chunksRef.current = [];\
+\
+      mediaRecorder.ondataavailable = (e) => \{\
+        if (e.data.size > 0) \{\
+          chunksRef.current.push(e.data);\
+        \}\
+      \};\
+\
+      mediaRecorder.onstop = () => \{\
+        const blob = new Blob(chunksRef.current, \{ type: 'audio/webm' \});\
+        setAudioBlob(blob);\
+        stream.getTracks().forEach(track => track.stop());\
+      \};\
+\
+      mediaRecorder.start();\
+      setIsRecording(true);\
+    \} catch (err) \{\
+      console.error('Microphone access denied:', err);\
+    \}\
+  \};\
+\
+  const stopRecording = () => \{\
+    if (mediaRecorderRef.current && isRecording) \{\
+      mediaRecorderRef.current.stop();\
+      setIsRecording(false);\
+    \}\
+  \};\
+\
+  const uploadAudio = async () => \{\
+    if (!audioBlob) return;\
+\
+    const formData = new FormData();\
+    formData.append('audio', audioBlob, 'recording.webm');\
+\
+    const response = await fetch('/api/upload-voice', \{\
+      method: 'POST',\
+      body: formData,\
+    \});\
+\
+    const data = await response.json();\
+    console.log('Uploaded:', data);\
+  \};\
+\
+  return (\
+    <div>\
+      <button onClick=\{isRecording ? stopRecording : startRecording\}>\
+        \{isRecording ? '\uc0\u9209  Stop' : '\u55356 \u57252  Record'\}\
+      </button>\
+      \
+      \{audioBlob && (\
+        <>\
+          <audio src=\{URL.createObjectURL(audioBlob)\} controls />\
+          <button onClick=\{uploadAudio\}>Upload</button>\
+        </>\
+      )\}\
+    </div>\
+  );\
+\}}
