@@ -25,17 +25,43 @@ The server-side architecture uses a Node.js/Express foundation with:
 - **Runtime**: Node.js with TypeScript and ES modules
 - **Web Framework**: Express.js for REST API endpoints and middleware
 - **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations
-- **Session Management**: Express sessions with PostgreSQL session store
+- **Session Management**: Express sessions with PostgreSQL session store for persistent authentication
+- **Authentication**: Passport.js with LocalStrategy and bcrypt for secure password hashing
 - **Audio Processing**: MediaRecorder API on frontend with base64 encoding for audio storage
 
+### Authentication & Security
+The application implements comprehensive user authentication and data security:
+
+- **User Authentication**: Passport.js with LocalStrategy for email/password authentication
+- **Password Security**: Bcrypt hashing with salt rounds for secure password storage
+- **Session Management**: PostgreSQL-backed sessions with connect-pg-simple for persistence across server restarts
+- **Protected Routes**: All API endpoints requiring authentication use requireAuth middleware
+- **Data Scoping**: Every profile, recording, and message is scoped to the authenticated user's ID
+- **Cross-User Protection**: Storage layer enforces userId filtering to prevent unauthorized data access
+- **Password Safety**: Hashed passwords are never exposed in API responses or client-side code
+- **Session Secret**: Required SESSION_SECRET environment variable (no hardcoded fallback)
+
+Authentication flow:
+1. Unauthenticated users see login/signup pages
+2. After signup or login, users are automatically authenticated
+3. Authenticated users proceed to onboarding/main application
+4. All data operations are scoped to the authenticated user
+5. Sessions persist until explicit logout or session expiration
+
 ### Database Design
-The application uses PostgreSQL with three core entities:
+The application uses PostgreSQL with four core entities:
 
-- **Profiles**: User voice profiles with metadata (name, relation, notes, voice model status)
-- **Voice Recordings**: Individual training phrase recordings linked to profiles
-- **Messages**: Generated AI voice messages with content and audio data
+- **Users**: User accounts with email, hashed password, name, and age
+- **Profiles**: User voice profiles with metadata (name, relation, notes, voice model status) - scoped to userId
+- **Voice Recordings**: Individual training phrase recordings linked to profiles - scoped to userId
+- **Messages**: Generated AI voice messages with content and audio data - scoped to userId
 
-The schema includes enums for voice model status tracking and message categorization, with proper foreign key relationships and cascading deletes.
+The schema includes:
+- Foreign key relationships with cascading deletes for data integrity
+- userId fields on all user-generated content (profiles, recordings, messages)
+- Enums for voice model status tracking and message categorization
+- Unique constraints to prevent duplicate recordings per profile/act combination
+- PostgreSQL session store for authentication persistence
 
 ### Component Architecture
 The application is built around five main interactive components:
@@ -88,9 +114,12 @@ The application handles audio through:
 
 ### Backend Infrastructure
 - **Express.js**: Web application framework with middleware support
+- **Passport.js**: Authentication middleware with LocalStrategy for email/password login
+- **bcryptjs**: Secure password hashing with salt rounds
 - **Drizzle ORM**: Type-safe database operations with PostgreSQL
 - **@neondatabase/serverless**: PostgreSQL database connection for serverless environments
-- **Connect PG Simple**: PostgreSQL session store for user sessions
+- **Connect PG Simple**: PostgreSQL session store for persistent user sessions
+- **Express Session**: Session management with secure cookie configuration
 
 ### Development Tools
 - **ESBuild**: Fast JavaScript bundler for production builds
