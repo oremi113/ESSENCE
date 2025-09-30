@@ -41,16 +41,27 @@ The schema includes enums for voice model status tracking and message categoriza
 The application is built around five main interactive components:
 
 - **WelcomeOnboarding**: Entry point with feature introduction
-- **VoiceRecorder**: Training phrase recording with waveform visualization
+- **VoiceRecorder**: 3-act voice training system with meaningful passage recording
 - **MessageCreator**: Text-to-speech generation interface
 - **PlaybackLibrary**: Audio message management and playback
 - **UserProfiles**: Multi-user profile management system
 
-### Design System
-The UI follows a carefully crafted design system with:
+### 3-Act Voice Training System
+The voice training system has been redesigned to capture three essential dimensions of a person's voice instead of 20 generic phrases:
 
+- **Act 1 - Speaking Voice**: Natural conversational tone with everyday language and cadence
+- **Act 2 - Storytelling**: Narrative voice with memory recall and descriptive language
+- **Act 3 - Emotional Range**: Deep emotional expression including vulnerability, love, and hope
+
+Each act consists of one meaningful multi-sentence passage (not short phrases) that captures specific vocal characteristics. The system uses direct 1:1 mapping where recording index 0 = Act 1, index 1 = Act 2, and index 2 = Act 3. Progress tracking shows "X / 3" throughout the UI, with passage navigation displaying "1 of 3", "2 of 3", "3 of 3".
+
+### Design System
+The UI follows the **Skylight Serenity** theme, a carefully crafted design system with:
+
+- **Design Theme**: Skylight Serenity - hopeful pastel color palette conveying warmth and comfort
+- **Border Radius**: Consistent 16px border radius (rounded-2xl) across all components (Card, Button, Badge)
 - **Typography**: Playfair Display for headings (serif) and Inter for body text (sans-serif)
-- **Color Palette**: Warm, emotionally-driven colors with light/dark mode support
+- **Color Palette**: Warm pastel colors with light/dark mode support
 - **Spacing**: Consistent Tailwind spacing units (2, 4, 6, 8, 12, 16)
 - **Components**: Radix UI primitives with custom styling for accessibility
 
