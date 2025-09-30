@@ -41,17 +41,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
     try {
+      console.log('[SIGNUP] Starting signup process for:', req.body.email);
       const { email, password, name, age } = req.body;
       
       // Validate input
       if (!email || !password) {
+        console.log('[SIGNUP] Validation failed: missing email or password');
         return res.status(400).json({ error: "Email and password are required" });
       }
       
       if (password.length < 6) {
+        console.log('[SIGNUP] Validation failed: password too short');
         return res.status(400).json({ error: "Password must be at least 6 characters" });
       }
       
+      console.log('[SIGNUP] Checking if user exists');
       // Check if user already exists
       const [existingUser] = await db
         .select()
@@ -60,12 +64,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
       
       if (existingUser) {
+        console.log('[SIGNUP] User already exists:', email);
         return res.status(400).json({ error: "Email already registered" });
       }
       
+      console.log('[SIGNUP] Hashing password');
       // Hash password
       const hashedPassword = await hashPassword(password);
       
+      console.log('[SIGNUP] Creating user in database');
       // Create user
       const [newUser] = await db
         .insert(users)
@@ -77,17 +84,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
       
+      console.log('[SIGNUP] User created successfully:', newUser.id);
+      
       // Log in the user automatically
       const { password: _, ...userWithoutPassword } = newUser;
+      console.log('[SIGNUP] Attempting to log in user');
       req.login(userWithoutPassword, (err) => {
         if (err) {
+          console.error('[SIGNUP] Login error:', err);
+          console.error('[SIGNUP] Error details:', JSON.stringify(err, null, 2));
           return next(err);
         }
         
+        console.log('[SIGNUP] Login successful, sending response');
         res.json({ user: userWithoutPassword });
       });
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("[SIGNUP] Signup error:", error);
+      console.error("[SIGNUP] Error stack:", error instanceof Error ? error.stack : 'No stack trace');
       res.status(500).json({ error: "Failed to create account" });
     }
   });
