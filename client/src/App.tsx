@@ -32,7 +32,7 @@ interface Message {
   title: string;
   content: string;
   createdAt: Date;
-  category: 'birthday' | 'advice' | 'story' | 'love' | 'other';
+  category: 'children' | 'partner' | 'parents' | 'future_me' | 'family' | 'other';
   audioUrl?: string;
   duration: number;
 }
@@ -253,7 +253,7 @@ function Router() {
     createMessageMutation.mutate({ 
       title, 
       content, 
-      category: category as 'birthday' | 'advice' | 'story' | 'love' | 'other',
+      category: category as 'children' | 'partner' | 'parents' | 'future_me' | 'family' | 'other',
       audioData: audioData || null,
       duration: duration || 30
     });

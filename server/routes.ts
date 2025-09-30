@@ -387,58 +387,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Generate speech using ElevenLabs
-      let audioData: string | null = null;
-      let duration = 30; // Default duration
+      // Use audioData from frontend if provided (already generated via preview),
+      // otherwise generate it now
+      const { content, audioData: providedAudioData, duration: providedDuration } = req.body;
+      let audioData: string | null = providedAudioData || null;
+      let duration = providedDuration || 30;
       
-      try {
-        console.log(`Generating speech for profile ${profile.name}...`);
-        
-        const { content } = req.body;
-        if (!content || !content.trim()) {
-          return res.status(400).json({ error: "Content is required for speech generation" });
-        }
-        
-        // Enforce content length limit for messages too
-        if (content.trim().length > 2000) {
-          return res.status(413).json({ 
-            error: "Content too long. Maximum 2000 characters allowed." 
-          });
-        }
-        
-        // Generate speech using ElevenLabs
-        const audioBuffer = await elevenLabsService.generateSpeech(
-          content.trim(),
-          profile.elevenLabsVoiceId
-        );
-        
-        // Convert to base64 for storage
-        audioData = elevenLabsService.convertBufferToBase64(audioBuffer, 'audio/mpeg');
-        
-        // Estimate duration (rough calculation: ~150 words per minute, ~5 chars per word)
-        const estimatedWords = content.length / 5;
-        duration = Math.max(Math.floor((estimatedWords / 150) * 60), 5); // Min 5 seconds
-        
-        console.log(`Speech generated successfully. Duration: ${duration}s`);
-        
-      } catch (error) {
-        console.error('Failed to generate speech:', error);
-        return res.status(500).json({ 
-          error: "Failed to generate speech. Please try again." 
-        });
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Content is required" });
       }
       
+      // If audioData wasn't already generated, generate it now
+      if (!audioData) {
+        try {
+          console.log(`Generating speech for profile ${profile.name}...`);
+          
+          // Enforce content length limit
+          if (content.trim().length > 2000) {
+            return res.status(413).json({ 
+              error: "Content too long. Maximum 2000 characters allowed." 
+            });
+          }
+          
+          // Generate speech using ElevenLabs
+          const audioBuffer = await elevenLabsService.generateSpeech(
+            content.trim(),
+            profile.elevenLabsVoiceId
+          );
+          
+          // Convert to base64 for storage
+          audioData = elevenLabsService.convertBufferToBase64(audioBuffer, 'audio/mpeg');
+          
+          // Estimate duration (rough calculation: ~150 words per minute, ~5 chars per word)
+          const estimatedWords = content.length / 5;
+          duration = Math.max(Math.floor((estimatedWords / 150) * 60), 5); // Min 5 seconds
+          
+          console.log(`Speech generated successfully. Duration: ${duration}s`);
+          
+        } catch (error) {
+          console.error('Failed to generate speech:', error);
+          return res.status(500).json({ 
+            error: "Failed to generate speech. Please try again." 
+          });
+        }
+      } else {
+        console.log(`Using pre-generated audio for profile ${profile.name}`);
+      }
+      
+      // Map frontend data to schema fields
+      const { title, category } = req.body;
+      
+      console.log('Creating message with data:', { title, content, category, audioData: audioData ? 'present' : 'null', duration, profileId });
+      
       const messageData = insertMessageSchema.parse({
-        ...req.body,
+        userId: null, // Optional until auth is implemented
         profileId,
+        title,
+        category,
+        promptText: content, // Using content for both fields until templates are implemented
+        generatedText: content,
         audioData,
-        duration
+        duration,
+        isPrivate: 1, // Default to private
+        shareInterestExpressed: 0 // Default to not interested
       });
       
       const message = await storage.createMessage(messageData);
       res.json(message);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error creating message:", JSON.stringify(error.errors, null, 2));
         res.status(400).json({ error: "Invalid message data", details: error.errors });
       } else {
         console.error("Error creating message:", error);

@@ -21,7 +21,7 @@ interface Message {
   title: string;
   content: string;
   createdAt: Date;
-  category: 'birthday' | 'advice' | 'story' | 'love' | 'other';
+  category: 'children' | 'partner' | 'parents' | 'future_me' | 'family' | 'other';
   audioUrl?: string;
   duration: number;
 }
@@ -43,18 +43,20 @@ export default function PlaybackLibrary({
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const categoryIcons = {
-    birthday: Heart,
-    advice: MessageSquare,
-    story: MessageSquare,
-    love: Heart,
+    children: Heart,
+    partner: Heart,
+    parents: Heart,
+    future_me: MessageSquare,
+    family: Heart,
     other: MessageSquare
   };
 
   const categoryColors = {
-    birthday: "bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300",
-    advice: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300", 
-    story: "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
-    love: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+    children: "bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300",
+    partner: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+    parents: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300", 
+    future_me: "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
+    family: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
     other: "bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300"
   };
 

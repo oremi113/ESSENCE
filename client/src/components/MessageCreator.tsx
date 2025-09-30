@@ -88,11 +88,11 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
     
     // Auto-set category based on relationship
     const categoryMap: { [key: string]: string } = {
-      "Spouse": "love",
-      "Daughter": "love", 
-      "Son": "story",
-      "Parent": "other",
-      "Friend": "other"
+      "Spouse": "partner",
+      "Daughter": "children", 
+      "Son": "children",
+      "Parent": "parents",
+      "Friend": "family"
     };
     setSelectedCategory(categoryMap[relationship] || "other");
   };

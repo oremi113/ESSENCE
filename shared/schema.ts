@@ -46,7 +46,7 @@ export const voiceRecordings = pgTable("voice_recordings", {
 
 export const messages = pgTable("messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }), // Optional until auth is implemented
   profileId: varchar("profile_id").references(() => profiles.id, { onDelete: 'cascade' }),
   title: text("title").notNull(),
   category: messageCategoryEnum("category").default('other'),
