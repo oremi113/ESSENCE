@@ -40,8 +40,10 @@ function getUserId(req: any): string {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
+    console.log('[SIGNUP] Starting signup');
+    console.log('[SIGNUP] Request body:', req.body);
+    
     try {
-      console.log('[SIGNUP] Starting signup process for:', req.body.email);
       const { email, password, name, age } = req.body;
       
       // Validate input
@@ -100,9 +102,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ user: userWithoutPassword });
       });
     } catch (error) {
-      console.error("[SIGNUP] Signup error:", error);
-      console.error("[SIGNUP] Error stack:", error instanceof Error ? error.stack : 'No stack trace');
-      res.status(500).json({ error: "Failed to create account" });
+      console.error('[SIGNUP] Error occurred:', error);
+      console.error('[SIGNUP] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      return res.status(500).json({ 
+        error: "Failed to create account",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
   
