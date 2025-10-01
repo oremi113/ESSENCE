@@ -40,7 +40,8 @@ function getUserId(req: any): string {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
-    console.log('[SIGNUP] Starting signup');
+    console.log('[SIGNUP] Starting signup - SERVER ID:', process.pid);
+    console.log('[SIGNUP] DATABASE_URL:', process.env.DATABASE_URL?.substring(0, 50) + '...');
     console.log('[SIGNUP] Request body:', req.body);
     
     try {
