@@ -8,5 +8,9 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+// Log the DATABASE_URL (hiding password for security)
+const dbUrl = process.env.DATABASE_URL.replace(/:[^:]*@/, ':***@');
+console.log('[DB] Connecting to database:', dbUrl);
+
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle(pool, { schema });
