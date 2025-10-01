@@ -60,6 +60,7 @@ export default function Signup({ onSignup }: SignupProps) {
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ email, password, name }),
       });
 
