@@ -40,7 +40,12 @@ function getUserId(req: any): string {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
-    console.log('[SIGNUP] Starting signup - SERVER ID:', process.pid);
+    const serverInfo = {
+      pid: process.pid,
+      dbType: process.env.DATABASE_URL?.includes('helium') ? 'HELIUM' : 'NEON',
+      timestamp: new Date().toISOString()
+    };
+    console.log('[SIGNUP] Starting signup - SERVER INFO:', serverInfo);
     console.log('[SIGNUP] DATABASE_URL:', process.env.DATABASE_URL?.substring(0, 50) + '...');
     console.log('[SIGNUP] Request body:', req.body);
     
@@ -50,7 +55,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate input
       if (!email || !password) {
         console.log('[SIGNUP] Validation failed: missing email or password');
-        return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({ 
+          error: "Email and password are required",
+          serverInfo  // Include server info in error response
+        });
       }
       
       if (password.length < 6) {
@@ -103,11 +111,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ user: userWithoutPassword });
       });
     } catch (error) {
+      const serverInfo = {
+        pid: process.pid,
+        dbType: process.env.DATABASE_URL?.includes('helium') ? 'HELIUM' : 'NEON',
+        timestamp: new Date().toISOString()
+      };
       console.error('[SIGNUP] Error occurred:', error);
       console.error('[SIGNUP] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('[SIGNUP] Server info on error:', serverInfo);
       return res.status(500).json({ 
         error: "Failed to create account",
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        serverInfo  // Include server info in error response
       });
     }
   });
