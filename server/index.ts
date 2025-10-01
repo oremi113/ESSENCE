@@ -94,11 +94,20 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+  
+  // Force close any existing servers on this port
+  process.on('SIGTERM', () => {
+    server.close(() => {
+      process.exit(0);
+    });
+  });
+  
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
+    reusePort: false,  // Changed to false to prevent port reuse
   }, () => {
-    log(`serving on port ${port}`);
+    log(`serving on port ${port} [PID: ${process.pid}]`);
+    console.log(`[SERVER] Database type: ${process.env.DATABASE_URL?.includes('helium') ? 'HELIUM (ERROR!)' : 'NEON (OK)'}`);
   });
 })();
