@@ -10,6 +10,9 @@ const app = express();
 app.use(express.json({ limit: '10mb' })); // Limit for base64 audio uploads
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
+// Trust Replit proxy for secure cookies
+app.set("trust proxy", 1);
+
 // Session configuration with PostgreSQL store
 if (!process.env.SESSION_SECRET) {
   throw new Error('SESSION_SECRET environment variable is required');
