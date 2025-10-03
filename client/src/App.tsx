@@ -211,9 +211,11 @@ function Router() {
   const isVoiceTrainingComplete = completedRecordings === TRAINING_SCRIPT.length;
   
   // Voice model status from current profile or derived from recordings
-  const voiceModelStatus = currentProfile?.voiceModelStatus || 
-    (completedRecordings === 0 ? 'not_submitted' :
-     completedRecordings < TRAINING_SCRIPT.length ? 'training' : 'ready');
+  const voiceModelStatus = DEV_SKIP_AUTH && currentProfile?.id === 'profile-1' 
+    ? 'ready'
+    : (currentProfile?.voiceModelStatus || 
+        (completedRecordings === 0 ? 'not_submitted' :
+         completedRecordings < TRAINING_SCRIPT.length ? 'training' : 'ready'));
 
   // Theme handling
   useEffect(() => {
