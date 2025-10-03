@@ -19,6 +19,7 @@ interface NavigationProps {
   totalRecordings: number;
   messagesCount: number;
   profilesCount: number;
+  voiceModelStatus: 'not_submitted' | 'training' | 'ready';
 }
 
 export default function Navigation({ 
@@ -29,9 +30,10 @@ export default function Navigation({
   completedRecordings,
   totalRecordings,
   messagesCount,
-  profilesCount
+  profilesCount,
+  voiceModelStatus
 }: NavigationProps) {
-  const isTrainingComplete = completedRecordings === totalRecordings && totalRecordings > 0;
+  const isTrainingComplete = voiceModelStatus === 'ready';
 
   const navItems = [
     {

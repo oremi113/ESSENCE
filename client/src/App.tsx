@@ -607,6 +607,7 @@ function Router() {
         totalRecordings={TRAINING_SCRIPT.length}
         messagesCount={messages.length}
         profilesCount={profiles.length}
+        voiceModelStatus={voiceModelStatus}
       />
 
       <main className="pb-8">
