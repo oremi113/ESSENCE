@@ -60,8 +60,8 @@ function Router() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   
-  // DEV MODE: Skip authentication for testing
-  const DEV_SKIP_AUTH = import.meta.env.DEV; // Set to true to bypass auth in development
+  // DEV MODE: Skip authentication for testing - SET TO FALSE TO RE-ENABLE AUTH
+  const DEV_SKIP_AUTH = true;
   
   // Check authentication status
   const { data: authData, isLoading: authLoading, refetch: refetchAuth } = useQuery({
@@ -81,11 +81,12 @@ function Router() {
           }
         };
       }
-      const response = await fetch('/api/user');
+      const response = await fetch('/api/user', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to check auth');
       return response.json();
     },
-    retry: false
+    retry: false,
+    enabled: !DEV_SKIP_AUTH
   });
 
   const user = authData?.user;
