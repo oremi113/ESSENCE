@@ -110,26 +110,60 @@ function Router() {
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState(0);
   const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(TRAINING_SCRIPT.length).fill(null));
   
-  // Load profiles from backend
+  // Load profiles from backend (or use mock data in dev mode)
   const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
     queryKey: ['/api/profiles'],
     queryFn: async () => {
-      const response = await fetch('/api/profiles');
+      if (DEV_SKIP_AUTH) {
+        // Return mock profiles in dev mode
+        return [
+          {
+            id: 'profile-1',
+            userId: 'dev-user-123',
+            name: 'My Children',
+            relation: 'Children',
+            notes: 'Messages for my kids to listen to in the future',
+            voiceModelStatus: 'ready',
+            recordingsCount: 3,
+            messagesCount: 2,
+            createdAt: new Date('2024-01-15')
+          },
+          {
+            id: 'profile-2',
+            userId: 'dev-user-123',
+            name: 'My Partner',
+            relation: 'Spouse',
+            notes: 'Love notes and special messages',
+            voiceModelStatus: 'training',
+            recordingsCount: 2,
+            messagesCount: 1,
+            createdAt: new Date('2024-02-01')
+          }
+        ];
+      }
+      const response = await fetch('/api/profiles', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load profiles');
       return response.json();
-    }
+    },
+    enabled: !DEV_SKIP_AUTH || true
   });
 
   // Set current profile to first profile if available
-  const [currentProfileId, setCurrentProfileId] = useState<string>('1');
+  const [currentProfileId, setCurrentProfileId] = useState<string>(DEV_SKIP_AUTH ? 'profile-1' : '1');
   const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
 
-  // Load existing recordings for current profile
+  // Load existing recordings for current profile (or use mock in dev mode)
   const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
     queryKey: ['/api/profiles', currentProfile?.id, 'recordings'],
     queryFn: async () => {
       if (!currentProfile?.id) return [];
-      const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`);
+      
+      if (DEV_SKIP_AUTH) {
+        // Return empty recordings in dev mode so user can test the recording flow
+        return [];
+      }
+      
+      const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load recordings');
       return response.json();
     },
@@ -224,12 +258,41 @@ function Router() {
 
   // No longer needed since profiles come from backend
 
-  // Load messages from backend for current profile
+  // Load messages from backend for current profile (or use mock data in dev mode)
   const { data: messages = [], isLoading: loadingMessages } = useQuery({
     queryKey: ['/api/profiles', currentProfile?.id, 'messages'],
     queryFn: async () => {
       if (!currentProfile?.id) return [];
-      const response = await fetch(`/api/profiles/${currentProfile.id}/messages`);
+      
+      if (DEV_SKIP_AUTH) {
+        // Return mock messages in dev mode
+        return [
+          {
+            id: 'msg-1',
+            profileId: 'profile-1',
+            userId: 'dev-user-123',
+            title: 'My First Message',
+            content: 'Hello my dear children. I hope this message finds you well...',
+            category: 'children',
+            audioUrl: null,
+            duration: 45,
+            createdAt: new Date('2024-01-20')
+          },
+          {
+            id: 'msg-2',
+            profileId: 'profile-1',
+            userId: 'dev-user-123',
+            title: 'Life Advice',
+            content: 'As you grow older, remember these important lessons...',
+            category: 'children',
+            audioUrl: null,
+            duration: 62,
+            createdAt: new Date('2024-02-10')
+          }
+        ];
+      }
+      
+      const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load messages');
       return response.json();
     },
