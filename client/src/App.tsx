@@ -14,6 +14,7 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import MessageCreator from "@/components/MessageCreator";
 import PlaybackLibrary from "@/components/PlaybackLibrary";
 import UserProfiles from "@/components/UserProfiles";
+import Settings from "@/components/Settings";
 
 // Auth Pages
 import Login from "@/pages/login";
@@ -98,7 +99,7 @@ function Router() {
   
   // Application state
   const [hasOnboarded, setHasOnboarded] = useState(false);
-  const [currentView, setCurrentView] = useState<'training' | 'create' | 'library' | 'profiles'>('training');
+  const [currentView, setCurrentView] = useState<'training' | 'create' | 'library' | 'profiles' | 'settings'>('training');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -533,6 +534,15 @@ function Router() {
     setCurrentRecordingIndex(0); // Reset to first phrase
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   // Show loading while checking authentication
   if (authLoading) {
     return (
@@ -647,6 +657,13 @@ function Router() {
             onCreateProfile={handleCreateProfile}
             onUpdateProfile={handleUpdateProfile}
             onDeleteProfile={handleDeleteProfile}
+          />
+        )}
+
+        {currentView === 'settings' && (
+          <Settings
+            user={user}
+            onLogout={handleLogout}
           />
         )}
       </main>

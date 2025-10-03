@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 
 interface NavigationProps {
-  currentView: 'training' | 'create' | 'library' | 'profiles';
-  onViewChange: (view: 'training' | 'create' | 'library' | 'profiles') => void;
+  currentView: 'training' | 'create' | 'library' | 'profiles' | 'settings';
+  onViewChange: (view: 'training' | 'create' | 'library' | 'profiles' | 'settings') => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   completedRecordings: number;
@@ -134,12 +134,12 @@ export default function Navigation({
               {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
 
-            {/* Settings (placeholder for future) */}
+            {/* Settings */}
             <Button
               variant="ghost"
               size="sm"
-              disabled
-              className="opacity-50"
+              onClick={() => onViewChange('settings' as any)}
+              data-testid="button-settings"
             >
               <Settings className="w-4 h-4" />
             </Button>
