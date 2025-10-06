@@ -15,6 +15,10 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name"),
   age: integer("age"),
+  city: text("city"),
+  state: text("state"),
+  country: text("country"),
+  timezone: text("timezone"),
   voiceModelId: varchar("voice_model_id", { length: 100 }), // ElevenLabs voice ID
   voiceTrainingComplete: integer("voice_training_complete").default(0), // 0 = false, 1 = true
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -133,6 +137,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   name: true,
   age: true,
+  city: true,
+  state: true,
+  country: true,
+  timezone: true,
 });
 
 // Types

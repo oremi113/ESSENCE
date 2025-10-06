@@ -7,7 +7,14 @@ import { Separator } from "@/components/ui/separator";
 import { User, Bell, Shield, Trash2, Download, LogOut } from "lucide-react";
 
 interface SettingsProps {
-  user: { name: string; email: string } | null;
+  user: { 
+    name: string; 
+    email: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    timezone?: string;
+  } | null;
   onLogout: () => void;
 }
 
@@ -31,23 +38,74 @@ export default function Settings({ user, onLogout }: SettingsProps) {
           <CardDescription>Update your personal details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input 
-              id="name" 
-              defaultValue={user?.name || ""}
-              data-testid="input-name"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                defaultValue={user?.name || ""}
+                data-testid="input-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                defaultValue={user?.email || ""}
+                data-testid="input-email"
+              />
+            </div>
           </div>
+          
+          <Separator className="my-4" />
+          
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              defaultValue={user?.email || ""}
-              data-testid="input-email"
-            />
+            <Label className="text-sm font-semibold">Location Information</Label>
+            <p className="text-sm text-muted-foreground mb-3">
+              Help us personalize your experience based on your location
+            </p>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input 
+                id="city" 
+                placeholder="e.g., New York"
+                defaultValue={user?.city || ""}
+                data-testid="input-city"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state">State / Region</Label>
+              <Input 
+                id="state" 
+                placeholder="e.g., NY"
+                defaultValue={user?.state || ""}
+                data-testid="input-state"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
+              <Input 
+                id="country" 
+                placeholder="e.g., United States"
+                defaultValue={user?.country || ""}
+                data-testid="input-country"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              <Input 
+                id="timezone" 
+                placeholder="e.g., America/New_York"
+                defaultValue={user?.timezone || ""}
+                data-testid="input-timezone"
+              />
+            </div>
+          </div>
+          
           <Button variant="outline" data-testid="button-save-account">
             Save Changes
           </Button>
