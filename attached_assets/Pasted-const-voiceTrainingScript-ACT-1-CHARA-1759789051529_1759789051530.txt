@@ -1,0 +1,242 @@
+const voiceTrainingScript = [
+  
+  // ============================================
+  // ACT 1: CHARACTER WARM-UP (2.5-3 min)
+  // ============================================
+  
+  {
+    stage: 1,
+    title: "Meet Your Voice",
+    prompts: [
+      {
+        instruction: "Let's start simple. Say hello like yourself.",
+        line: "Hi! My name is Sarah, and I'm here to record my voice."
+      },
+      {
+        instruction: "Now say it like you're hosting a cooking show.",
+        line: "Welcome back to the kitchen! Today we're making something special, so grab your apron and let's get started!"
+      },
+      {
+        instruction: "Now you're a golf announcer whispering at the Masters.",
+        line: "And here we are on the eighteenth hole. The crowd is silent. This putt could change everything."
+      }
+    ]
+  },
+  
+  {
+    stage: 2,
+    title: "Movie Trailer Madness",
+    prompts: [
+      {
+        instruction: "Time for your movie trailer voice. Deep and dramatic.",
+        line: "In a world where nothing is as it seems, one person will discover the truth that changes everything."
+      },
+      {
+        instruction: "Now the comedy trailer version - upbeat and fun!",
+        line: "This summer, get ready for the most hilarious adventure of the year! You won't believe what happens next!"
+      },
+      {
+        instruction: "And now the horror movie whisper.",
+        line: "They thought they were alone. They were wrong. Coming soon to a theater near you."
+      }
+    ]
+  },
+  
+  {
+    stage: 3,
+    title: "Tongue Twister Theater",
+    prompts: [
+      {
+        instruction: "Let's warm up that voice! Say this three times fast.",
+        line: "She sells seashells by the seashore. She sells seashells by the seashore. She sells seashells by the seashore."
+      },
+      {
+        instruction: "Now this one - and don't trip!",
+        line: "Peter Piper picked a peck of pickled peppers. How many pickled peppers did Peter Piper pick?"
+      },
+      {
+        instruction: "One more. You've got this!",
+        line: "How much wood would a woodchuck chuck if a woodchuck could chuck wood?"
+      }
+    ]
+  },
+  
+  // ============================================
+  // ACT 2: THEATRICAL PERFORMANCES (3-3.5 min)
+  // ============================================
+  
+  {
+    stage: 4,
+    title: "The Absurd Storyteller",
+    prompts: [
+      {
+        instruction: "You're telling a fairy tale, but it's weird. Make it dramatic.",
+        line: "Once upon a time, there lived a penguin named Gerald who was terrified of ice. He dreamed of moving to the desert and opening a taco truck."
+      },
+      {
+        instruction: "Now the plot thickens! Add some drama.",
+        line: "But one day, a mysterious wizard arrived with shocking news. Gerald wasn't actually a penguin at all. He was an enchanted accountant from New Jersey!"
+      },
+      {
+        instruction: "The action sequence! Things are getting wild!",
+        line: "Suddenly, an army of angry pelicans descended from the sky, demanding their tax returns! Gerald grabbed his calculator and fought back with spreadsheets and pivot tables!"
+      },
+      {
+        instruction: "And the ridiculous ending.",
+        line: "In the end, Gerald defeated the pelicans with his quarterly earnings report, moved to Arizona, and his taco truck became the most successful business in the Southwest. The end."
+      }
+    ]
+  },
+  
+  {
+    stage: 5,
+    title: "Infomercial Insanity",
+    prompts: [
+      {
+        instruction: "You're selling the most amazing product ever invented. Be enthusiastic!",
+        line: "But wait, there's more! Order now and we'll double your offer! That's right, you get two for the price of one!"
+      },
+      {
+        instruction: "Now do the disclaimer voice at the end - fast and monotone.",
+        line: "Terms and conditions apply. Results may vary. Not responsible for any damages. Please consult a doctor before use. Shipping and handling not included."
+      },
+      {
+        instruction: "Back to the enthusiastic pitch!",
+        line: "Don't wait! Operators are standing by! Call now and change your life forever! This offer won't last long!"
+      }
+    ]
+  },
+  
+  {
+    stage: 6,
+    title: "Nature Documentary Narrator",
+    prompts: [
+      {
+        instruction: "You're David Attenborough observing animals in the wild.",
+        line: "And here we see the majestic creature in its natural habitat, carefully stalking its prey through the tall grass. Every movement is calculated. Every step, deliberate."
+      },
+      {
+        instruction: "Now narrate something dramatic happening.",
+        line: "But suddenly, danger approaches from behind! The hunter has become the hunted! Will it escape in time? Nature can be cruel, but also magnificent."
+      },
+      {
+        instruction: "Finish with wonder and awe.",
+        line: "And so the circle of life continues, just as it has for millions of years. Truly, the natural world never ceases to amaze us."
+      }
+    ]
+  },
+  
+  {
+    stage: 7,
+    title: "Classic Radio Voices",
+    prompts: [
+      {
+        instruction: "You're a 1940s radio announcer with that old-timey voice.",
+        line: "Good evening, ladies and gentlemen, and welcome to tonight's broadcast. We have a wonderful show lined up for you this evening."
+      },
+      {
+        instruction: "Now you're a smooth jazz radio DJ late at night.",
+        line: "You're listening to midnight grooves on ninety-five-point-seven. Sit back, relax, and let the music take you away."
+      },
+      {
+        instruction: "Sports radio announcer calling the big play!",
+        line: "He winds up, the pitch! It's a long drive to center field! Going, going, gone! Home run! The crowd goes absolutely wild!"
+      }
+    ]
+  },
+  
+  {
+    stage: 8,
+    title: "Character Emotions",
+    prompts: [
+      {
+        instruction: "Say this line like you just won the lottery.",
+        line: "I can't believe it! This is incredible! This is the best day of my entire life!"
+      },
+      {
+        instruction: "Now like you're a detective who just solved the case.",
+        line: "So that's how it happened. I should have seen it from the beginning. It was right in front of me the whole time."
+      },
+      {
+        instruction: "Like a proud parent at graduation.",
+        line: "I'm so proud of you. All that hard work paid off. This is your moment. You did it."
+      },
+      {
+        instruction: "Like you're giving a pep talk before the big game.",
+        line: "Listen up, team. We've trained for this. We're ready. Now get out there and show them what you're made of!"
+      }
+    ]
+  },
+  
+  // ============================================
+  // ACT 3: REAL TALK WITH PERSONALITY (3-3.5 min)
+  // ============================================
+  
+  {
+    stage: 9,
+    title: "Wisdom & Advice",
+    prompts: [
+      {
+        instruction: "Give advice to your younger self. Be real.",
+        line: "Stop worrying so much about what other people think. Life's too short for that. Do what makes you happy. Trust your gut. You'll be fine."
+      },
+      {
+        instruction: "Encourage someone having a rough day.",
+        line: "Today was tough, I know. But you got through it. That counts for something. Tomorrow's a fresh start. You're tougher than you realize."
+      },
+      {
+        instruction: "Share what you've learned about life.",
+        line: "Here's what I've figured out. Things rarely go according to plan, and that's okay. The best moments are usually the ones you didn't see coming. Stay flexible. Stay curious."
+      }
+    ]
+  },
+  
+  {
+    stage: 10,
+    title: "Dad Jokes & Humor",
+    prompts: [
+      {
+        instruction: "Tell a classic dad joke with confidence.",
+        line: "Why don't scientists trust atoms? Because they make up everything! Thank you, thank you, I'll be here all week."
+      },
+      {
+        instruction: "Knock knock joke time!",
+        line: "Knock knock. Who's there? Interrupting cow. Interrupting cow wh— MOOOOO!"
+      },
+      {
+        instruction: "One more groaner.",
+        line: "I used to hate facial hair, but then it grew on me."
+      },
+      {
+        instruction: "React to your own terrible joke.",
+        line: "Okay, that was bad. I admit it. But you smiled. I saw that little smirk. You can't hide it."
+      }
+    ]
+  },
+  
+  {
+    stage: 11,
+    title: "Memory & Heart",
+    prompts: [
+      {
+        instruction: "Talk about a moment you'll never forget.",
+        line: "I remember this one summer day when I was a kid. The sun was setting, and everything just felt perfect. I didn't know it then, but those are the moments you carry with you forever."
+      },
+      {
+        instruction: "Describe someone important to you.",
+        line: "There's someone in my life who always knows what to say. They make me laugh when I need it most. They've seen me at my worst and stuck around anyway. That's friendship."
+      },
+      {
+        instruction: "Talk about a place that feels like home.",
+        line: "There's this spot I go to when I need to think. Quiet. Peaceful. Just me and my thoughts. Everyone needs a place like that. Somewhere you can just breathe."
+      }
+    ]
+  },
+  
+  {
+    stage: 12,
+    title: "Practical Stuff",
+    prompts: [
+      {
+        instruction: "Count from one to ten like you're teaching a kid.",
+        line
