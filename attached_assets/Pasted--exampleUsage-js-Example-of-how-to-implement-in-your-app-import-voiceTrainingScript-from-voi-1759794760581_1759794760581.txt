@@ -1,0 +1,131 @@
+// exampleUsage.js - Example of how to implement in your app
+
+import voiceTrainingScript from './voiceTrainingScript.js';
+import { 
+  getPersonalizedLine, 
+  getTimeOfDay, 
+  getGeneration,
+  getTotalPrompts 
+} from './personalizationHelper.js';
+
+// ============================================
+// STEP 1: Collect user data (from onboarding)
+// ============================================
+
+const userContext = {
+  name: "Michael",
+  city: "Chicago",
+  hometown: "Detroit",  // Optional
+  timeOfDay: getTimeOfDay(),  // Auto-detect or ask user
+  generation: getGeneration(1975),  // Calculate from birth year
+  relationship: "daughter"  // Ask during onboarding
+};
+
+// ============================================
+// STEP 2: Use in your voice training component
+// ============================================
+
+function VoiceTrainingComponent({ userContext }) {
+  const [currentStage, setCurrentStage] = useState(0);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  
+  // Get current prompt
+  const stage = voiceTrainingScript[currentStage];
+  const prompt = stage.prompts[currentPromptIndex];
+  
+  // Get personalized line
+  const displayLine = getPersonalizedLine(prompt, userContext);
+  
+  // Calculate progress
+  const totalPrompts = getTotalPrompts(voiceTrainingScript);
+  const currentPromptNumber = voiceTrainingScript
+    .slice(0, currentStage)
+    .reduce((sum, s) => sum + s.prompts.length, 0) + currentPromptIndex + 1;
+  
+  return (
+    <div className="voice-training">
+      <h2>{stage.title}</h2>
+      <p className="progress">Recording {currentPromptNumber} of {totalPrompts}</p>
+      
+      <div className="prompt-card">
+        <p className="instruction">{prompt.instruction}</p>
+        <p className="line-to-read">{displayLine}</p>
+      </div>
+      
+      <button onClick={handleRecord}>Start Recording</button>
+    </div>
+  );
+}
+
+// ============================================
+// STEP 3: Onboarding form to collect user data
+// ============================================
+
+function OnboardingForm({ onComplete }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    birthYear: '',
+    city: '',
+    relationship: ''
+  });
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const userContext = {
+      name: formData.name,
+      city: formData.city,
+      timeOfDay: getTimeOfDay(),
+      generation: getGeneration(parseInt(formData.birthYear)),
+      relationship: formData.relationship
+    };
+    
+    onComplete(userContext);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        type="text" 
+        placeholder="Your name"
+        value={formData.name}
+        onChange={(e) => setFormData({...formData, name: e.target.value})}
+        required
+      />
+      
+      <input 
+        type="number" 
+        placeholder="Birth year (e.g., 1975)"
+        value={formData.birthYear}
+        onChange={(e) => setFormData({...formData, birthYear: e.target.value})}
+        required
+      />
+      
+      <input 
+        type="text" 
+        placeholder="Your city"
+        value={formData.city}
+        onChange={(e) => setFormData({...formData, city: e.target.value})}
+        required
+      />
+      
+      <select 
+        value={formData.relationship}
+        onChange={(e) => setFormData({...formData, relationship: e.target.value})}
+        required
+      >
+        <option value="">Who are you recording for?</option>
+        <option value="daughter">My daughter</option>
+        <option value="son">My son</option>
+        <option value="spouse">My spouse</option>
+        <option value="grandchild">My grandchild</option>
+        <option value="friend">A friend</option>
+        <option value="parent">My parent</option>
+      </select>
+      
+      <button type="submit">Start Voice Training</button>
+    </form>
+  );
+}
+
+export { VoiceTrainingComponent, OnboardingForm };
