@@ -1,0 +1,112 @@
+// personalizationHelper.js - Functions to personalize script lines
+
+/**
+ * Get the appropriate line based on user context
+ * @param {Object} prompt - The prompt object from the script
+ * @param {Object} userContext - User's personalization data
+ * @returns {string} - The personalized line to display
+ */
+export function getPersonalizedLine(prompt, userContext) {
+  const { lineType, line } = prompt;
+  
+  // Simple string - just replace variables
+  if (lineType === 'simple') {
+    return replacePlaceholders(line, userContext);
+  }
+  
+  // Time of day variation
+  if (lineType === 'timeOfDay') {
+    const timeKey = userContext.timeOfDay || 'morning';
+    return replacePlaceholders(line[timeKey], userContext);
+  }
+  
+  // Time of day + city variation
+  if (lineType === 'timeOfDayCity') {
+    const timeKey = userContext.timeOfDay || 'morning';
+    return replacePlaceholders(line[timeKey], userContext);
+  }
+  
+  // City variation
+  if (lineType === 'city') {
+    return replacePlaceholders(line, userContext);
+  }
+  
+  // Generation-based variation
+  if (lineType === 'generation') {
+    const generation = userContext.generation || 'default';
+    const selectedLine = line[generation] || line.default;
+    return replacePlaceholders(selectedLine, userContext);
+  }
+  
+  // Relationship-based variation
+  if (lineType === 'relationship') {
+    const relationship = userContext.relationship || 'default';
+    const selectedLine = line[relationship] || line.default;
+    return replacePlaceholders(selectedLine, userContext);
+  }
+  
+  // Relationship goodbye
+  if (lineType === 'relationshipGoodbye') {
+    const relationship = userContext.relationship || 'default';
+    const selectedLine = line[relationship] || line.default;
+    return replacePlaceholders(selectedLine, userContext);
+  }
+  
+  // Fallback
+  return replacePlaceholders(line, userContext);
+}
+
+/**
+ * Replace placeholder variables in a string
+ * @param {string} text - Text with placeholders like {userName}
+ * @param {Object} userContext - User data
+ * @returns {string} - Text with placeholders replaced
+ */
+function replacePlaceholders(text, userContext) {
+  if (typeof text !== 'string') return text;
+  
+  return text
+    .replace(/{userName}/g, userContext.name || 'there')
+    .replace(/{city}/g, userContext.city || 'your city')
+    .replace(/{hometown}/g, userContext.hometown || userContext.city || 'home');
+}
+
+/**
+ * Determine time of day from current time
+ * @returns {string} - 'morning', 'afternoon', 'evening', or 'lateNight'
+ */
+export function getTimeOfDay() {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 18) return 'afternoon';
+  if (hour >= 18 && hour < 22) return 'evening';
+  return 'lateNight';
+}
+
+/**
+ * Determine generation from birth year
+ * @param {number} birthYear - User's birth year
+ * @returns {string} - Generation key
+ */
+export function getGeneration(birthYear) {
+  if (!birthYear) return 'default';
+  
+  if (birthYear >= 1950 && birthYear <= 1959) return '1950s';
+  if (birthYear >= 1960 && birthYear <= 1969) return '1960s';
+  if (birthYear >= 1970 && birthYear <= 1979) return '1970s';
+  if (birthYear >= 1980 && birthYear <= 1989) return '1980s';
+  if (birthYear >= 1990 && birthYear <= 1999) return '1990s';
+  if (birthYear >= 2000 && birthYear <= 2009) return '2000s';
+  
+  return 'default';
+}
+
+/**
+ * Calculate total number of prompts
+ * @param {Array} script - The voice training script array
+ * @returns {number} - Total prompt count
+ */
+export function getTotalPrompts(script) {
+  return script.reduce((total, stage) => total + stage.prompts.length, 0);
+}
