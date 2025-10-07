@@ -296,7 +296,13 @@ function Router() {
       if (!currentProfile?.id) return [];
       
       if (DEV_SKIP_AUTH) {
-        // Return mock messages in dev mode
+        // Check if we have cached messages first
+        const cached = queryClient.getQueryData(['/api/profiles', currentProfile?.id, 'messages']) as any[];
+        if (cached && cached.length > 0) {
+          return cached;
+        }
+        
+        // Return initial mock messages only if cache is empty
         return [
           {
             id: 'msg-1',
@@ -305,7 +311,7 @@ function Router() {
             title: 'My First Message',
             content: 'Hello my dear children. I hope this message finds you well...',
             category: 'children',
-            audioUrl: null,
+            audioData: null,
             duration: 45,
             createdAt: new Date('2024-01-20')
           },
@@ -316,7 +322,7 @@ function Router() {
             title: 'Life Advice',
             content: 'As you grow older, remember these important lessons...',
             category: 'children',
-            audioUrl: null,
+            audioData: null,
             duration: 62,
             createdAt: new Date('2024-02-10')
           }
@@ -327,7 +333,8 @@ function Router() {
       if (!response.ok) throw new Error('Failed to load messages');
       return response.json();
     },
-    enabled: !!currentProfile?.id
+    enabled: !!currentProfile?.id,
+    staleTime: DEV_SKIP_AUTH ? Infinity : 0  // Never refetch in dev mode
   });
 
   // Handlers
