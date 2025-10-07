@@ -118,7 +118,13 @@ function Router() {
     queryKey: ['/api/profiles'],
     queryFn: async () => {
       if (DEV_SKIP_AUTH) {
-        // Return mock profiles in dev mode
+        // Check if we have profiles in query cache first
+        const cachedProfiles = queryClient.getQueryData(['/api/profiles']);
+        if (cachedProfiles) {
+          return cachedProfiles;
+        }
+        
+        // Return initial mock profiles in dev mode
         return [
           {
             id: 'profile-1',
@@ -458,7 +464,13 @@ function Router() {
       return response.json();
     },
     onSuccess: (newProfile) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      if (DEV_SKIP_AUTH) {
+        // Manually add to cache in dev mode
+        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
+        queryClient.setQueryData(['/api/profiles'], [...currentProfiles, newProfile]);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      }
       setCurrentProfileId(newProfile.id);
       toast({
         title: "Profile created",
@@ -495,8 +507,17 @@ function Router() {
       if (!response.ok) throw new Error('Failed to update profile');
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+    onSuccess: (_, variables) => {
+      if (DEV_SKIP_AUTH) {
+        // Manually update cache in dev mode
+        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
+        const updatedProfiles = currentProfiles.map(p => 
+          p.id === variables.id ? { ...p, ...variables.updates } : p
+        );
+        queryClient.setQueryData(['/api/profiles'], updatedProfiles);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      }
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -526,11 +547,19 @@ function Router() {
       if (!response.ok) throw new Error('Failed to delete profile');
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+    onSuccess: (_, deletedId) => {
+      if (DEV_SKIP_AUTH) {
+        // Manually remove from cache in dev mode
+        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
+        const updatedProfiles = currentProfiles.filter(p => p.id !== deletedId);
+        queryClient.setQueryData(['/api/profiles'], updatedProfiles);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
+      }
+      
       // Switch to first remaining profile if current was deleted
-      if (currentProfile?.id === currentProfileId) {
-        const remainingProfiles = profiles.filter((p: Profile) => p.id !== currentProfileId);
+      if (currentProfile?.id === deletedId) {
+        const remainingProfiles = profiles.filter((p: Profile) => p.id !== deletedId);
         if (remainingProfiles.length > 0) {
           setCurrentProfileId(remainingProfiles[0].id);
         }
