@@ -191,6 +191,7 @@ function Router() {
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           phraseIndex,
           phraseText,
