@@ -359,9 +359,25 @@ function Router() {
       duration?: number
     }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
+      
+      if (DEV_SKIP_AUTH) {
+        // In dev mode, return mock success without API call
+        return {
+          id: `message-${Date.now()}`,
+          profileId: currentProfile.id,
+          title,
+          content,
+          category,
+          audioData,
+          duration,
+          createdAt: new Date().toISOString()
+        };
+      }
+      
       const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ title, content, category, audioData, duration })
       });
       if (!response.ok) throw new Error('Failed to create message');
