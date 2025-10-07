@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { voiceTrainingScript } from "@shared/voiceTrainingScript";
@@ -77,6 +78,10 @@ function Router() {
             email: 'dev@test.com',
             name: 'Dev User',
             age: 30,
+            city: 'San Francisco',
+            state: 'CA',
+            country: 'USA',
+            timezone: 'America/Los_Angeles',
             voiceModelId: null,
             voiceTrainingComplete: 0,
             createdAt: new Date().toISOString()
@@ -678,7 +683,7 @@ function Router() {
       />
 
       <main className="pb-8">
-        {currentView === 'training' && user && (
+        {currentView === 'training' && user && currentProfile && (
           <VoiceRecorder
             currentUser={user}
             currentProfile={currentProfile}
@@ -688,6 +693,17 @@ function Router() {
             onPrevious={() => setCurrentRecordingIndex(prev => Math.max(prev - 1, 0))}
             recordings={recordings}
           />
+        )}
+        
+        {currentView === 'training' && user && !currentProfile && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
+            <p className="text-xl text-muted-foreground mb-6">
+              Please select a profile first to begin voice training
+            </p>
+            <Button onClick={() => setCurrentView('profiles')} data-testid="button-select-profile">
+              Go to Profiles
+            </Button>
+          </div>
         )}
 
         {currentView === 'create' && (
