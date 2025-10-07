@@ -693,6 +693,17 @@ function Router() {
       />
 
       <main className="pb-8">
+        {(() => {
+          console.log('🔎 Render Check:', { 
+            currentView, 
+            hasUser: !!user, 
+            hasProfile: !!currentProfile,
+            profileId: currentProfile?.id,
+            shouldRender: currentView === 'training' && !!user && !!currentProfile
+          });
+          return null;
+        })()}
+        
         {currentView === 'training' && user && currentProfile && (
           <VoiceRecorder
             currentUser={user}

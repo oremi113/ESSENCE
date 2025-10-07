@@ -118,6 +118,17 @@ export default function VoiceRecorder({
 
   const completedRecordings = recordings.filter(r => r !== null).length;
   const progress = (completedRecordings / totalPrompts) * 100;
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🎙️ VoiceRecorder Debug:', {
+      totalPrompts,
+      currentPromptIndex,
+      currentPrompt: currentPrompt?.instruction || 'none',
+      personalizedLine: personalizedLine.substring(0, 50),
+      userContext
+    });
+  }, [totalPrompts, currentPromptIndex, currentPrompt, personalizedLine, userContext]);
 
   useEffect(() => {
     setCurrentRecording(recordings[currentPromptIndex] || null);
