@@ -200,8 +200,9 @@ export default function VoiceRecorder({
   };
 
   const playRecording = () => {
-    if (currentRecording) {
-      const url = URL.createObjectURL(currentRecording);
+    const recordingToPlay = currentRecording || recordings[currentPromptIndex];
+    if (recordingToPlay) {
+      const url = URL.createObjectURL(recordingToPlay);
       audioRef.current = new Audio(url);
       audioRef.current.play();
       setIsPlaying(true);
@@ -215,6 +216,8 @@ export default function VoiceRecorder({
 
   const reRecord = () => {
     setCurrentRecording(null);
+    // Clear the recording from parent's recordings array by passing null blob
+    onRecordingComplete(null as any, currentPromptIndex, '');
   };
 
   const formatTime = (seconds: number) => {
