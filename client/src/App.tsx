@@ -63,7 +63,7 @@ function Router() {
   const [location, setLocation] = useLocation();
   
   // DEV MODE: Skip authentication for testing - SET TO FALSE TO RE-ENABLE AUTH
-  const DEV_SKIP_AUTH = false;
+  const DEV_SKIP_AUTH = true;
   
   // Check authentication status
   const { data: authData, isLoading: authLoading, refetch: refetchAuth } = useQuery({
