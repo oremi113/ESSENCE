@@ -46,6 +46,34 @@ export interface IStorage {
   getMessageCount(profileId: string, userId: string): Promise<number>;
 }
 
+// Mock data for DEV mode
+const DEV_USER_ID = 'dev-user-123';
+const DEV_PROFILES: Profile[] = [
+  {
+    id: 'profile-1',
+    userId: DEV_USER_ID,
+    name: 'My Children',
+    relation: 'Children',
+    notes: 'Messages for my kids to listen to in the future',
+    voiceModelStatus: 'not_submitted',
+    elevenLabsVoiceId: null,
+    createdAt: new Date('2024-01-15')
+  },
+  {
+    id: 'profile-2',
+    userId: DEV_USER_ID,
+    name: 'My Partner',
+    relation: 'Spouse',
+    notes: 'Love notes and special messages',
+    voiceModelStatus: 'not_submitted',
+    elevenLabsVoiceId: null,
+    createdAt: new Date('2024-02-01')
+  }
+];
+
+// In-memory storage for dev mode recordings
+const DEV_RECORDINGS: Map<string, VoiceRecording> = new Map();
+
 export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: string): Promise<User | undefined> {
@@ -68,6 +96,11 @@ export class DatabaseStorage implements IStorage {
 
   // Profile methods
   async getProfile(id: string, userId: string): Promise<Profile | undefined> {
+    // DEV MODE: Return mock profiles for dev user
+    if (userId === DEV_USER_ID && process.env.NODE_ENV === 'development') {
+      return DEV_PROFILES.find(p => p.id === id);
+    }
+    
     const [profile] = await db
       .select()
       .from(profiles)
@@ -79,6 +112,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllProfiles(userId: string): Promise<Profile[]> {
+    // DEV MODE: Return mock profiles for dev user
+    if (userId === DEV_USER_ID && process.env.NODE_ENV === 'development') {
+      return DEV_PROFILES;
+    }
+    
     return await db
       .select()
       .from(profiles)
@@ -129,6 +167,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVoiceRecordingsByProfile(profileId: string, userId: string): Promise<VoiceRecording[]> {
+    // DEV MODE: Return mock recordings for dev user
+    if (userId === DEV_USER_ID && process.env.NODE_ENV === 'development') {
+      const profileRecordings: VoiceRecording[] = [];
+      DEV_RECORDINGS.forEach((recording, key) => {
+        if (recording.profileId === profileId) {
+          profileRecordings.push(recording);
+        }
+      });
+      return profileRecordings.sort((a, b) => parseInt(a.actNumber) - parseInt(b.actNumber));
+    }
+    
     return await db
       .select()
       .from(voiceRecordings)
@@ -148,6 +197,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveVoiceRecording(insertRecording: InsertVoiceRecording): Promise<VoiceRecording> {
+    // DEV MODE: Store recordings in memory for dev user
+    if (insertRecording.userId === DEV_USER_ID && process.env.NODE_ENV === 'development') {
+      const key = `${insertRecording.profileId}-${insertRecording.actNumber}`;
+      const recording: VoiceRecording = {
+        id: key,
+        ...insertRecording,
+        qualityStatus: insertRecording.qualityStatus || 'approved',
+        createdAt: new Date()
+      };
+      DEV_RECORDINGS.set(key, recording);
+      console.log('[DEV] Saved recording to memory:', key);
+      return recording;
+    }
+    
     // Use upsert to atomically insert or update recording
     const [recording] = await db
       .insert(voiceRecordings)
