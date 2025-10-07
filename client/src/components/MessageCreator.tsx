@@ -112,10 +112,27 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
     setAudioDuration(0);
     
     try {
-      // Use preview endpoint to generate speech without saving message
+      // DEV MODE: Generate mock audio without API call
+      const DEV_SKIP_AUTH = true; // Same as App.tsx
+      
+      if (DEV_SKIP_AUTH) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Generate mock audio data (base64 silence or placeholder)
+        const mockAudioData = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+        setGeneratedAudio(mockAudioData);
+        setAudioDuration(30);
+        console.log('DEV MODE: Mock voice generation completed');
+        setIsGenerating(false);
+        return;
+      }
+      
+      // PRODUCTION: Use actual ElevenLabs API
       const response = await fetch(`/api/profiles/${currentProfileId}/tts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ 
           content: content.trim()
         })
