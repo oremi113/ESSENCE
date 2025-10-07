@@ -383,13 +383,22 @@ function Router() {
       if (!response.ok) throw new Error('Failed to create message');
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
+    onSuccess: (newMessage) => {
+      if (DEV_SKIP_AUTH) {
+        // Manually add to cache in dev mode
+        const currentMessages = queryClient.getQueryData(['/api/profiles', currentProfile?.id, 'messages']) as any[] || [];
+        queryClient.setQueryData(['/api/profiles', currentProfile?.id, 'messages'], [...currentMessages, newMessage]);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       toast({
         title: "Message created",
         description: "Your message has been created successfully.",
       });
+      
+      // Auto-navigate to library to see the message
+      setCurrentView('library');
     },
     onError: (error) => {
       toast({
