@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Plus, 
   User, 
@@ -64,10 +65,55 @@ export default function UserProfiles({
     }
   };
 
+  const normalizeRelationship = (relation: string): string => {
+    const normalized = relation.toLowerCase().trim();
+    
+    // Map relationships to Select dropdown options
+    const mapping: Record<string, string> = {
+      // Direct matches for Select options
+      'daughter': 'daughter',
+      'son': 'son',
+      'spouse': 'spouse',
+      'parent': 'parent',
+      'grandchild': 'grandchild',
+      'grandparent': 'grandparent',
+      'sibling': 'sibling',
+      'friend': 'friend',
+      'other': 'other',
+      
+      // Legacy/plural/alternative forms
+      'children': 'daughter',
+      'kids': 'daughter',
+      'child': 'daughter',
+      'partner': 'spouse',
+      'husband': 'spouse',
+      'wife': 'spouse',
+      'grandchildren': 'grandchild',
+      'grandkids': 'grandchild',
+      'mom': 'parent',
+      'dad': 'parent',
+      'mother': 'parent',
+      'father': 'parent',
+      'grandmother': 'grandparent',
+      'grandfather': 'grandparent',
+      'grandma': 'grandparent',
+      'grandpa': 'grandparent',
+      'brother': 'sibling',
+      'sister': 'sibling',
+      'uncle': 'other',
+      'aunt': 'other',
+      'cousin': 'other',
+      'nephew': 'other',
+      'niece': 'other',
+    };
+    
+    return mapping[normalized] || 'other';
+  };
+
   const handleEdit = (profile: Profile) => {
     setFormData({
       name: profile.name,
-      relation: profile.relation,
+      relation: normalizeRelationship(profile.relation),
       notes: profile.notes
     });
     setEditingId(profile.id);
@@ -101,6 +147,22 @@ export default function UserProfiles({
       case 'training': return 'Training';
       default: return 'Not Started';
     }
+  };
+
+  const getRelationshipLabel = (relation: string): string => {
+    const normalized = normalizeRelationship(relation);
+    const labels: Record<string, string> = {
+      'daughter': 'Daughter',
+      'son': 'Son',
+      'spouse': 'Spouse / Partner',
+      'parent': 'Parent',
+      'grandchild': 'Grandchild',
+      'grandparent': 'Grandparent',
+      'sibling': 'Sibling',
+      'friend': 'Friend',
+      'other': relation, // Show original value for "other"
+    };
+    return labels[normalized] || relation;
   };
 
   return (
@@ -153,14 +215,26 @@ export default function UserProfiles({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="profile-relation">Relation *</Label>
-                <Input
-                  id="profile-relation"
-                  placeholder="e.g., Father, Grandmother, Uncle"
+                <Label htmlFor="profile-relation">Relationship *</Label>
+                <Select
                   value={formData.relation}
-                  onChange={(e) => setFormData(prev => ({ ...prev, relation: e.target.value }))}
-                  data-testid="input-profile-relation"
-                />
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, relation: value }))}
+                >
+                  <SelectTrigger id="profile-relation" data-testid="select-profile-relation">
+                    <SelectValue placeholder="Select relationship" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daughter">Daughter</SelectItem>
+                    <SelectItem value="son">Son</SelectItem>
+                    <SelectItem value="spouse">Spouse / Partner</SelectItem>
+                    <SelectItem value="parent">Parent</SelectItem>
+                    <SelectItem value="grandchild">Grandchild</SelectItem>
+                    <SelectItem value="grandparent">Grandparent</SelectItem>
+                    <SelectItem value="sibling">Sibling</SelectItem>
+                    <SelectItem value="friend">Friend</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -224,7 +298,7 @@ export default function UserProfiles({
                     </Avatar>
                     <div>
                       <h3 className="font-semibold text-lg">{profile.name}</h3>
-                      <p className="text-muted-foreground text-sm">{profile.relation}</p>
+                      <p className="text-muted-foreground text-sm">{getRelationshipLabel(profile.relation)}</p>
                     </div>
                   </div>
                   

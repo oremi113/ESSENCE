@@ -1,22 +1,27 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Mic, Square, Play, RotateCcw, Check, Volume2 } from "lucide-react";
+import { voiceTrainingScript } from "@shared/voiceTrainingScript";
+import { getPersonalizedLine, getTimeOfDay, getGeneration, getTotalPrompts, type UserContext } from "@shared/personalizationHelper";
+import type { User, Profile } from "@shared/schema";
 
 interface VoiceRecorderProps {
-  script: string[];
-  currentIndex: number;
-  onRecordingComplete: (audioBlob: Blob, index: number) => void;
+  currentUser: User;
+  currentProfile: Profile;
+  currentPromptIndex: number;
+  onRecordingComplete: (audioBlob: Blob, promptIndex: number, passageText: string) => void;
   onNext: () => void;
   onPrevious: () => void;
   recordings: (Blob | null)[];
 }
 
 export default function VoiceRecorder({ 
-  script, 
-  currentIndex, 
+  currentUser,
+  currentProfile,
+  currentPromptIndex,
   onRecordingComplete, 
   onNext, 
   onPrevious,
@@ -35,13 +40,88 @@ export default function VoiceRecorder({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<number | null>(null);
 
+  const userContext = useMemo<UserContext>(() => {
+    const birthYear = currentUser.age ? new Date().getFullYear() - currentUser.age : 0;
+    
+    // Normalize relationship to lowercase and map to personalization keys
+    const normalizeRelationship = (relation: string): UserContext['relationship'] => {
+      const normalized = relation.toLowerCase().trim();
+      
+      // Map relationships to personalization keys (for voice training script)
+      const mapping: Record<string, UserContext['relationship']> = {
+        // Direct matches
+        'daughter': 'daughter',
+        'son': 'son',
+        'spouse': 'spouse',
+        'grandchild': 'grandchild',
+        'friend': 'friend',
+        'parent': 'parent',
+        
+        // Legacy/plural/alternative forms
+        'children': 'daughter',
+        'kids': 'daughter',
+        'child': 'daughter',
+        'partner': 'spouse',
+        'husband': 'spouse',
+        'wife': 'spouse',
+        'grandchildren': 'grandchild',
+        'grandkids': 'grandchild',
+        'mom': 'parent',
+        'dad': 'parent',
+        'mother': 'parent',
+        'father': 'parent',
+        
+        // Extended relationships (map to closest personalization key)
+        'sibling': 'friend', // Use friend for siblings
+        'brother': 'friend',
+        'sister': 'friend',
+        'grandparent': 'parent', // Grandparent uses parent prompts
+        'grandmother': 'parent',
+        'grandfather': 'parent',
+        'grandma': 'parent',
+        'grandpa': 'parent',
+        'uncle': 'friend',
+        'aunt': 'friend',
+        'cousin': 'friend',
+        'nephew': 'friend',
+        'niece': 'friend',
+        'other': 'default',
+      };
+      
+      return mapping[normalized] || 'default';
+    };
+    
+    return {
+      name: currentUser.name || 'there',
+      city: currentUser.city || undefined,
+      hometown: currentUser.city || undefined,
+      timeOfDay: getTimeOfDay(),
+      generation: getGeneration(birthYear),
+      relationship: normalizeRelationship(currentProfile.relation),
+    };
+  }, [currentUser, currentProfile]);
+
+  const allPrompts = useMemo(() => {
+    return voiceTrainingScript.flatMap(stage => 
+      stage.prompts.map((prompt, idx) => ({
+        ...prompt,
+        stageTitle: stage.title,
+        stageNumber: stage.stage,
+        promptIndexInStage: idx
+      }))
+    );
+  }, []);
+
+  const totalPrompts = allPrompts.length;
+  const currentPrompt = allPrompts[currentPromptIndex];
+  const personalizedLine = currentPrompt ? getPersonalizedLine(currentPrompt, userContext) : '';
+
   const completedRecordings = recordings.filter(r => r !== null).length;
-  const progress = (completedRecordings / script.length) * 100;
+  const progress = (completedRecordings / totalPrompts) * 100;
 
   useEffect(() => {
-    // Load existing recording for current index
-    setCurrentRecording(recordings[currentIndex] || null);
-  }, [currentIndex, recordings]);
+    setCurrentRecording(recordings[currentPromptIndex] || null);
+  }, [currentPromptIndex, recordings]);
 
   const startRecording = async () => {
     try {
@@ -79,7 +159,7 @@ export default function VoiceRecorder({
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(chunks, { type: 'audio/wav' });
         setCurrentRecording(audioBlob);
-        onRecordingComplete(audioBlob, currentIndex);
+        onRecordingComplete(audioBlob, currentPromptIndex, personalizedLine);
         
         // Clean up
         stream.getTracks().forEach(track => track.stop());
@@ -143,8 +223,7 @@ export default function VoiceRecorder({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentScript = script[currentIndex];
-  const hasRecording = currentRecording || recordings[currentIndex];
+  const hasRecording = currentRecording || recordings[currentPromptIndex];
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -154,12 +233,12 @@ export default function VoiceRecorder({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-serif">Voice Training</CardTitle>
             <Badge variant="secondary" data-testid="progress-badge">
-              {completedRecordings} / {script.length}
+              {completedRecordings} / {totalPrompts}
             </Badge>
           </div>
           <Progress value={progress} className="w-full" data-testid="progress-bar" />
           <p className="text-sm text-muted-foreground">
-            {completedRecordings === script.length 
+            {completedRecordings === totalPrompts 
               ? "Training complete! You can review or re-record any phrase." 
               : "Read each phrase clearly and naturally"
             }
@@ -169,14 +248,25 @@ export default function VoiceRecorder({
 
       {/* Current Script */}
       <Card className="border-accent/20">
-        <CardContent className="p-8 text-center">
-          <div className="space-y-4">
-            <Badge variant="outline" className="mb-2">
-              Phrase {currentIndex + 1}
-            </Badge>
-            <p className="text-2xl font-serif leading-relaxed text-foreground">
-              "{currentScript}"
-            </p>
+        <CardContent className="p-8">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline">
+                {currentPrompt?.stageTitle || 'Stage'}
+              </Badge>
+              <Badge variant="secondary">
+                Prompt {currentPromptIndex + 1} of {totalPrompts}
+              </Badge>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground italic">
+                {currentPrompt?.instruction}
+              </p>
+              <p className="text-2xl font-serif leading-relaxed text-foreground text-center">
+                "{personalizedLine}"
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -281,7 +371,7 @@ export default function VoiceRecorder({
         <Button
           onClick={onPrevious}
           variant="outline"
-          disabled={currentIndex === 0}
+          disabled={currentPromptIndex === 0}
           data-testid="button-previous"
         >
           Previous
@@ -289,14 +379,14 @@ export default function VoiceRecorder({
         
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            {currentIndex + 1} of {script.length} phrases
+            {currentPromptIndex + 1} of {totalPrompts} prompts
           </p>
         </div>
         
         <Button
           onClick={onNext}
           variant="outline"
-          disabled={currentIndex === script.length - 1}
+          disabled={currentPromptIndex === totalPrompts - 1}
           data-testid="button-next"
         >
           Next

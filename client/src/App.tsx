@@ -3,9 +3,10 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { TRAINING_SCRIPT, TOTAL_TRAINING_PHRASES } from "@shared/constants";
+import { voiceTrainingScript } from "@shared/voiceTrainingScript";
+import { getTotalPrompts } from "@shared/personalizationHelper";
 
 // Components
 import WelcomeOnboarding from "@/components/WelcomeOnboarding";
@@ -108,8 +109,9 @@ function Router() {
   });
 
   // Voice training state
+  const totalPrompts = useMemo(() => getTotalPrompts(voiceTrainingScript), []);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState(0);
-  const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(TRAINING_SCRIPT.length).fill(null));
+  const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(totalPrompts).fill(null));
   
   // Load profiles from backend (or use mock data in dev mode)
   const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
@@ -173,7 +175,7 @@ function Router() {
 
   // Save recording mutation
   const saveRecordingMutation = useMutation({
-    mutationFn: async ({ audioBlob, phraseIndex }: { audioBlob: Blob, phraseIndex: number }) => {
+    mutationFn: async ({ audioBlob, phraseIndex, phraseText }: { audioBlob: Blob, phraseIndex: number, phraseText: string }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
       const audioData = await blobToBase64(audioBlob);
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, {
@@ -181,7 +183,7 @@ function Router() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phraseIndex,
-          phraseText: TRAINING_SCRIPT[phraseIndex],
+          phraseText,
           audioData
         })
       });
@@ -209,14 +211,14 @@ function Router() {
 
   // Derived state
   const completedRecordings = recordings.filter(r => r !== null).length;
-  const isVoiceTrainingComplete = completedRecordings === TRAINING_SCRIPT.length;
+  const isVoiceTrainingComplete = completedRecordings === totalPrompts;
   
   // Voice model status from current profile or derived from recordings
   const voiceModelStatus = DEV_SKIP_AUTH && currentProfile?.id === 'profile-1' 
     ? 'ready'
     : (currentProfile?.voiceModelStatus || 
         (completedRecordings === 0 ? 'not_submitted' :
-         completedRecordings < TRAINING_SCRIPT.length ? 'training' : 'ready'));
+         completedRecordings < totalPrompts ? 'training' : 'ready'));
 
   // Theme handling
   useEffect(() => {
@@ -230,7 +232,7 @@ function Router() {
   // Load recordings from backend when they're fetched
   useEffect(() => {
     if (existingRecordings) {
-      const newRecordings = new Array(TRAINING_SCRIPT.length).fill(null);
+      const newRecordings = new Array(totalPrompts).fill(null);
       existingRecordings.forEach((recording: any) => {
         // Convert base64 back to Blob for local playback
         // Strip data URL prefix if present (e.g., "data:audio/webm;base64,")
@@ -257,7 +259,7 @@ function Router() {
       });
       setRecordings(newRecordings);
     }
-  }, [existingRecordings]);
+  }, [existingRecordings, totalPrompts]);
 
   // No longer needed since profiles come from backend
 
@@ -311,14 +313,14 @@ function Router() {
     setIsDarkMode(prev => !prev);
   };
 
-  const handleRecordingComplete = (audioBlob: Blob, index: number) => {
+  const handleRecordingComplete = (audioBlob: Blob, promptIndex: number, passageText: string) => {
     // Update local state immediately for responsive UI
     const newRecordings = [...recordings];
-    newRecordings[index] = audioBlob;
+    newRecordings[promptIndex] = audioBlob;
     setRecordings(newRecordings);
     
     // Save to backend
-    saveRecordingMutation.mutate({ audioBlob, phraseIndex: index });
+    saveRecordingMutation.mutate({ audioBlob, phraseIndex: promptIndex, phraseText: passageText });
   };
 
   // Create message mutation
@@ -614,19 +616,20 @@ function Router() {
         isDarkMode={isDarkMode}
         onToggleDarkMode={handleToggleDarkMode}
         completedRecordings={completedRecordings}
-        totalRecordings={TRAINING_SCRIPT.length}
+        totalRecordings={totalPrompts}
         messagesCount={messages.length}
         profilesCount={profiles.length}
         voiceModelStatus={voiceModelStatus}
       />
 
       <main className="pb-8">
-        {currentView === 'training' && (
+        {currentView === 'training' && user && (
           <VoiceRecorder
-            script={TRAINING_SCRIPT}
-            currentIndex={currentRecordingIndex}
+            currentUser={user}
+            currentProfile={currentProfile}
+            currentPromptIndex={currentRecordingIndex}
             onRecordingComplete={handleRecordingComplete}
-            onNext={() => setCurrentRecordingIndex(prev => Math.min(prev + 1, TRAINING_SCRIPT.length - 1))}
+            onNext={() => setCurrentRecordingIndex(prev => Math.min(prev + 1, totalPrompts - 1))}
             onPrevious={() => setCurrentRecordingIndex(prev => Math.max(prev - 1, 0))}
             recordings={recordings}
           />
