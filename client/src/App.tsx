@@ -240,8 +240,8 @@ function Router() {
   const isVoiceTrainingComplete = completedRecordings === totalPrompts;
   
   // Voice model status from current profile or derived from recordings
-  const voiceModelStatus = DEV_SKIP_AUTH && currentProfile?.id === 'profile-1' 
-    ? 'ready'
+  const voiceModelStatus = DEV_SKIP_AUTH
+    ? 'ready'  // In DEV mode, always set to ready so voice generation works
     : (currentProfile?.voiceModelStatus || 
         (completedRecordings === 0 ? 'not_submitted' :
          completedRecordings < totalPrompts ? 'training' : 'ready'));
