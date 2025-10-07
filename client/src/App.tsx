@@ -165,6 +165,16 @@ function Router() {
   // Set current profile to first profile if available
   const [currentProfileId, setCurrentProfileId] = useState<string>(DEV_SKIP_AUTH ? 'profile-1' : '1');
   const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 Profile Debug:', { 
+      currentProfileId, 
+      profilesCount: profiles.length,
+      profileIds: profiles.map(p => p.id),
+      currentProfile: currentProfile?.id || 'none'
+    });
+  }, [currentProfileId, profiles, currentProfile]);
 
   // Load existing recordings for current profile (or use mock in dev mode)
   const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
