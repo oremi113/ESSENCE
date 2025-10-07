@@ -435,13 +435,30 @@ function Router() {
 
     // Find the message to get its audio data
     const message = messages?.find((m: any) => m.id === id);
-    if (!message || !message.audioData) {
-      console.log('No audio data available for message:', id);
+    console.log('Playing message:', id, 'Found message:', message);
+    
+    if (!message) {
+      console.error('Message not found:', id);
+      toast({
+        title: "Playback error",
+        description: "Message not found",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!message.audioData) {
+      console.error('No audio data for message:', id, 'Message:', message);
+      toast({
+        title: "No audio available",
+        description: "This message doesn't have audio generated yet",
+        variant: "destructive",
+      });
       return;
     }
 
     setPlayingMessageId(id);
-    console.log('Playing message:', id);
+    console.log('Playing audio from message:', id, 'Audio data length:', message.audioData?.length);
     
     try {
       // Create and play audio element
@@ -449,14 +466,24 @@ function Router() {
       audio.onended = () => {
         setPlayingMessageId(undefined);
       };
-      audio.onerror = () => {
-        console.error('Error playing audio for message:', id);
+      audio.onerror = (e) => {
+        console.error('Error playing audio for message:', id, e);
         setPlayingMessageId(undefined);
+        toast({
+          title: "Playback error",
+          description: "Failed to play audio",
+          variant: "destructive",
+        });
       };
       await audio.play();
     } catch (error) {
       console.error('Failed to play audio:', error);
       setPlayingMessageId(undefined);
+      toast({
+        title: "Playback error",
+        description: "Failed to play audio",
+        variant: "destructive",
+      });
     }
   };
 
