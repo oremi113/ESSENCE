@@ -81,5 +81,25 @@ export function requireAuth(req: any, res: any, next: any) {
   if (req.isAuthenticated()) {
     return next();
   }
+  
+  // DEV MODE: Create a mock authenticated user if not authenticated
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[AUTH] DEV MODE: Bypassing authentication with mock user');
+    req.user = {
+      id: 'dev-user-123',
+      email: 'dev@test.com',
+      name: 'Dev User',
+      age: 30,
+      city: 'San Francisco',
+      state: 'CA',
+      country: 'USA',
+      timezone: 'America/Los_Angeles',
+      voiceModelId: null,
+      voiceTrainingComplete: 0,
+      createdAt: new Date().toISOString()
+    };
+    return next();
+  }
+  
   res.status(401).json({ error: 'Authentication required' });
 }
