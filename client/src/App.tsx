@@ -92,8 +92,7 @@ function Router() {
       if (!response.ok) throw new Error('Failed to check auth');
       return response.json();
     },
-    retry: false,
-    enabled: !DEV_SKIP_AUTH
+    retry: false
   });
 
   const user = authData?.user;
@@ -104,7 +103,7 @@ function Router() {
   };
   
   // Application state
-  const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(DEV_SKIP_AUTH ? true : false);
   const [currentView, setCurrentView] = useState<'training' | 'create' | 'library' | 'profiles' | 'settings'>('training');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -165,16 +164,6 @@ function Router() {
   // Set current profile to first profile if available
   const [currentProfileId, setCurrentProfileId] = useState<string>(DEV_SKIP_AUTH ? 'profile-1' : '1');
   const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
-  
-  // Debug logging
-  useEffect(() => {
-    console.log('🔍 Profile Debug:', { 
-      currentProfileId, 
-      profilesCount: profiles.length,
-      profileIds: profiles.map(p => p.id),
-      currentProfile: currentProfile?.id || 'none'
-    });
-  }, [currentProfileId, profiles, currentProfile]);
 
   // Load existing recordings for current profile (or use mock in dev mode)
   const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
@@ -693,17 +682,6 @@ function Router() {
       />
 
       <main className="pb-8">
-        {(() => {
-          console.log('🔎 Render Check:', { 
-            currentView, 
-            hasUser: !!user, 
-            hasProfile: !!currentProfile,
-            profileId: currentProfile?.id,
-            shouldRender: currentView === 'training' && !!user && !!currentProfile
-          });
-          return null;
-        })()}
-        
         {currentView === 'training' && user && currentProfile && (
           <VoiceRecorder
             currentUser={user}
