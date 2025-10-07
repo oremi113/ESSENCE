@@ -435,10 +435,24 @@ function Router() {
   // Create profile mutation
   const createProfileMutation = useMutation({
     mutationFn: async (profileData: { name: string, relation: string, notes: string }) => {
+      if (DEV_SKIP_AUTH) {
+        // Return mock profile in dev mode
+        return {
+          id: `profile-${Date.now()}`,
+          userId: 'dev-user-123',
+          ...profileData,
+          voiceModelStatus: 'not_submitted',
+          recordingsCount: 0,
+          messagesCount: 0,
+          createdAt: new Date()
+        };
+      }
+      
       const response = await fetch('/api/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData)
+        body: JSON.stringify(profileData),
+        credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to create profile');
       return response.json();
@@ -467,10 +481,16 @@ function Router() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string, updates: Partial<Profile> }) => {
+      if (DEV_SKIP_AUTH) {
+        // Return mock response in dev mode
+        return { success: true };
+      }
+      
       const response = await fetch(`/api/profiles/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
+        credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to update profile');
       return response.json();
@@ -494,8 +514,14 @@ function Router() {
   // Delete profile mutation
   const deleteProfileMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (DEV_SKIP_AUTH) {
+        // Return mock response in dev mode
+        return { success: true };
+      }
+      
       const response = await fetch(`/api/profiles/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to delete profile');
       return response.json();
