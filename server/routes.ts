@@ -306,8 +306,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get all recordings for this profile
             const allRecordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
             
+            // ElevenLabs has a 25-sample limit - select first 25 recordings
+            // This gives us samples from the first ~25 prompts which cover diverse vocal ranges
+            const recordingsToUse = allRecordings.slice(0, 25);
+            
             // Convert base64 audio data to buffers for ElevenLabs
-            const audioFiles = allRecordings.map((recording, index) => {
+            const audioFiles = recordingsToUse.map((recording, index) => {
               const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
               return {
                 name: `sample_${index + 1}`,
@@ -315,6 +319,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 mimeType
               };
             });
+            
+            console.log(`Using ${audioFiles.length} out of ${allRecordings.length} recordings for ElevenLabs voice creation (25-sample limit)`);
             
             // Create voice in ElevenLabs
             elevenLabsVoiceId = await elevenLabsService.createVoice(
@@ -410,6 +416,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting recording:", error);
       res.status(500).json({ error: "Failed to delete recording" });
+    }
+  });
+
+  // Retry voice creation for profiles with complete recordings but no voice - protected
+  app.post("/api/profiles/:profileId/retry-voice-creation", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const { profileId } = req.params;
+      
+      // Check if profile exists
+      const profile = await storage.getProfile(profileId, userId);
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      
+      // Check recording count
+      const recordingCount = await storage.getRecordingCount(profileId, userId);
+      if (recordingCount < TOTAL_TRAINING_PHRASES) {
+        return res.status(400).json({ 
+          error: `Need ${TOTAL_TRAINING_PHRASES} recordings to create voice. Current: ${recordingCount}` 
+        });
+      }
+      
+      // Check if voice already exists
+      if (profile.elevenLabsVoiceId) {
+        return res.status(400).json({ 
+          error: "Voice already exists for this profile",
+          voiceId: profile.elevenLabsVoiceId 
+        });
+      }
+      
+      try {
+        console.log(`Manually creating ElevenLabs voice for profile ${profile.name}...`);
+        
+        // Get all recordings for this profile
+        const allRecordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
+        
+        // ElevenLabs has a 25-sample limit - select first 25 recordings
+        // This gives us samples from the first ~25 prompts which cover diverse vocal ranges
+        const recordingsToUse = allRecordings.slice(0, 25);
+        
+        // Convert base64 audio data to buffers for ElevenLabs
+        const audioFiles = recordingsToUse.map((recording, index) => {
+          const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
+          return {
+            name: `sample_${index + 1}`,
+            data: buffer,
+            mimeType
+          };
+        });
+        
+        console.log(`Using ${audioFiles.length} out of ${allRecordings.length} recordings for ElevenLabs voice creation (25-sample limit)`);
+        
+        // Create voice in ElevenLabs
+        const elevenLabsVoiceId = await elevenLabsService.createVoice(
+          `${profile.name} Voice`,
+          `Custom voice for ${profile.name} (${profile.relation})`,
+          audioFiles
+        );
+        
+        // Update profile with voice ID and ready status
+        await storage.updateProfile(profileId, userId, {
+          elevenLabsVoiceId,
+          voiceModelStatus: 'ready'
+        });
+        
+        console.log(`ElevenLabs voice created successfully: ${elevenLabsVoiceId}`);
+        
+        res.json({ 
+          success: true, 
+          voiceId: elevenLabsVoiceId,
+          status: 'ready'
+        });
+        
+      } catch (error) {
+        console.error('Failed to create ElevenLabs voice:', error);
+        res.status(500).json({ 
+          error: "Failed to create voice model",
+          details: error instanceof Error ? error.message : String(error)
+        });
+      }
+    } catch (error) {
+      console.error("Error in retry voice creation:", error);
+      res.status(500).json({ error: "Failed to retry voice creation" });
     }
   });
 
