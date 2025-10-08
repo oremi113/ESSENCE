@@ -60,26 +60,39 @@ The schema includes:
 - Foreign key relationships with cascading deletes for data integrity
 - userId fields on all user-generated content (profiles, recordings, messages)
 - Enums for voice model status tracking and message categorization
-- Unique constraints to prevent duplicate recordings per profile/act combination
+- Unique constraints to prevent duplicate recordings per profile/recording index combination
 - PostgreSQL session store for authentication persistence
+- Recording index field (0-51) for the 52-prompt voice training system
 
 ### Component Architecture
 The application is built around five main interactive components:
 
 - **WelcomeOnboarding**: Entry point with feature introduction
-- **VoiceRecorder**: 3-act voice training system with meaningful passage recording
+- **VoiceRecorder**: 52-prompt voice training system with personalized prompts across 14 stages
 - **MessageCreator**: Text-to-speech generation interface
 - **PlaybackLibrary**: Audio message management and playback
 - **UserProfiles**: Multi-user profile management system
 
-### 3-Act Voice Training System
-The voice training system has been redesigned to capture three essential dimensions of a person's voice instead of 20 generic phrases:
+### 52-Prompt Voice Training System
+The voice training system captures a comprehensive vocal signature through 52 personalized prompts organized across 14 distinct stages:
 
-- **Act 1 - Speaking Voice**: Natural conversational tone with everyday language and cadence
-- **Act 2 - Storytelling**: Narrative voice with memory recall and descriptive language
-- **Act 3 - Emotional Range**: Deep emotional expression including vulnerability, love, and hope
+**14 Training Stages:**
+1. **Meet Your Voice** - Introduction and baseline vocal patterns
+2. **Movie Trailer Madness** - Dramatic vocal range exploration
+3. **Tongue Twister Theater** - Articulation and speech clarity
+4. **The Absurd Storyteller** - Creative narrative voice
+5. **Infomercial Insanity** - Persuasive and energetic tone
+6. **News Reporter Voices** - Professional delivery styles
+7. **Emotion Playground** - Emotional expression range
+8. **Speed Settings** - Varied speaking paces
+9. **Character Voices** - Vocal versatility
+10. **Instructions & Directions** - Clear instructional tone
+11. **Storytelling Styles** - Narrative techniques
+12. **Professional Voices** - Business and formal speaking
+13. **Celebrations & Toasts** - Joyful and celebratory tone
+14. **Personal Messages** - Intimate and heartfelt expression
 
-Each act consists of one meaningful multi-sentence passage (not short phrases) that captures specific vocal characteristics. The system uses direct 1:1 mapping where recording index 0 = Act 1, index 1 = Act 2, and index 2 = Act 3. Progress tracking shows "X / 3" throughout the UI, with passage navigation displaying "1 of 3", "2 of 3", "3 of 3".
+The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-51, with progress tracking showing "X / 52" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-51) for efficient lookup and management.
 
 ### Design System
 The UI follows the **Skylight Serenity** theme, a carefully crafted design system with:

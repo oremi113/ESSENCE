@@ -30,7 +30,7 @@ export interface IStorage {
   deleteProfile(id: string, userId: string): Promise<boolean>;
   
   // Voice recording methods (scoped by userId)
-  getVoiceRecording(userId: string, recordingIndex: number): Promise<VoiceRecording | undefined>;
+  getVoiceRecording(profileId: string, recordingIndex: number, userId: string): Promise<VoiceRecording | undefined>;
   getVoiceRecordingsByProfile(profileId: string, userId: string): Promise<VoiceRecording[]>;
   getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]>;
   saveVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
@@ -155,13 +155,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Voice recording methods
-  async getVoiceRecording(userId: string, recordingIndex: number): Promise<VoiceRecording | undefined> {
+  async getVoiceRecording(profileId: string, recordingIndex: number, userId: string): Promise<VoiceRecording | undefined> {
     const [recording] = await db
       .select()
       .from(voiceRecordings)
       .where(and(
-        eq(voiceRecordings.userId, userId),
-        eq(voiceRecordings.recordingIndex, recordingIndex)
+        eq(voiceRecordings.profileId, profileId),
+        eq(voiceRecordings.recordingIndex, recordingIndex),
+        eq(voiceRecordings.userId, userId)
       ));
     return recording || undefined;
   }
