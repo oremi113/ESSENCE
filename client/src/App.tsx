@@ -165,16 +165,11 @@ function Router() {
   const [currentProfileId, setCurrentProfileId] = useState<string>(DEV_SKIP_AUTH ? 'profile-1' : '1');
   const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
 
-  // Load existing recordings for current profile (or use mock in dev mode)
+  // Load existing recordings for current profile
   const { data: existingRecordings, isLoading: loadingRecordings } = useQuery({
     queryKey: ['/api/profiles', currentProfile?.id, 'recordings'],
     queryFn: async () => {
       if (!currentProfile?.id) return [];
-      
-      if (DEV_SKIP_AUTH) {
-        // Return empty recordings in dev mode so user can test the recording flow
-        return [];
-      }
       
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load recordings');
@@ -276,8 +271,8 @@ function Router() {
           const byteArray = new Uint8Array(byteNumbers);
           const blob = new Blob([byteArray], { type: 'audio/wav' });
           
-          // Direct 1:1 mapping: Act 1→index 0, Act 2→index 1, Act 3→index 2
-          const index = parseInt(recording.actNumber) - 1;
+          // Direct mapping using recordingIndex (0-51)
+          const index = recording.recordingIndex;
           newRecordings[index] = blob;
         } catch (error) {
           console.error('Failed to decode recording:', error, recording);
