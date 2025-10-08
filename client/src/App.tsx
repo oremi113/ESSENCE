@@ -298,13 +298,10 @@ function Router() {
   const handlePlayMessage = async (id: string) => {
     if (playingMessageId === id) {
       setPlayingMessageId(undefined);
-      console.log('Pausing message:', id);
       return;
     }
 
-    // Find the message to get its audio data
     const message = messages?.find((m: any) => m.id === id);
-    console.log('Playing message:', id, 'Found message:', message);
     
     if (!message) {
       console.error('Message not found:', id);
@@ -327,7 +324,6 @@ function Router() {
     }
 
     setPlayingMessageId(id);
-    console.log('Playing audio from message:', id, 'Audio data length:', message.audioData?.length);
     
     try {
       // Create and play audio element

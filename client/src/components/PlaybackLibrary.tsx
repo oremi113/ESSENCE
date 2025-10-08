@@ -75,8 +75,16 @@ export default function PlaybackLibrary({
   };
 
   const handleExport = () => {
-    console.log('Export functionality triggered');
-    // TODO: Implement export functionality when backend is ready
+    messages.forEach((message, index) => {
+      if (message.audioUrl) {
+        const link = document.createElement('a');
+        link.href = message.audioUrl;
+        link.download = `${message.title.replace(/[^a-z0-9]/gi, '_')}_${index + 1}.mp3`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    });
   };
 
   return (
@@ -201,10 +209,7 @@ export default function PlaybackLibrary({
 
                         <div className="flex items-center space-x-2">
                           <Button
-                            onClick={() => {
-                              console.log('Play clicked - Message data:', message);
-                              onPlayMessage(message.id);
-                            }}
+                            onClick={() => onPlayMessage(message.id)}
                             variant="outline"
                             size="sm"
                             className="w-20"

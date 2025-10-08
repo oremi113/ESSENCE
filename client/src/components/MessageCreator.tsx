@@ -139,7 +139,6 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
       if (result.audioData) {
         setGeneratedAudio(result.audioData);
         setAudioDuration(result.duration || 30);
-        console.log('ElevenLabs voice generation completed successfully!');
       } else {
         throw new Error('No audio data received');
       }
@@ -157,10 +156,8 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
     if (!generatedAudio) return;
     
     setIsPlaying(true);
-    console.log('Playing generated audio');
     
     try {
-      // Create and play the actual generated audio
       const audio = new Audio(generatedAudio);
       
       audio.onended = () => {
