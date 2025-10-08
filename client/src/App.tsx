@@ -183,20 +183,6 @@ function Router() {
     mutationFn: async ({ audioBlob, phraseIndex, phraseText }: { audioBlob: Blob, phraseIndex: number, phraseText: string }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
       
-      if (DEV_SKIP_AUTH) {
-        // In dev mode, just return success without API call (cookies don't work in Replit proxy)
-        const audioData = await blobToBase64(audioBlob);
-        return {
-          id: `recording-${currentProfile.id}-${phraseIndex}`,
-          profileId: currentProfile.id,
-          actNumber: String(phraseIndex + 1),
-          passageText: phraseText,
-          audioData,
-          qualityStatus: 'good',
-          createdAt: new Date().toISOString()
-        };
-      }
-      
       const audioData = await blobToBase64(audioBlob);
       const response = await fetch(`/api/profiles/${currentProfile.id}/recordings`, {
         method: 'POST',
