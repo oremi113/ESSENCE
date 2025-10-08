@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, pgEnum, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, pgEnum, unique, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -33,7 +33,9 @@ export const profiles = pgTable("profiles", {
   voiceModelStatus: voiceModelStatusEnum("voice_model_status").default('not_submitted'),
   elevenLabsVoiceId: varchar("elevenlabs_voice_id", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("profiles_user_id_idx").on(table.userId),
+}));
 
 export const voiceRecordings = pgTable("voice_recordings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -46,6 +48,8 @@ export const voiceRecordings = pgTable("voice_recordings", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   profileRecordingUnique: unique().on(table.profileId, table.recordingIndex),
+  userIdIdx: index("voice_recordings_user_id_idx").on(table.userId),
+  profileIdIdx: index("voice_recordings_profile_id_idx").on(table.profileId),
 }));
 
 export const messages = pgTable("messages", {
@@ -61,7 +65,10 @@ export const messages = pgTable("messages", {
   isPrivate: integer("is_private").default(1), // 1 = true (default), 0 = false
   shareInterestExpressed: integer("share_interest_expressed").default(0), // Tracking if user wants sharing feature
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("messages_user_id_idx").on(table.userId),
+  profileIdIdx: index("messages_profile_id_idx").on(table.profileId),
+}));
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({

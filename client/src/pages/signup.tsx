@@ -55,8 +55,6 @@ export default function Signup({ onSignup }: SignupProps) {
     setIsLoading(true);
     
     try {
-      console.log('Attempting signup with email:', email);
-      
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,9 +62,7 @@ export default function Signup({ onSignup }: SignupProps) {
         body: JSON.stringify({ email, password, name }),
       });
 
-      console.log('Signup response status:', response.status);
       const data = await response.json();
-      console.log('Signup response data:', data);
 
       if (!response.ok) {
         const errorMsg = data.error || "Signup failed";
@@ -80,10 +76,9 @@ export default function Signup({ onSignup }: SignupProps) {
         duration: 5000,
       });
 
-      console.log('Calling onSignup callback');
       onSignup();
     } catch (error) {
-      console.error('Signup error caught:', error);
+      console.error('Signup error:', error);
       toast({
         title: "Signup failed",
         description: error instanceof Error ? error.message : "Could not create account",
