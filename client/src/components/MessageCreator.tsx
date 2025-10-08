@@ -119,11 +119,11 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Generate a proper playable silent WAV file (1 second, 44.1kHz, mono)
+        // Generate a proper playable WAV file with a test tone (440Hz beep)
         const sampleRate = 44100;
         const numChannels = 1;
         const bitsPerSample = 16;
-        const duration = 3; // 3 seconds of silence
+        const duration = 2; // 2 seconds
         const numSamples = sampleRate * duration;
         const byteRate = sampleRate * numChannels * bitsPerSample / 8;
         const blockAlign = numChannels * bitsPerSample / 8;
@@ -143,8 +143,8 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
         view.setUint32(4, 36 + dataSize, true);
         writeString(8, 'WAVE');
         writeString(12, 'fmt ');
-        view.setUint32(16, 16, true); // fmt chunk size
-        view.setUint16(20, 1, true); // audio format (1 = PCM)
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
         view.setUint16(22, numChannels, true);
         view.setUint32(24, sampleRate, true);
         view.setUint32(28, byteRate, true);
@@ -153,9 +153,12 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
         writeString(36, 'data');
         view.setUint32(40, dataSize, true);
         
-        // Audio data (silence = 0s)
+        // Generate 440Hz tone (A note) for 2 seconds
+        const frequency = 440; // Hz
+        const amplitude = 8000; // Volume (max is 32767 for 16-bit)
         for (let i = 0; i < numSamples; i++) {
-          view.setInt16(44 + i * 2, 0, true);
+          const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * amplitude;
+          view.setInt16(44 + i * 2, sample, true);
         }
         
         // Convert to base64
@@ -169,7 +172,7 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
         
         setGeneratedAudio(mockAudioData);
         setAudioDuration(duration);
-        console.log('DEV MODE: Mock voice generation completed (3 sec silence)');
+        console.log('DEV MODE: Mock voice generation completed (2 sec test tone at 440Hz)');
         setIsGenerating(false);
         return;
       }
