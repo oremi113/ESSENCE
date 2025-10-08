@@ -6,7 +6,6 @@ import { z } from "zod";
 // Enums
 export const voiceModelStatusEnum = pgEnum('voice_model_status', ['not_submitted', 'training', 'ready']);
 export const messageCategoryEnum = pgEnum('message_category', ['children', 'partner', 'parents', 'future_me', 'family', 'other']);
-export const actNumberEnum = pgEnum('act_number', ['1', '2', '3']);
 
 // Users table (defined first for foreign key references)
 export const users = pgTable("users", {
@@ -40,13 +39,13 @@ export const voiceRecordings = pgTable("voice_recordings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   profileId: varchar("profile_id").notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  actNumber: actNumberEnum("act_number").notNull(),
+  recordingIndex: integer("recording_index").notNull(), // 0-51 for 52-prompt system
   passageText: text("passage_text").notNull(), // The text that was read
   audioData: text("audio_data").notNull(), // Base64 encoded audio blob
   qualityStatus: text("quality_status").default('good'), // good, needs_improvement, excellent
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
-  profileActUnique: unique().on(table.profileId, table.actNumber),
+  profileRecordingUnique: unique().on(table.profileId, table.recordingIndex),
 }));
 
 export const messages = pgTable("messages", {
@@ -113,7 +112,7 @@ export const insertProfileSchema = createInsertSchema(profiles).pick({
 export const insertVoiceRecordingSchema = createInsertSchema(voiceRecordings).pick({
   userId: true,
   profileId: true,
-  actNumber: true,
+  recordingIndex: true,
   passageText: true,
   audioData: true,
   qualityStatus: true,
