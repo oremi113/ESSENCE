@@ -93,19 +93,19 @@ The schema includes:
 - Enums for voice model status tracking and message categorization
 - Unique constraints to prevent duplicate recordings per profile/recording index combination
 - PostgreSQL session store for authentication persistence
-- Recording index field (0-51) for the 52-prompt voice training system
+- Recording index field (0-50) for the 51-prompt voice training system
 
 ### Component Architecture
 The application is built around five main interactive components:
 
 - **WelcomeOnboarding**: Entry point with feature introduction
-- **VoiceRecorder**: 52-prompt voice training system with personalized prompts across 14 stages
+- **VoiceRecorder**: 51-prompt voice training system with personalized prompts across 14 stages
 - **MessageCreator**: Text-to-speech generation interface
 - **PlaybackLibrary**: Audio message management and playback
 - **UserProfiles**: Multi-user profile management system
 
-### 52-Prompt Voice Training System
-The voice training system captures a comprehensive vocal signature through 52 personalized prompts organized across 14 distinct stages:
+### 51-Prompt Voice Training System
+The voice training system captures a comprehensive vocal signature through 51 personalized prompts organized across 14 distinct stages:
 
 **14 Training Stages:**
 1. **Meet Your Voice** - Introduction and baseline vocal patterns
@@ -123,7 +123,7 @@ The voice training system captures a comprehensive vocal signature through 52 pe
 13. **Celebrations & Toasts** - Joyful and celebratory tone
 14. **Personal Messages** - Intimate and heartfelt expression
 
-The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-51, with progress tracking showing "X / 52" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-51) for efficient lookup and management.
+The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-50, with progress tracking showing "X / 51" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-50) for efficient lookup and management.
 
 ### Design System
 The UI follows the **Skylight Serenity** theme, a carefully crafted design system with:

@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Profile not found" });
       }
       
-      // Validate recording index (0-51 for 52 prompts)
+      // Validate recording index (0-50 for 51 prompts)
       if (phraseIndex < 0 || phraseIndex >= TOTAL_TRAINING_PHRASES) {
         return res.status(400).json({ 
           error: `Invalid recording index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
