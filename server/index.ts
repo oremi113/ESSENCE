@@ -45,6 +45,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.path} - Headers:`, {
+    authorization: req.headers.authorization,
+    cookie: req.headers.cookie ? 'present' : 'none',
+    origin: req.headers.origin
+  });
+  
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
