@@ -6,8 +6,6 @@ import { setupVite, serveStatic, log } from "./vite";
 import { pool } from "./db";
 import { passport } from "./auth";
 
-console.log('[SERVER] Starting server with NODE_ENV:', process.env.NODE_ENV);
-
 const app = express();
 app.use(express.json({ limit: '10mb' })); // Limit for base64 audio uploads
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
@@ -44,39 +42,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Simple API request logging
 app.use((req, res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.path} - Headers:`, {
-    authorization: req.headers.authorization,
-    cookie: req.headers.cookie ? 'present' : 'none',
-    origin: req.headers.origin
-  });
-  
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
+  if (req.path.startsWith("/api")) {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      log(`${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+    });
+  }
   next();
 });
 
@@ -116,9 +90,8 @@ app.use((req, res, next) => {
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: false,  // Changed to false to prevent port reuse
+    reusePort: false,
   }, () => {
-    log(`serving on port ${port} [PID: ${process.pid}]`);
-    console.log(`[SERVER] Database type: ${process.env.DATABASE_URL?.includes('helium') ? 'HELIUM (ERROR!)' : 'NEON (OK)'}`);
+    log(`serving on port ${port}`);
   });
 })();

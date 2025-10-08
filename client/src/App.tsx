@@ -63,31 +63,10 @@ function Router() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   
-  // DEV MODE: Skip authentication for testing - SET TO FALSE TO RE-ENABLE AUTH
-  const DEV_SKIP_AUTH = true;
-  
   // Check authentication status
   const { data: authData, isLoading: authLoading, refetch: refetchAuth } = useQuery({
     queryKey: ['/api/user'],
     queryFn: async () => {
-      if (DEV_SKIP_AUTH) {
-        // Return mock user in dev mode
-        return {
-          user: {
-            id: 'dev-user-123',
-            email: 'dev@test.com',
-            name: 'Dev User',
-            age: 30,
-            city: 'San Francisco',
-            state: 'CA',
-            country: 'USA',
-            timezone: 'America/Los_Angeles',
-            voiceModelId: null,
-            voiceTrainingComplete: 0,
-            createdAt: new Date().toISOString()
-          }
-        };
-      }
       const response = await fetch('/api/user', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to check auth');
       return response.json();
@@ -96,14 +75,14 @@ function Router() {
   });
 
   const user = authData?.user;
-  const isAuthenticated = DEV_SKIP_AUTH || !!user;
+  const isAuthenticated = !!user;
 
   const handleAuthSuccess = () => {
     refetchAuth();
   };
   
   // Application state
-  const [hasOnboarded, setHasOnboarded] = useState(DEV_SKIP_AUTH ? true : false);
+  const [hasOnboarded, setHasOnboarded] = useState(false);
   const [currentView, setCurrentView] = useState<'training' | 'create' | 'library' | 'profiles' | 'settings'>('training');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -117,52 +96,18 @@ function Router() {
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState(0);
   const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(totalPrompts).fill(null));
   
-  // Load profiles from backend (or use mock data in dev mode)
+  // Load profiles from backend
   const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
     queryKey: ['/api/profiles'],
     queryFn: async () => {
-      if (DEV_SKIP_AUTH) {
-        // Check if we have profiles in query cache first
-        const cachedProfiles = queryClient.getQueryData(['/api/profiles']);
-        if (cachedProfiles) {
-          return cachedProfiles;
-        }
-        
-        // Return initial mock profiles in dev mode
-        return [
-          {
-            id: 'profile-1',
-            userId: 'dev-user-123',
-            name: 'My Children',
-            relation: 'Children',
-            notes: 'Messages for my kids to listen to in the future',
-            voiceModelStatus: 'ready',
-            recordingsCount: 3,
-            messagesCount: 2,
-            createdAt: new Date('2024-01-15')
-          },
-          {
-            id: 'profile-2',
-            userId: 'dev-user-123',
-            name: 'My Partner',
-            relation: 'Spouse',
-            notes: 'Love notes and special messages',
-            voiceModelStatus: 'training',
-            recordingsCount: 2,
-            messagesCount: 1,
-            createdAt: new Date('2024-02-01')
-          }
-        ];
-      }
       const response = await fetch('/api/profiles', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load profiles');
       return response.json();
-    },
-    enabled: !DEV_SKIP_AUTH || true
+    }
   });
 
   // Set current profile to first profile if available
-  const [currentProfileId, setCurrentProfileId] = useState<string>(DEV_SKIP_AUTH ? 'profile-1' : '1');
+  const [currentProfileId, setCurrentProfileId] = useState<string>('1');
   const currentProfile = profiles.find((p: Profile) => p.id === currentProfileId) || profiles[0] || null;
 
   // Load existing recordings for current profile
@@ -221,11 +166,9 @@ function Router() {
   const isVoiceTrainingComplete = completedRecordings === totalPrompts;
   
   // Voice model status from current profile or derived from recordings
-  const voiceModelStatus = DEV_SKIP_AUTH
-    ? 'ready'  // In DEV mode, always set to ready so voice generation works
-    : (currentProfile?.voiceModelStatus || 
-        (completedRecordings === 0 ? 'not_submitted' :
-         completedRecordings < totalPrompts ? 'training' : 'ready'));
+  const voiceModelStatus = currentProfile?.voiceModelStatus || 
+    (completedRecordings === 0 ? 'not_submitted' :
+     completedRecordings < totalPrompts ? 'training' : 'ready');
 
   // Theme handling
   useEffect(() => {
@@ -270,52 +213,17 @@ function Router() {
 
   // No longer needed since profiles come from backend
 
-  // Load messages from backend for current profile (or use mock data in dev mode)
+  // Load messages from backend for current profile
   const { data: messages = [], isLoading: loadingMessages } = useQuery({
     queryKey: ['/api/profiles', currentProfile?.id, 'messages'],
     queryFn: async () => {
       if (!currentProfile?.id) return [];
       
-      if (DEV_SKIP_AUTH) {
-        // Check if we have cached messages first
-        const cached = queryClient.getQueryData(['/api/profiles', currentProfile?.id, 'messages']) as any[];
-        if (cached && cached.length > 0) {
-          return cached;
-        }
-        
-        // Return initial mock messages only if cache is empty
-        return [
-          {
-            id: 'msg-1',
-            profileId: 'profile-1',
-            userId: 'dev-user-123',
-            title: 'My First Message',
-            content: 'Hello my dear children. I hope this message finds you well...',
-            category: 'children',
-            audioData: null,
-            duration: 45,
-            createdAt: new Date('2024-01-20')
-          },
-          {
-            id: 'msg-2',
-            profileId: 'profile-1',
-            userId: 'dev-user-123',
-            title: 'Life Advice',
-            content: 'As you grow older, remember these important lessons...',
-            category: 'children',
-            audioData: null,
-            duration: 62,
-            createdAt: new Date('2024-02-10')
-          }
-        ];
-      }
-      
       const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load messages');
       return response.json();
     },
-    enabled: !!currentProfile?.id,
-    staleTime: DEV_SKIP_AUTH ? Infinity : 0  // Never refetch in dev mode
+    enabled: !!currentProfile?.id
   });
 
   // Handlers
@@ -348,7 +256,6 @@ function Router() {
     }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
       
-      if (DEV_SKIP_AUTH) {
         // In dev mode, return mock success without API call
         return {
           id: `message-${Date.now()}`,
@@ -372,7 +279,6 @@ function Router() {
       return response.json();
     },
     onSuccess: (newMessage) => {
-      if (DEV_SKIP_AUTH) {
         // Manually add to cache in dev mode
         const currentMessages = queryClient.getQueryData(['/api/profiles', currentProfile?.id, 'messages']) as any[] || [];
         queryClient.setQueryData(['/api/profiles', currentProfile?.id, 'messages'], [...currentMessages, newMessage]);
@@ -501,7 +407,6 @@ function Router() {
   // Create profile mutation
   const createProfileMutation = useMutation({
     mutationFn: async (profileData: { name: string, relation: string, notes: string }) => {
-      if (DEV_SKIP_AUTH) {
         // Return mock profile in dev mode
         return {
           id: `profile-${Date.now()}`,
@@ -524,7 +429,6 @@ function Router() {
       return response.json();
     },
     onSuccess: (newProfile) => {
-      if (DEV_SKIP_AUTH) {
         // Manually add to cache in dev mode
         const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
         queryClient.setQueryData(['/api/profiles'], [...currentProfiles, newProfile]);
@@ -553,7 +457,6 @@ function Router() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string, updates: Partial<Profile> }) => {
-      if (DEV_SKIP_AUTH) {
         // Return mock response in dev mode
         return { success: true };
       }
@@ -568,7 +471,6 @@ function Router() {
       return response.json();
     },
     onSuccess: (_, variables) => {
-      if (DEV_SKIP_AUTH) {
         // Manually update cache in dev mode
         const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
         const updatedProfiles = currentProfiles.map(p => 
@@ -595,7 +497,6 @@ function Router() {
   // Delete profile mutation
   const deleteProfileMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (DEV_SKIP_AUTH) {
         // Return mock response in dev mode
         return { success: true };
       }
@@ -608,7 +509,6 @@ function Router() {
       return response.json();
     },
     onSuccess: (_, deletedId) => {
-      if (DEV_SKIP_AUTH) {
         // Manually remove from cache in dev mode
         const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
         const updatedProfiles = currentProfiles.filter(p => p.id !== deletedId);

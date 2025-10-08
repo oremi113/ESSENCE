@@ -38,46 +38,22 @@ function getUserId(req: any): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Debug endpoint to check auth status
-  app.get("/api/debug/auth", (req, res) => {
-    res.json({
-      isAuthenticated: req.isAuthenticated?.() ?? false,
-      hasUser: !!req.user,
-      user: req.user,
-      nodeEnv: process.env.NODE_ENV,
-      hasSession: !!req.session,
-    });
-  });
-
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
-    const serverInfo = {
-      pid: process.pid,
-      dbType: process.env.DATABASE_URL?.includes('helium') ? 'HELIUM' : 'NEON',
-      timestamp: new Date().toISOString()
-    };
-    console.log('[SIGNUP] Starting signup - SERVER INFO:', serverInfo);
-    console.log('[SIGNUP] DATABASE_URL:', process.env.DATABASE_URL?.substring(0, 50) + '...');
-    console.log('[SIGNUP] Request body:', req.body);
-    
     try {
       const { email, password, name, age } = req.body;
       
       // Validate input
       if (!email || !password) {
-        console.log('[SIGNUP] Validation failed: missing email or password');
         return res.status(400).json({ 
-          error: "Email and password are required",
-          serverInfo  // Include server info in error response
+          error: "Email and password are required"
         });
       }
       
       if (password.length < 6) {
-        console.log('[SIGNUP] Validation failed: password too short');
         return res.status(400).json({ error: "Password must be at least 6 characters" });
       }
       
-      console.log('[SIGNUP] Checking if user exists');
       // Check if user already exists
       const [existingUser] = await db
         .select()
@@ -86,15 +62,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
       
       if (existingUser) {
-        console.log('[SIGNUP] User already exists:', email);
         return res.status(400).json({ error: "Email already registered" });
       }
       
-      console.log('[SIGNUP] Hashing password');
       // Hash password
       const hashedPassword = await hashPassword(password);
       
-      console.log('[SIGNUP] Creating user in database');
       // Create user
       const [newUser] = await db
         .insert(users)
@@ -106,34 +79,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
       
-      console.log('[SIGNUP] User created successfully:', newUser.id);
-      
       // Log in the user automatically
       const { password: _, ...userWithoutPassword } = newUser;
-      console.log('[SIGNUP] Attempting to log in user');
       req.login(userWithoutPassword, (err) => {
         if (err) {
-          console.error('[SIGNUP] Login error:', err);
-          console.error('[SIGNUP] Error details:', JSON.stringify(err, null, 2));
+          console.error('Signup login error:', err);
           return next(err);
         }
         
-        console.log('[SIGNUP] Login successful, sending response');
         res.json({ user: userWithoutPassword });
       });
     } catch (error) {
-      const serverInfo = {
-        pid: process.pid,
-        dbType: process.env.DATABASE_URL?.includes('helium') ? 'HELIUM' : 'NEON',
-        timestamp: new Date().toISOString()
-      };
-      console.error('[SIGNUP] Error occurred:', error);
-      console.error('[SIGNUP] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      console.error('[SIGNUP] Server info on error:', serverInfo);
+      console.error('Signup error:', error);
       return res.status(500).json({ 
-        error: "Failed to create account",
-        details: error instanceof Error ? error.message : 'Unknown error',
-        serverInfo  // Include server info in error response
+        error: "Failed to create account"
       });
     }
   });
@@ -457,8 +416,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Speech preview route (generates audio without saving message) - protected
   app.post("/api/profiles/:profileId/tts", requireAuth, async (req, res) => {
     try {
-      console.log('[TTS] Request received for profile:', req.params.profileId);
-      console.log('[TTS] User from request:', req.user);
       const userId = getUserId(req);
       const { profileId } = req.params;
       
