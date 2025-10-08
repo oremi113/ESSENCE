@@ -311,20 +311,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Profile not found" });
       }
       
-      // Validate act index (0-2 for 3 acts)
+      // Validate recording index (0-51 for 52 prompts)
       if (phraseIndex < 0 || phraseIndex >= TOTAL_TRAINING_PHRASES) {
         return res.status(400).json({ 
-          error: `Invalid act index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
+          error: `Invalid recording index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
         });
       }
-      
-      // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
-      const actNumber = String(phraseIndex + 1) as '1' | '2' | '3';
       
       // Create recording data with userId
       const recordingData = insertVoiceRecordingSchema.parse({
         profileId,
-        actNumber,
+        recordingIndex: phraseIndex,
         passageText: phraseText,
         audioData,
         qualityStatus: 'good',
@@ -403,12 +400,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getUserId(req);
       const { profileId, phraseIndex } = req.params;
-      const actIndex = parseInt(phraseIndex);
+      const recordingIndex = parseInt(phraseIndex);
       
-      // Direct 1:1 mapping: index 0→Act 1, 1→Act 2, 2→Act 3
-      const actNumber = String(actIndex + 1) as '1' | '2' | '3';
-      
-      const deleted = await storage.deleteVoiceRecording(profileId, actNumber, userId);
+      const deleted = await storage.deleteVoiceRecording(profileId, recordingIndex, userId);
       
       if (!deleted) {
         return res.status(404).json({ error: "Recording not found" });
