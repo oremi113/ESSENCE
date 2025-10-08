@@ -29,29 +29,46 @@ export class ElevenLabsService {
     }
   }
 
-  private async makeRequest(endpoint: string, options: any = {}) {
+  private async makeRequest(endpoint: string, options: any = {}, retries = 3) {
     const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'xi-api-key': this.apiKey,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    
+    for (let attempt = 0; attempt <= retries; attempt++) {
       try {
-        const errorData = await response.json() as ElevenLabsError;
-        errorMessage = errorData.detail?.message || errorMessage;
-      } catch {
-        // Response isn't JSON, use status text
-      }
-      throw new Error(`ElevenLabs API error: ${errorMessage}`);
-    }
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'xi-api-key': this.apiKey,
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+        });
 
-    return response;
+        if (!response.ok) {
+          if (response.status === 429 && attempt < retries) {
+            const retryAfter = parseInt(response.headers.get('retry-after') || '2');
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            continue;
+          }
+          
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json() as ElevenLabsError;
+            errorMessage = errorData.detail?.message || errorMessage;
+          } catch {
+            // Response isn't JSON, use status text
+          }
+          throw new Error(`ElevenLabs API error: ${errorMessage}`);
+        }
+
+        return response;
+      } catch (error) {
+        if (attempt === retries) throw error;
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw new Error('Max retries exceeded');
   }
 
   /**
@@ -109,39 +126,55 @@ export class ElevenLabsService {
   /**
    * Generate speech from text using a voice
    */
-  async generateSpeech(text: string, voiceId: string): Promise<Buffer> {
-    const response = await fetch(`${this.baseUrl}/text-to-speech/${voiceId}`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': this.apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg'
-      },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.8,
-          style: 0.0,
-          use_speaker_boost: true
-        },
-        output_format: 'mp3_44100_128'
-      }),
-    });
-
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+  async generateSpeech(text: string, voiceId: string, retries = 3): Promise<Buffer> {
+    for (let attempt = 0; attempt <= retries; attempt++) {
       try {
-        const errorData = await response.json() as ElevenLabsError;
-        errorMessage = errorData.detail?.message || errorMessage;
-      } catch {
-        // Response isn't JSON, use status text
-      }
-      throw new Error(`Failed to generate speech: ${errorMessage}`);
-    }
+        const response = await fetch(`${this.baseUrl}/text-to-speech/${voiceId}`, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': this.apiKey,
+            'Content-Type': 'application/json',
+            'Accept': 'audio/mpeg'
+          },
+          body: JSON.stringify({
+            text,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.8,
+              style: 0.0,
+              use_speaker_boost: true
+            },
+            output_format: 'mp3_44100_128'
+          }),
+        });
 
-    return Buffer.from(await response.arrayBuffer());
+        if (!response.ok) {
+          if (response.status === 429 && attempt < retries) {
+            const retryAfter = parseInt(response.headers.get('retry-after') || '2');
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            continue;
+          }
+          
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json() as ElevenLabsError;
+            errorMessage = errorData.detail?.message || errorMessage;
+          } catch {
+            // Response isn't JSON, use status text
+          }
+          throw new Error(`Failed to generate speech: ${errorMessage}`);
+        }
+
+        return Buffer.from(await response.arrayBuffer());
+      } catch (error) {
+        if (attempt === retries) throw error;
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw new Error('Max retries exceeded for speech generation');
   }
 
   /**
