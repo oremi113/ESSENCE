@@ -30,11 +30,11 @@ export interface IStorage {
   deleteProfile(id: string, userId: string): Promise<boolean>;
   
   // Voice recording methods (scoped by userId)
-  getVoiceRecording(userId: string, actNumber: '1' | '2' | '3'): Promise<VoiceRecording | undefined>;
+  getVoiceRecording(userId: string, recordingIndex: number): Promise<VoiceRecording | undefined>;
   getVoiceRecordingsByProfile(profileId: string, userId: string): Promise<VoiceRecording[]>;
   getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]>;
   saveVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
-  deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3', userId: string): Promise<boolean>;
+  deleteVoiceRecording(profileId: string, recordingIndex: number, userId: string): Promise<boolean>;
   getRecordingCount(profileId: string, userId: string): Promise<number>;
   getRecordingCountByUser(userId: string): Promise<number>;
   
@@ -155,13 +155,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Voice recording methods
-  async getVoiceRecording(userId: string, actNumber: '1' | '2' | '3'): Promise<VoiceRecording | undefined> {
+  async getVoiceRecording(userId: string, recordingIndex: number): Promise<VoiceRecording | undefined> {
     const [recording] = await db
       .select()
       .from(voiceRecordings)
       .where(and(
         eq(voiceRecordings.userId, userId),
-        eq(voiceRecordings.actNumber, actNumber)
+        eq(voiceRecordings.recordingIndex, recordingIndex)
       ));
     return recording || undefined;
   }
@@ -175,7 +175,7 @@ export class DatabaseStorage implements IStorage {
           profileRecordings.push(recording);
         }
       });
-      return profileRecordings.sort((a, b) => parseInt(a.actNumber) - parseInt(b.actNumber));
+      return profileRecordings.sort((a, b) => a.recordingIndex - b.recordingIndex);
     }
     
     return await db
@@ -185,7 +185,7 @@ export class DatabaseStorage implements IStorage {
         eq(voiceRecordings.profileId, profileId),
         eq(voiceRecordings.userId, userId)
       ))
-      .orderBy(voiceRecordings.actNumber);
+      .orderBy(voiceRecordings.recordingIndex);
   }
 
   async getVoiceRecordingsByUser(userId: string): Promise<VoiceRecording[]> {
@@ -193,13 +193,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(voiceRecordings)
       .where(eq(voiceRecordings.userId, userId))
-      .orderBy(voiceRecordings.actNumber);
+      .orderBy(voiceRecordings.recordingIndex);
   }
 
   async saveVoiceRecording(insertRecording: InsertVoiceRecording): Promise<VoiceRecording> {
     // DEV MODE: Store recordings in memory for dev user
     if (insertRecording.userId === DEV_USER_ID && process.env.NODE_ENV === 'development') {
-      const key = `${insertRecording.profileId}-${insertRecording.actNumber}`;
+      const key = `${insertRecording.profileId}-${insertRecording.recordingIndex}`;
       const recording: VoiceRecording = {
         id: key,
         ...insertRecording,
@@ -216,7 +216,7 @@ export class DatabaseStorage implements IStorage {
       .insert(voiceRecordings)
       .values(insertRecording)
       .onConflictDoUpdate({
-        target: [voiceRecordings.profileId, voiceRecordings.actNumber],
+        target: [voiceRecordings.profileId, voiceRecordings.recordingIndex],
         set: {
           passageText: insertRecording.passageText,
           audioData: insertRecording.audioData,
@@ -228,12 +228,12 @@ export class DatabaseStorage implements IStorage {
     return recording;
   }
 
-  async deleteVoiceRecording(profileId: string, actNumber: '1' | '2' | '3', userId: string): Promise<boolean> {
+  async deleteVoiceRecording(profileId: string, recordingIndex: number, userId: string): Promise<boolean> {
     const result = await db
       .delete(voiceRecordings)
       .where(and(
         eq(voiceRecordings.profileId, profileId),
-        eq(voiceRecordings.actNumber, actNumber),
+        eq(voiceRecordings.recordingIndex, recordingIndex),
         eq(voiceRecordings.userId, userId)
       ));
     return (result.rowCount ?? 0) > 0;
