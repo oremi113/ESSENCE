@@ -13,6 +13,7 @@ interface VoiceRecorderProps {
   currentProfile: Profile;
   currentPromptIndex: number;
   onRecordingComplete: (audioBlob: Blob, promptIndex: number, passageText: string) => void;
+  onClearRecording: (promptIndex: number) => void;
   onNext: () => void;
   onPrevious: () => void;
   recordings: (Blob | null)[];
@@ -22,7 +23,8 @@ export default function VoiceRecorder({
   currentUser,
   currentProfile,
   currentPromptIndex,
-  onRecordingComplete, 
+  onRecordingComplete,
+  onClearRecording,
   onNext, 
   onPrevious,
   recordings 
@@ -216,8 +218,8 @@ export default function VoiceRecorder({
 
   const reRecord = () => {
     setCurrentRecording(null);
-    // Note: We only clear the local UI state. The user needs to record again to save.
-    // The existing recording in the database remains until overwritten by a new recording.
+    // Clear from parent's recordings array (local state only, doesn't delete from database)
+    onClearRecording(currentPromptIndex);
   };
 
   const formatTime = (seconds: number) => {

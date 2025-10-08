@@ -251,6 +251,13 @@ function Router() {
     saveRecordingMutation.mutate({ audioBlob, phraseIndex: promptIndex, phraseText: passageText });
   };
 
+  const handleClearRecording = (promptIndex: number) => {
+    // Clear from local recordings array only (doesn't affect database)
+    const newRecordings = [...recordings];
+    newRecordings[promptIndex] = null;
+    setRecordings(newRecordings);
+  };
+
   // Create message mutation
   const createMessageMutation = useMutation({
     mutationFn: async ({ title, content, category = 'other', audioData, duration }: { 
@@ -589,6 +596,7 @@ function Router() {
             currentProfile={currentProfile}
             currentPromptIndex={currentRecordingIndex}
             onRecordingComplete={handleRecordingComplete}
+            onClearRecording={handleClearRecording}
             onNext={() => setCurrentRecordingIndex(prev => Math.min(prev + 1, totalPrompts - 1))}
             onPrevious={() => setCurrentRecordingIndex(prev => Math.max(prev - 1, 0))}
             recordings={recordings}
