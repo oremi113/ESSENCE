@@ -18,6 +18,8 @@ export default function Signup({ onSignup }: SignupProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [city, setCity] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -59,7 +61,13 @@ export default function Signup({ onSignup }: SignupProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          name,
+          age: age ? parseInt(age) : undefined,
+          city: city || undefined
+        }),
       });
 
       const data = await response.json();
@@ -102,7 +110,7 @@ export default function Signup({ onSignup }: SignupProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 type="text"
@@ -111,7 +119,39 @@ export default function Signup({ onSignup }: SignupProps) {
                 onChange={(e) => setName(e.target.value)}
                 disabled={isLoading}
                 data-testid="input-name"
+                required
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="age">Age</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  placeholder="25"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  disabled={isLoading}
+                  data-testid="input-age"
+                  required
+                  min="1"
+                  max="120"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  placeholder="San Francisco"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  disabled={isLoading}
+                  data-testid="input-city"
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

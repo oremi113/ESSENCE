@@ -170,37 +170,6 @@ function Router() {
     (completedRecordings === 0 ? 'not_submitted' :
      completedRecordings < totalPrompts ? 'training' : 'ready');
 
-  // Auto-retry voice creation if profile has 51 recordings but no voice (edge case fix)
-  useEffect(() => {
-    const retryVoiceCreation = async () => {
-      if (!currentProfile?.id) return;
-      
-      if (completedRecordings === totalPrompts && 
-          currentProfile.voiceModelStatus === 'training' && 
-          !currentProfile.elevenLabsVoiceId) {
-        
-        try {
-          const response = await fetch(`/api/profiles/${currentProfile.id}/retry-voice-creation`, {
-            method: 'POST',
-            credentials: 'include',
-          });
-          
-          if (response.ok) {
-            queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
-            toast({
-              title: "Voice model created!",
-              description: "Your voice training is now complete. You can create messages!",
-            });
-          }
-        } catch (error) {
-          console.error('Auto-retry voice creation failed:', error);
-        }
-      }
-    };
-    
-    retryVoiceCreation();
-  }, [currentProfile?.id, completedRecordings, totalPrompts, currentProfile?.voiceModelStatus, currentProfile?.elevenLabsVoiceId, queryClient, toast]);
-
   // Theme handling
   useEffect(() => {
     if (isDarkMode) {

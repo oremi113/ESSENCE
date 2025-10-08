@@ -41,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
     try {
-      const { email, password, name, age } = req.body;
+      const { email, password, name, age, city } = req.body;
       
       // Validate input
       if (!email || !password) {
@@ -76,6 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           password: hashedPassword,
           name: name || null,
           age: age || null,
+          city: city || null,
         })
         .returning();
       
