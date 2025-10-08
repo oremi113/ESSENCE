@@ -462,10 +462,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if profile has a ready voice model
-      if (profile.voiceModelStatus !== 'ready' || !profile.elevenLabsVoiceId) {
-        return res.status(400).json({ 
-          error: "Voice model not ready. Complete voice training first." 
-        });
+      // In DEV mode, use a default voice if no custom voice exists
+      const isDevMode = process.env.NODE_ENV === 'development';
+      let voiceId = profile.elevenLabsVoiceId;
+      
+      if (!voiceId) {
+        if (isDevMode) {
+          // Use ElevenLabs' default "Rachel" voice for testing
+          voiceId = '21m00Tcm4TlvDq8ikWAM';
+          console.log('[DEV MODE] Using default ElevenLabs voice for testing:', voiceId);
+        } else {
+          return res.status(400).json({ 
+            error: "Voice model not ready. Complete voice training first." 
+          });
+        }
       }
       
       const { content } = req.body;
@@ -486,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Generate speech using ElevenLabs
         const audioBuffer = await elevenLabsService.generateSpeech(
           content.trim(),
-          profile.elevenLabsVoiceId
+          voiceId
         );
         
         // Convert to base64 for frontend
