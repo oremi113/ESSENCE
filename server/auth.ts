@@ -78,9 +78,14 @@ export async function hashPassword(password: string): Promise<string> {
 
 // Middleware to require authentication
 export function requireAuth(req: any, res: any, next: any) {
+  console.log('[AUTH] requireAuth called - NODE_ENV:', process.env.NODE_ENV);
+  console.log('[AUTH] req.user:', req.user);
+  console.log('[AUTH] req.isAuthenticated():', typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : 'N/A');
+  
   // DEV MODE: Bypass authentication completely in development
   if (process.env.NODE_ENV === 'development') {
     if (!req.user) {
+      console.log('[AUTH] DEV: Creating mock user');
       req.user = {
         id: 'dev-user-123',
         email: 'dev@test.com',
@@ -95,6 +100,7 @@ export function requireAuth(req: any, res: any, next: any) {
         createdAt: new Date().toISOString()
       };
     }
+    console.log('[AUTH] DEV: Allowing request with user:', req.user.id);
     return next();
   }
   
@@ -103,5 +109,6 @@ export function requireAuth(req: any, res: any, next: any) {
     return next();
   }
   
+  console.log('[AUTH] PRODUCTION: Rejecting request - not authenticated');
   res.status(401).json({ error: 'Authentication required' });
 }
