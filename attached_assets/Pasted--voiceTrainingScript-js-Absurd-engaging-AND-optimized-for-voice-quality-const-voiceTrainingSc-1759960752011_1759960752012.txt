@@ -1,20 +1,6 @@
-// Absurd, engaging voice training script optimized for voice quality
-// 25 prompts across 3 acts - designed to capture natural vocal variety
+// voiceTrainingScript.js - Absurd, engaging, AND optimized for voice quality
 
-export interface VoicePrompt {
-  id?: number;
-  instruction: string;
-  lineType: 'simple' | 'timeOfDay' | 'timeOfDayName' | 'timeOfDayCity' | 'city' | 'generation' | 'relationship' | 'relationshipGoodbye';
-  line: string | Record<string, string>;
-}
-
-export interface VoiceStage {
-  stage: number;
-  title: string;
-  prompts: VoicePrompt[];
-}
-
-export const voiceTrainingScript: VoiceStage[] = [
+const voiceTrainingScript = [
   
   // ============================================
   // ACT 1: ABSURD INTRODUCTIONS (5 prompts)
@@ -253,3 +239,5 @@ export const voiceTrainingScript: VoiceStage[] = [
   }
   
 ];
+
+module.exports = voiceTrainingScript;

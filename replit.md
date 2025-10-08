@@ -112,20 +112,22 @@ The application is built around five main interactive components:
 - **UserProfiles**: Multi-user profile management system
 
 ### 25-Prompt Voice Training System
-The voice training system captures a comprehensive vocal signature through 25 personalized prompts organized across 11 distinct stages (optimized for ElevenLabs' 25-sample limit):
+The voice training system captures a comprehensive vocal signature through 25 absurd and engaging prompts organized across 3 acts (optimized for ElevenLabs' 25-sample limit and voice quality):
 
-**11 Training Stages (Recording time: 5-6 minutes):**
-1. **Meet Your Voice** - Introduction and baseline vocal patterns (3 prompts)
-2. **Tongue Twister Warm-Up** - Articulation and speech clarity (2 prompts)
-3. **Movie Trailer Voice** - Dramatic vocal range (1 prompt)
-4. **The Absurd Storyteller** - Creative narrative voice (2 prompts)
-5. **Character Voices** - Vocal versatility across different personas (3 prompts)
-6. **Emotional Moments** - Emotional expression range (5 prompts)
-7. **Wisdom & Advice** - Heartfelt guidance and encouragement (2 prompts)
-8. **A Little Humor** - Dad jokes and personality (1 prompt)
-9. **Memory & Heart** - Personal nostalgia and meaningful places (2 prompts)
-10. **Numbers & Dates** - Clear enunciation for practical content (3 prompts)
-11. **The Big Finish** - Final goodbye message (1 prompt)
+**3 Training Acts (Recording time: 5-6 minutes):**
+1. **Welcome to the Weirdness** - Absurd introductions establishing baseline personality (5 prompts)
+   - Strange talk show hosting, superhero origins, conspiracies, useless talents
+2. **Tales from the Weird Side** - Absurd adventures and storytelling to capture emotional range (10 prompts)
+   - Gerald the Penguin saga, fake inventions, nature documentaries, terrible advice, passionate rants
+3. **Getting Real (But Make It Weird)** - Heartfelt moments with humor for natural emotional expression (10 prompts)
+   - Genuine advice, childhood memories, gratitude, love messages, hopes, goodbyes
+
+**Voice Quality Optimizations:**
+- Absurd, engaging content encourages natural vocal variety and emotion
+- Balances humor with heartfelt moments to capture full emotional range
+- Long-form storytelling (Gerald saga) captures sustained speech patterns
+- Counting and contact info prompts ensure clear enunciation of numbers
+- Relationship-based personalization for authentic emotional delivery
 
 The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-24, with progress tracking showing "X / 25" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-24) for efficient lookup and management.
 

@@ -16,13 +16,7 @@ export function getPersonalizedLine(prompt: VoicePrompt, userContext: UserContex
     return replacePlaceholders(line as string, userContext);
   }
   
-  if (lineType === 'timeOfDay') {
-    const timeKey = userContext.timeOfDay || 'morning';
-    const lineObj = line as Record<string, string>;
-    return replacePlaceholders(lineObj[timeKey], userContext);
-  }
-  
-  if (lineType === 'timeOfDayCity') {
+  if (lineType === 'timeOfDay' || lineType === 'timeOfDayName' || lineType === 'timeOfDayCity') {
     const timeKey = userContext.timeOfDay || 'morning';
     const lineObj = line as Record<string, string>;
     return replacePlaceholders(lineObj[timeKey], userContext);
