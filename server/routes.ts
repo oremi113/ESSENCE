@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Profile not found" });
       }
       
-      // Validate recording index (0-50 for 51 prompts)
+      // Validate recording index (0-24 for 25 prompts)
       if (phraseIndex < 0 || phraseIndex >= TOTAL_TRAINING_PHRASES) {
         return res.status(400).json({ 
           error: `Invalid recording index. Must be between 0 and ${TOTAL_TRAINING_PHRASES - 1}` 
@@ -306,12 +306,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get all recordings for this profile
             const allRecordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
             
-            // ElevenLabs has a 25-sample limit - select first 25 recordings
-            // This gives us samples from the first ~25 prompts which cover diverse vocal ranges
-            const recordingsToUse = allRecordings.slice(0, 25);
-            
-            // Convert base64 audio data to buffers for ElevenLabs
-            const audioFiles = recordingsToUse.map((recording, index) => {
+            // Use all 25 recordings for ElevenLabs voice creation
+            const audioFiles = allRecordings.map((recording, index) => {
               const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
               return {
                 name: `sample_${index + 1}`,
@@ -320,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               };
             });
             
-            console.log(`Using ${audioFiles.length} out of ${allRecordings.length} recordings for ElevenLabs voice creation (25-sample limit)`);
+            console.log(`Using all ${audioFiles.length} recordings for ElevenLabs voice creation`);
             
             // Create voice in ElevenLabs
             elevenLabsVoiceId = await elevenLabsService.createVoice(
@@ -453,12 +449,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get all recordings for this profile
         const allRecordings = await storage.getVoiceRecordingsByProfile(profileId, userId);
         
-        // ElevenLabs has a 25-sample limit - select first 25 recordings
-        // This gives us samples from the first ~25 prompts which cover diverse vocal ranges
-        const recordingsToUse = allRecordings.slice(0, 25);
-        
-        // Convert base64 audio data to buffers for ElevenLabs
-        const audioFiles = recordingsToUse.map((recording, index) => {
+        // Use all 25 recordings for ElevenLabs voice creation
+        const audioFiles = allRecordings.map((recording, index) => {
           const { buffer, mimeType } = elevenLabsService.convertBase64ToBuffer(recording.audioData);
           return {
             name: `sample_${index + 1}`,
@@ -467,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         });
         
-        console.log(`Using ${audioFiles.length} out of ${allRecordings.length} recordings for ElevenLabs voice creation (25-sample limit)`);
+        console.log(`Using all ${audioFiles.length} recordings for ElevenLabs voice creation`);
         
         // Create voice in ElevenLabs
         const elevenLabsVoiceId = await elevenLabsService.createVoice(

@@ -41,7 +41,7 @@ export const voiceRecordings = pgTable("voice_recordings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   profileId: varchar("profile_id").notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  recordingIndex: integer("recording_index").notNull(), // 0-50 for 51-prompt system
+  recordingIndex: integer("recording_index").notNull(), // 0-24 for 25-prompt system
   passageText: text("passage_text").notNull(), // The text that was read
   audioData: text("audio_data").notNull(), // Base64 encoded audio blob
   qualityStatus: text("quality_status").default('good'), // good, needs_improvement, excellent

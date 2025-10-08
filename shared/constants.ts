@@ -1,5 +1,5 @@
-// Voice training constants for ESSENCE - 51-Prompt System
-export const TOTAL_TRAINING_PHRASES = 51;
+// Voice training constants for ESSENCE - 25-Prompt System
+export const TOTAL_TRAINING_PHRASES = 25;
 
 // Voice training script is defined in shared/voiceTrainingScript.ts
-// 14 stages with 51 total personalized prompts
+// 11 stages with 25 total personalized prompts (optimized for ElevenLabs)
