@@ -256,19 +256,6 @@ function Router() {
     }) => {
       if (!currentProfile?.id) throw new Error('No profile selected');
       
-        // In dev mode, return mock success without API call
-        return {
-          id: `message-${Date.now()}`,
-          profileId: currentProfile.id,
-          title,
-          content,
-          category,
-          audioData,
-          duration,
-          createdAt: new Date().toISOString()
-        };
-      }
-      
       const response = await fetch(`/api/profiles/${currentProfile.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -278,13 +265,8 @@ function Router() {
       if (!response.ok) throw new Error('Failed to create message');
       return response.json();
     },
-    onSuccess: (newMessage) => {
-        // Manually add to cache in dev mode
-        const currentMessages = queryClient.getQueryData(['/api/profiles', currentProfile?.id, 'messages']) as any[] || [];
-        queryClient.setQueryData(['/api/profiles', currentProfile?.id, 'messages'], [...currentMessages, newMessage]);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles', currentProfile?.id, 'messages'] });
       queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       toast({
         title: "Message created",
@@ -407,18 +389,6 @@ function Router() {
   // Create profile mutation
   const createProfileMutation = useMutation({
     mutationFn: async (profileData: { name: string, relation: string, notes: string }) => {
-        // Return mock profile in dev mode
-        return {
-          id: `profile-${Date.now()}`,
-          userId: 'dev-user-123',
-          ...profileData,
-          voiceModelStatus: 'not_submitted',
-          recordingsCount: 0,
-          messagesCount: 0,
-          createdAt: new Date()
-        };
-      }
-      
       const response = await fetch('/api/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -429,12 +399,7 @@ function Router() {
       return response.json();
     },
     onSuccess: (newProfile) => {
-        // Manually add to cache in dev mode
-        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
-        queryClient.setQueryData(['/api/profiles'], [...currentProfiles, newProfile]);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       setCurrentProfileId(newProfile.id);
       toast({
         title: "Profile created",
@@ -457,10 +422,6 @@ function Router() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string, updates: Partial<Profile> }) => {
-        // Return mock response in dev mode
-        return { success: true };
-      }
-      
       const response = await fetch(`/api/profiles/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -470,16 +431,8 @@ function Router() {
       if (!response.ok) throw new Error('Failed to update profile');
       return response.json();
     },
-    onSuccess: (_, variables) => {
-        // Manually update cache in dev mode
-        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
-        const updatedProfiles = currentProfiles.map(p => 
-          p.id === variables.id ? { ...p, ...variables.updates } : p
-        );
-        queryClient.setQueryData(['/api/profiles'], updatedProfiles);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -497,10 +450,6 @@ function Router() {
   // Delete profile mutation
   const deleteProfileMutation = useMutation({
     mutationFn: async (id: string) => {
-        // Return mock response in dev mode
-        return { success: true };
-      }
-      
       const response = await fetch(`/api/profiles/${id}`, {
         method: 'DELETE',
         credentials: 'include'
@@ -509,13 +458,7 @@ function Router() {
       return response.json();
     },
     onSuccess: (_, deletedId) => {
-        // Manually remove from cache in dev mode
-        const currentProfiles = queryClient.getQueryData(['/api/profiles']) as Profile[] || [];
-        const updatedProfiles = currentProfiles.filter(p => p.id !== deletedId);
-        queryClient.setQueryData(['/api/profiles'], updatedProfiles);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['/api/profiles'] });
       
       // Switch to first remaining profile if current was deleted
       if (currentProfile?.id === deletedId) {
