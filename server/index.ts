@@ -6,6 +6,8 @@ import { setupVite, serveStatic, log } from "./vite";
 import { pool } from "./db";
 import { passport } from "./auth";
 
+console.log('[SERVER] Starting server with NODE_ENV:', process.env.NODE_ENV);
+
 const app = express();
 app.use(express.json({ limit: '10mb' })); // Limit for base64 audio uploads
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
