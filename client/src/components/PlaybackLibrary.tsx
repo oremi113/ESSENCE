@@ -201,7 +201,10 @@ export default function PlaybackLibrary({
 
                         <div className="flex items-center space-x-2">
                           <Button
-                            onClick={() => onPlayMessage(message.id)}
+                            onClick={() => {
+                              console.log('Play clicked - Message data:', message);
+                              onPlayMessage(message.id);
+                            }}
                             variant="outline"
                             size="sm"
                             className="w-20"
