@@ -97,7 +97,7 @@ function Router() {
   const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(totalPrompts).fill(null));
   
   // Load profiles from backend
-  const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
+  const { data: profiles = [], isLoading: loadingProfiles, isFetching: fetchingProfiles } = useQuery({
     queryKey: ['/api/profiles'],
     queryFn: async () => {
       const response = await fetch('/api/profiles', { credentials: 'include' });
@@ -544,7 +544,7 @@ function Router() {
   }
 
   // Show loading while profiles are being fetched
-  if (loadingProfiles) {
+  if (loadingProfiles || (fetchingProfiles && profiles.length === 0)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -555,8 +555,8 @@ function Router() {
     );
   }
 
-  // Show message if no profiles exist
-  if (!currentProfile) {
+  // Show message if no profiles exist (and we're not in the middle of creating one)
+  if (!currentProfile && !createProfileMutation.isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
