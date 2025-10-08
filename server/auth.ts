@@ -78,6 +78,10 @@ export async function hashPassword(password: string): Promise<string> {
 
 // Middleware to require authentication
 export function requireAuth(req: any, res: any, next: any) {
+  console.log('[AUTH] Middleware called - NODE_ENV:', process.env.NODE_ENV);
+  console.log('[AUTH] req.user exists:', !!req.user);
+  console.log('[AUTH] req.isAuthenticated():', typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : 'N/A');
+  
   // DEV MODE: Bypass authentication completely in development
   if (process.env.NODE_ENV === 'development') {
     if (!req.user) {
@@ -95,6 +99,8 @@ export function requireAuth(req: any, res: any, next: any) {
         voiceTrainingComplete: 0,
         createdAt: new Date().toISOString()
       };
+    } else {
+      console.log('[AUTH] DEV MODE: User already exists:', req.user);
     }
     return next();
   }
@@ -104,5 +110,6 @@ export function requireAuth(req: any, res: any, next: any) {
     return next();
   }
   
+  console.log('[AUTH] PRODUCTION: Authentication failed, returning 401');
   res.status(401).json({ error: 'Authentication required' });
 }
