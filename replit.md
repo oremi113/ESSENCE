@@ -34,6 +34,13 @@ Preferred communication style: Simple, everyday language.
 - **Security review**: No security issues found in code changes
 - **Performance validation**: Database indexes successfully applied and tested
 
+### Voice Training System Optimization (October 2025)
+- **Condensed to 25 prompts**: Reduced from 51 to 25 prompts (11 stages) for faster completion (5-6 minutes)
+- **ElevenLabs optimization**: Now uses all 25 recordings directly (matches ElevenLabs' 25-sample limit)
+- **Removed auto-retry logic**: Simplified voice creation flow (no edge case handling needed)
+- **Enhanced signup flow**: Added required age and city fields for better personalization
+- **Improved personalization**: Voice training prompts now properly use user's age and city data
+
 ### Recommendations for Production
 1. **End-to-end testing**: Test complete flow (signup → recording → TTS → playback/export) with real user data
 2. **API monitoring**: Track ElevenLabs API response times and retry rates to validate improvements
@@ -82,7 +89,7 @@ Authentication flow:
 ### Database Design
 The application uses PostgreSQL with four core entities:
 
-- **Users**: User accounts with email, hashed password, name, and age
+- **Users**: User accounts with email, hashed password, name, age, and city
 - **Profiles**: User voice profiles with metadata (name, relation, notes, voice model status) - scoped to userId
 - **Voice Recordings**: Individual training phrase recordings linked to profiles - scoped to userId
 - **Messages**: Generated AI voice messages with content and audio data - scoped to userId
@@ -93,37 +100,34 @@ The schema includes:
 - Enums for voice model status tracking and message categorization
 - Unique constraints to prevent duplicate recordings per profile/recording index combination
 - PostgreSQL session store for authentication persistence
-- Recording index field (0-50) for the 51-prompt voice training system
+- Recording index field (0-24) for the 25-prompt voice training system
 
 ### Component Architecture
 The application is built around five main interactive components:
 
 - **WelcomeOnboarding**: Entry point with feature introduction
-- **VoiceRecorder**: 51-prompt voice training system with personalized prompts across 14 stages
+- **VoiceRecorder**: 25-prompt voice training system with personalized prompts across 11 stages
 - **MessageCreator**: Text-to-speech generation interface
 - **PlaybackLibrary**: Audio message management and playback
 - **UserProfiles**: Multi-user profile management system
 
-### 51-Prompt Voice Training System
-The voice training system captures a comprehensive vocal signature through 51 personalized prompts organized across 14 distinct stages:
+### 25-Prompt Voice Training System
+The voice training system captures a comprehensive vocal signature through 25 personalized prompts organized across 11 distinct stages (optimized for ElevenLabs' 25-sample limit):
 
-**14 Training Stages:**
-1. **Meet Your Voice** - Introduction and baseline vocal patterns
-2. **Movie Trailer Madness** - Dramatic vocal range exploration
-3. **Tongue Twister Theater** - Articulation and speech clarity
-4. **The Absurd Storyteller** - Creative narrative voice
-5. **Infomercial Insanity** - Persuasive and energetic tone
-6. **News Reporter Voices** - Professional delivery styles
-7. **Emotion Playground** - Emotional expression range
-8. **Speed Settings** - Varied speaking paces
-9. **Character Voices** - Vocal versatility
-10. **Instructions & Directions** - Clear instructional tone
-11. **Storytelling Styles** - Narrative techniques
-12. **Professional Voices** - Business and formal speaking
-13. **Celebrations & Toasts** - Joyful and celebratory tone
-14. **Personal Messages** - Intimate and heartfelt expression
+**11 Training Stages (Recording time: 5-6 minutes):**
+1. **Meet Your Voice** - Introduction and baseline vocal patterns (3 prompts)
+2. **Tongue Twister Warm-Up** - Articulation and speech clarity (2 prompts)
+3. **Movie Trailer Voice** - Dramatic vocal range (1 prompt)
+4. **The Absurd Storyteller** - Creative narrative voice (2 prompts)
+5. **Character Voices** - Vocal versatility across different personas (3 prompts)
+6. **Emotional Moments** - Emotional expression range (5 prompts)
+7. **Wisdom & Advice** - Heartfelt guidance and encouragement (2 prompts)
+8. **A Little Humor** - Dad jokes and personality (1 prompt)
+9. **Memory & Heart** - Personal nostalgia and meaningful places (2 prompts)
+10. **Numbers & Dates** - Clear enunciation for practical content (3 prompts)
+11. **The Big Finish** - Final goodbye message (1 prompt)
 
-The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-50, with progress tracking showing "X / 51" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-50) for efficient lookup and management.
+The system uses **personalized content** based on user context (name, city, generation, relationship, time of day). Recording indices map directly from 0-24, with progress tracking showing "X / 25" throughout the UI. The database stores recordings using `recordingIndex` (integer 0-24) for efficient lookup and management.
 
 ### Design System
 The UI follows the **Skylight Serenity** theme, a carefully crafted design system with:
