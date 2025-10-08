@@ -452,6 +452,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Speech preview route (generates audio without saving message) - protected
   app.post("/api/profiles/:profileId/tts", requireAuth, async (req, res) => {
     try {
+      console.log('[TTS] Request received for profile:', req.params.profileId);
+      console.log('[TTS] User from request:', req.user);
       const userId = getUserId(req);
       const { profileId } = req.params;
       

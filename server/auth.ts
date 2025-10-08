@@ -78,7 +78,10 @@ export async function hashPassword(password: string): Promise<string> {
 
 // Middleware to require authentication
 export function requireAuth(req: any, res: any, next: any) {
+  console.log('[AUTH] Checking authentication. isAuthenticated:', req.isAuthenticated(), 'NODE_ENV:', process.env.NODE_ENV);
+  
   if (req.isAuthenticated()) {
+    console.log('[AUTH] User is authenticated:', req.user?.email);
     return next();
   }
   
@@ -101,5 +104,6 @@ export function requireAuth(req: any, res: any, next: any) {
     return next();
   }
   
+  console.log('[AUTH] Authentication failed, returning 401');
   res.status(401).json({ error: 'Authentication required' });
 }
