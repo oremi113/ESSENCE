@@ -105,14 +105,14 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
   };
 
   const handleGenerate = async () => {
-    if (!content.trim() || voiceModelStatus !== 'ready') return;
+    if (!content.trim()) return;
     
     setIsGenerating(true);
     setGeneratedAudio(null);
     setAudioDuration(0);
     
     try {
-      // Call real ElevenLabs API through backend
+      // Call real ElevenLabs API through backend (uses default voice for testing if custom voice not ready)
       const response = await fetch(`/api/profiles/${currentProfileId}/tts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
