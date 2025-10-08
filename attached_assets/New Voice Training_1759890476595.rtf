@@ -1,0 +1,711 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2865
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fnil\fcharset0 HelveticaNeue;
+\f3\fmodern\fcharset0 Courier-Bold;\f4\froman\fcharset0 Times-Italic;\f5\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red109\green109\blue109;\red0\green0\blue0;
+\red42\green44\blue51;\red143\green144\blue150;\red147\green0\blue147;\red50\green94\blue238;\red167\green87\blue5;
+\red219\green63\blue57;\red66\green147\blue62;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c50196\c50196\c50196;\cssrgb\c0\c0\c0\c84706;
+\cssrgb\c21961\c22745\c25882;\cssrgb\c62745\c63137\c65490;\cssrgb\c65098\c14902\c64314;\cssrgb\c25098\c47059\c94902;\cssrgb\c71765\c41961\c392;
+\cssrgb\c89412\c33725\c28627;\cssrgb\c31373\c63137\c30980;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa321\partightenfactor0
+
+\f0\b\fs48 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \uc0\u55356 \u57263  REPLIT IMPLEMENTATION GUIDE\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\fs36 \cf0 New Voice Training Script - Backend & Frontend Structure\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs24 \cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55357 \u56523  SUMMARY FOR REPLIT\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Goal:
+\f1\b0  Replace the old 3-act voice training script with new personalized 14-stage script that includes dynamic content based on user context (name, city, generation, relationship, time of day).\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55357 \u56770 \u65039  FILE STRUCTURE\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\b0\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf5 \strokec5 /backend\
+  /routes\
+    voiceRoutes.js              (KEEP - may need updates)\
+    profileRoutes.js            (KEEP)\
+  /models\
+    User.js                     (UPDATE - add new fields)\
+    VoiceProfile.js             (KEEP)\
+    Recording.js                (KEEP)\
+  /data\
+    voiceTrainingScript.js      (CREATE NEW - replaces old script)\
+    personalizationHelper.js    (CREATE NEW - helper functions)\
+  server.js                     (KEEP - may need route updates)\
+\
+/frontend\
+  /components\
+    /VoiceTraining\
+      VoiceTrainingFlow.jsx     (UPDATE COMPLETELY - new logic)\
+      OnboardingForm.jsx        (CREATE NEW - collect user context)\
+      RecordingInterface.jsx    (KEEP - recording UI stays similar)\
+      ProgressBar.jsx           (UPDATE - new progress calculation)\
+  /utils\
+    scriptHelpers.js            (CREATE NEW - frontend helpers)\
+  App.jsx                       (UPDATE - add onboarding step)\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55357 \u56772 \u65039  BACKEND CHANGES\
+\pard\pardeftab720\sa280\partightenfactor0
+
+\fs28 \cf0 1. NEW: User Context Fields in Database\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Update 
+\f3\fs26 User.js
+\f0\fs24  model
+\f1\b0  to store personalization data:\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // backend/models/User.js
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 const\cf5 \strokec5  userSchema \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 new\cf5 \strokec5  \cf9 \strokec9 mongoose\cf5 \strokec5 .\cf9 \strokec9 Schema\cf5 \strokec5 (\{\
+  \cf10 \strokec10 email\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,\
+  \cf10 \strokec10 name\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,  
+\f4\i \cf6 \strokec6 // NEW - user's actual name
+\f1\i0 \cf5 \strokec5 \
+  \
+  
+\f4\i \cf6 \strokec6 // NEW PERSONALIZATION FIELDS
+\f1\i0 \cf5 \strokec5 \
+  \cf10 \strokec10 city\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,\
+  \cf10 \strokec10 hometown\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,\
+  \cf10 \strokec10 birthYear\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 Number\cf5 \strokec5 ,\
+  \cf10 \strokec10 generation\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,  
+\f4\i \cf6 \strokec6 // '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', 'default'
+\f1\i0 \cf5 \strokec5 \
+  \cf10 \strokec10 relationship\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 String\cf5 \strokec5 ,  
+\f4\i \cf6 \strokec6 // 'daughter', 'son', 'spouse', 'grandchild', 'friend', 'parent'
+\f1\i0 \cf5 \strokec5 \
+  \
+  
+\f4\i \cf6 \strokec6 // EXISTING FIELDS
+\f1\i0 \cf5 \strokec5 \
+  \cf10 \strokec10 createdAt\cf8 \strokec8 :\cf5 \strokec5  \{ \cf10 \strokec10 type\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 Date\cf5 \strokec5 , \cf7 \strokec7 default\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 Date\cf5 \strokec5 .now \}\
+\});\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 2. NEW: Voice Training Script Data File\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Create 
+\f3\fs26 backend/data/voiceTrainingScript.js
+\f1\b0\fs24 \
+This file contains the complete 14-stage script with personalization logic (see FILE 1 from previous message).\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // backend/data/voiceTrainingScript.js
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 const\cf5 \strokec5  voiceTrainingScript \cf8 \strokec8 =\cf5 \strokec5  [\
+  \{\
+    \cf10 \strokec10 stage\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 ,\
+    \cf10 \strokec10 title\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 "Meet Your Voice"\cf5 \strokec5 ,\
+    \cf10 \strokec10 prompts\cf8 \strokec8 :\cf5 \strokec5  [\
+      \{\
+        \cf10 \strokec10 instruction\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 "Let's start simple..."\cf5 \strokec5 ,\
+        \cf10 \strokec10 lineType\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 "timeOfDay"\cf5 \strokec5 ,\
+        \cf10 \strokec10 line\cf8 \strokec8 :\cf5 \strokec5  \{\
+          \cf10 \strokec10 morning\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 "Good morning! My name is \{userName\}..."\cf5 \strokec5 ,\
+          \cf10 \strokec10 afternoon\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 "Good afternoon!..."\cf5 \strokec5 ,\
+          
+\f4\i \cf6 \strokec6 // etc
+\f1\i0 \cf5 \strokec5 \
+        \}\
+      \}\
+    ]\
+  \},\
+  
+\f4\i \cf6 \strokec6 // ... 14 stages total
+\f1\i0 \cf5 \strokec5 \
+];\
+\
+module.exports \cf8 \strokec8 =\cf5 \strokec5  voiceTrainingScript;\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 3. NEW: Personalization Helper Functions\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Create 
+\f3\fs26 backend/data/personalizationHelper.js
+\f1\b0\fs24 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // backend/data/personalizationHelper.js
+\f1\i0 \cf5 \strokec5 \
+\
+
+\f4\i \cf6 \strokec6 // Get personalized line based on user context
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 getPersonalizedLine\cf5 \strokec5 (prompt, userContext) \{\
+  \cf7 \strokec7 const\cf5 \strokec5  \{ lineType, line \} \cf8 \strokec8 =\cf5 \strokec5  prompt;\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (lineType \cf8 \strokec8 ===\cf5 \strokec5  \cf11 \strokec11 'simple'\cf5 \strokec5 ) \{\
+    \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (line, userContext);\
+  \}\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (lineType \cf8 \strokec8 ===\cf5 \strokec5  \cf11 \strokec11 'timeOfDay'\cf5 \strokec5 ) \{\
+    \cf7 \strokec7 const\cf5 \strokec5  timeKey \cf8 \strokec8 =\cf5 \strokec5  userContext.timeOfDay \cf8 \strokec8 ||\cf5 \strokec5  \cf11 \strokec11 'morning'\cf5 \strokec5 ;\
+    \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (line[timeKey], userContext);\
+  \}\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (lineType \cf8 \strokec8 ===\cf5 \strokec5  \cf11 \strokec11 'generation'\cf5 \strokec5 ) \{\
+    \cf7 \strokec7 const\cf5 \strokec5  generation \cf8 \strokec8 =\cf5 \strokec5  userContext.generation \cf8 \strokec8 ||\cf5 \strokec5  \cf11 \strokec11 'default'\cf5 \strokec5 ;\
+    \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (line[generation] \cf8 \strokec8 ||\cf5 \strokec5  line.\cf7 \strokec7 default\cf5 \strokec5 , userContext);\
+  \}\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (lineType \cf8 \strokec8 ===\cf5 \strokec5  \cf11 \strokec11 'relationship'\cf5 \strokec5 ) \{\
+    \cf7 \strokec7 const\cf5 \strokec5  relationship \cf8 \strokec8 =\cf5 \strokec5  userContext.relationship \cf8 \strokec8 ||\cf5 \strokec5  \cf11 \strokec11 'default'\cf5 \strokec5 ;\
+    \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (line[relationship] \cf8 \strokec8 ||\cf5 \strokec5  line.\cf7 \strokec7 default\cf5 \strokec5 , userContext);\
+  \}\
+  \
+  \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (line, userContext);\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // Replace \{userName\}, \{city\}, etc.
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 replacePlaceholders\cf5 \strokec5 (text, userContext) \{\
+  \cf7 \strokec7 return\cf5 \strokec5  text\
+    .\cf8 \strokec8 replace\cf5 \strokec5 (\cf11 \strokec11 /\{userName\}/g\cf5 \strokec5 , userContext.name \cf8 \strokec8 ||\cf5 \strokec5  \cf11 \strokec11 'there'\cf5 \strokec5 )\
+    .\cf8 \strokec8 replace\cf5 \strokec5 (\cf11 \strokec11 /\{city\}/g\cf5 \strokec5 , userContext.city \cf8 \strokec8 ||\cf5 \strokec5  \cf11 \strokec11 'your city'\cf5 \strokec5 );\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // Determine time of day
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 getTimeOfDay\cf5 \strokec5 () \{\
+  \cf7 \strokec7 const\cf5 \strokec5  hour \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 new\cf5 \strokec5  \cf9 \strokec9 Date\cf5 \strokec5 ().\cf8 \strokec8 getHours\cf5 \strokec5 ();\
+  \cf7 \strokec7 if\cf5 \strokec5  (hour \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 5\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  hour \cf8 \strokec8 <\cf5 \strokec5  \cf9 \strokec9 12\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 'morning'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (hour \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 12\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  hour \cf8 \strokec8 <\cf5 \strokec5  \cf9 \strokec9 18\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 'afternoon'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (hour \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 18\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  hour \cf8 \strokec8 <\cf5 \strokec5  \cf9 \strokec9 22\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 'evening'\cf5 \strokec5 ;\
+  \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 'lateNight'\cf5 \strokec5 ;\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // Determine generation from birth year
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 getGeneration\cf5 \strokec5 (birthYear) \{\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 1950\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 1959\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '1950s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 1960\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 1969\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '1960s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 1970\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 1979\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '1970s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 1980\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 1989\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '1980s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 1990\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 1999\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '1990s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 if\cf5 \strokec5  (birthYear \cf8 \strokec8 >=\cf5 \strokec5  \cf9 \strokec9 2000\cf5 \strokec5  \cf8 \strokec8 &&\cf5 \strokec5  birthYear \cf8 \strokec8 <=\cf5 \strokec5  \cf9 \strokec9 2009\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 '2000s'\cf5 \strokec5 ;\
+  \cf7 \strokec7 return\cf5 \strokec5  \cf11 \strokec11 'default'\cf5 \strokec5 ;\
+\}\
+\
+module.exports \cf8 \strokec8 =\cf5 \strokec5  \{\
+  getPersonalizedLine,\
+  getTimeOfDay,\
+  getGeneration\
+\};\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 4. UPDATE: API Endpoints\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Update 
+\f3\fs26 backend/routes/voiceRoutes.js
+\f1\b0\fs24 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // backend/routes/voiceRoutes.js
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 const\cf5 \strokec5  voiceTrainingScript \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 require\cf5 \strokec5 (\cf11 \strokec11 '../data/voiceTrainingScript'\cf5 \strokec5 );\
+\cf7 \strokec7 const\cf5 \strokec5  \{ getPersonalizedLine, getTimeOfDay, getGeneration \} \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 require\cf5 \strokec5 (\cf11 \strokec11 '../data/personalizationHelper'\cf5 \strokec5 );\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // NEW ENDPOINT: Get personalized script for user
+\f1\i0 \cf5 \strokec5 \
+router.\cf8 \strokec8 get\cf5 \strokec5 (\cf11 \strokec11 '/script'\cf5 \strokec5 , \cf7 \strokec7 async\cf5 \strokec5  (req, res) \cf8 \strokec8 =>\cf5 \strokec5  \{\
+  \cf7 \strokec7 try\cf5 \strokec5  \{\
+    \cf7 \strokec7 const\cf5 \strokec5  user \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  User.\cf8 \strokec8 findById\cf5 \strokec5 (req.user.id);\
+    \
+    \cf7 \strokec7 const\cf5 \strokec5  userContext \cf8 \strokec8 =\cf5 \strokec5  \{\
+      \cf10 \strokec10 name\cf8 \strokec8 :\cf5 \strokec5  user.name,\
+      \cf10 \strokec10 city\cf8 \strokec8 :\cf5 \strokec5  user.city,\
+      \cf10 \strokec10 hometown\cf8 \strokec8 :\cf5 \strokec5  user.hometown,\
+      \cf10 \strokec10 generation\cf8 \strokec8 :\cf5 \strokec5  user.generation,\
+      \cf10 \strokec10 relationship\cf8 \strokec8 :\cf5 \strokec5  user.relationship,\
+      \cf10 \strokec10 timeOfDay\cf8 \strokec8 :\cf5 \strokec5  \cf8 \strokec8 getTimeOfDay\cf5 \strokec5 ()\
+    \};\
+    \
+    
+\f4\i \cf6 \strokec6 // Personalize the entire script
+\f1\i0 \cf5 \strokec5 \
+    \cf7 \strokec7 const\cf5 \strokec5  personalizedScript \cf8 \strokec8 =\cf5 \strokec5  voiceTrainingScript.\cf8 \strokec8 map\cf5 \strokec5 (stage \cf8 \strokec8 =>\cf5 \strokec5  (\{\
+      \cf8 \strokec8 ...\cf5 \strokec5 stage,\
+      \cf10 \strokec10 prompts\cf8 \strokec8 :\cf5 \strokec5  stage.prompts.\cf8 \strokec8 map\cf5 \strokec5 (prompt \cf8 \strokec8 =>\cf5 \strokec5  (\{\
+        \cf8 \strokec8 ...\cf5 \strokec5 prompt,\
+        \cf10 \strokec10 displayLine\cf8 \strokec8 :\cf5 \strokec5  \cf8 \strokec8 getPersonalizedLine\cf5 \strokec5 (prompt, userContext)\
+      \}))\
+    \}));\
+    \
+    res.\cf8 \strokec8 json\cf5 \strokec5 (personalizedScript);\
+  \} \cf7 \strokec7 catch\cf5 \strokec5  (error) \{\
+    res.\cf8 \strokec8 status\cf5 \strokec5 (\cf9 \strokec9 500\cf5 \strokec5 ).\cf8 \strokec8 json\cf5 \strokec5 (\{ \cf10 \strokec10 error\cf8 \strokec8 :\cf5 \strokec5  error.message \});\
+  \}\
+\});\
+\
+
+\f4\i \cf6 \strokec6 // EXISTING ENDPOINTS - KEEP
+\f1\i0 \cf5 \strokec5 \
+router.\cf8 \strokec8 post\cf5 \strokec5 (\cf11 \strokec11 '/record'\cf5 \strokec5 , \cf8 \strokec8 ...\cf5 \strokec5 );\
+router.\cf8 \strokec8 post\cf5 \strokec5 (\cf11 \strokec11 '/train'\cf5 \strokec5 , \cf8 \strokec8 ...\cf5 \strokec5 );\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 5. NEW: Onboarding Endpoint\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\b0\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // backend/routes/userRoutes.js (or voiceRoutes.js)
+\f1\i0 \cf5 \strokec5 \
+\
+
+\f4\i \cf6 \strokec6 // Save user personalization data
+\f1\i0 \cf5 \strokec5 \
+router.\cf8 \strokec8 post\cf5 \strokec5 (\cf11 \strokec11 '/onboarding'\cf5 \strokec5 , \cf7 \strokec7 async\cf5 \strokec5  (req, res) \cf8 \strokec8 =>\cf5 \strokec5  \{\
+  \cf7 \strokec7 try\cf5 \strokec5  \{\
+    \cf7 \strokec7 const\cf5 \strokec5  \{ name, birthYear, city, hometown, relationship \} \cf8 \strokec8 =\cf5 \strokec5  req.body;\
+    \
+    \cf7 \strokec7 const\cf5 \strokec5  user \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  User.\cf8 \strokec8 findByIdAndUpdate\cf5 \strokec5 (\
+      req.user.id,\
+      \{\
+        name,\
+        city,\
+        hometown,\
+        birthYear,\
+        \cf10 \strokec10 generation\cf8 \strokec8 :\cf5 \strokec5  \cf8 \strokec8 getGeneration\cf5 \strokec5 (birthYear),\
+        relationship\
+      \},\
+      \{ \cf7 \strokec7 new\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 true\cf5 \strokec5  \}\
+    );\
+    \
+    res.\cf8 \strokec8 json\cf5 \strokec5 (\{ \cf10 \strokec10 success\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 true\cf5 \strokec5 , user \});\
+  \} \cf7 \strokec7 catch\cf5 \strokec5  (error) \{\
+    res.\cf8 \strokec8 status\cf5 \strokec5 (\cf9 \strokec9 500\cf5 \strokec5 ).\cf8 \strokec8 json\cf5 \strokec5 (\{ \cf10 \strokec10 error\cf8 \strokec8 :\cf5 \strokec5  error.message \});\
+  \}\
+\});\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55356 \u57256  FRONTEND CHANGES\
+\pard\pardeftab720\sa280\partightenfactor0
+
+\fs28 \cf0 1. NEW: Onboarding Form Component\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Create 
+\f3\fs26 frontend/components/VoiceTraining/OnboardingForm.jsx
+\f1\b0\fs24 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // frontend/components/VoiceTraining/OnboardingForm.jsx
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 import\cf5 \strokec5  React, \{ useState \} \cf7 \strokec7 from\cf5 \strokec5  \cf11 \strokec11 'react'\cf5 \strokec5 ;\
+\
+\cf7 \strokec7 export\cf5 \strokec5  \cf7 \strokec7 default\cf5 \strokec5  \cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 OnboardingForm\cf5 \strokec5 (\{ onComplete \}) \{\
+  \cf7 \strokec7 const\cf5 \strokec5  [formData, setFormData] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 (\{\
+    \cf10 \strokec10 name\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 ''\cf5 \strokec5 ,\
+    \cf10 \strokec10 birthYear\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 ''\cf5 \strokec5 ,\
+    \cf10 \strokec10 city\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 ''\cf5 \strokec5 ,\
+    \cf10 \strokec10 relationship\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 ''\cf5 \strokec5 \
+  \});\
+  \
+  \cf7 \strokec7 const\cf5 \strokec5  \cf8 \strokec8 handleSubmit\cf5 \strokec5  \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 async\cf5 \strokec5  (e) \cf8 \strokec8 =>\cf5 \strokec5  \{\
+    e.\cf8 \strokec8 preventDefault\cf5 \strokec5 ();\
+    \
+    
+\f4\i \cf6 \strokec6 // Save to backend
+\f1\i0 \cf5 \strokec5 \
+    \cf7 \strokec7 const\cf5 \strokec5  response \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  \cf8 \strokec8 fetch\cf5 \strokec5 (\cf11 \strokec11 '/api/users/onboarding'\cf5 \strokec5 , \{\
+      \cf10 \strokec10 method\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 'POST'\cf5 \strokec5 ,\
+      \cf10 \strokec10 headers\cf8 \strokec8 :\cf5 \strokec5  \{ \cf10 \strokec10 'Content-Type'\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 'application/json'\cf5 \strokec5  \},\
+      \cf10 \strokec10 body\cf8 \strokec8 :\cf5 \strokec5  \cf9 \strokec9 JSON\cf5 \strokec5 .\cf8 \strokec8 stringify\cf5 \strokec5 (formData)\
+    \});\
+    \
+    \cf7 \strokec7 if\cf5 \strokec5  (response.ok) \{\
+      \cf8 \strokec8 onComplete\cf5 \strokec5 ();\
+    \}\
+  \};\
+  \
+  \cf7 \strokec7 return\cf5 \strokec5  (\
+    \cf8 \strokec8 <\cf5 \strokec5 form onSubmit\cf8 \strokec8 =\cf5 \strokec5 \{handleSubmit\}\cf8 \strokec8 >\cf5 \strokec5 \
+      \cf8 \strokec8 <\cf5 \strokec5 h2\cf8 \strokec8 >\cf5 \strokec5 Let's personalize your experience\cf8 \strokec8 </\cf5 \strokec5 h2\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 input \
+        type\cf8 \strokec8 =\cf11 \strokec11 "text"\cf5 \strokec5  \
+        placeholder\cf8 \strokec8 =\cf11 \strokec11 "Your first name"\cf5 \strokec5 \
+        value\cf8 \strokec8 =\cf5 \strokec5 \{formData.name\}\
+        onChange\cf8 \strokec8 =\cf5 \strokec5 \{(e) \cf8 \strokec8 =>\cf5 \strokec5  \cf8 \strokec8 setFormData\cf5 \strokec5 (\{\cf8 \strokec8 ...\cf5 \strokec5 formData, \cf10 \strokec10 name\cf8 \strokec8 :\cf5 \strokec5  e.target.value\})\}\
+        required\
+      \cf8 \strokec8 />\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 input \
+        type\cf8 \strokec8 =\cf11 \strokec11 "number"\cf5 \strokec5  \
+        placeholder\cf8 \strokec8 =\cf11 \strokec11 "Birth year (e.g., 1975)"\cf5 \strokec5 \
+        min\cf8 \strokec8 =\cf11 \strokec11 "1930"\cf5 \strokec5 \
+        max\cf8 \strokec8 =\cf11 \strokec11 "2010"\cf5 \strokec5 \
+        value\cf8 \strokec8 =\cf5 \strokec5 \{formData.birthYear\}\
+        onChange\cf8 \strokec8 =\cf5 \strokec5 \{(e) \cf8 \strokec8 =>\cf5 \strokec5  \cf8 \strokec8 setFormData\cf5 \strokec5 (\{\cf8 \strokec8 ...\cf5 \strokec5 formData, \cf10 \strokec10 birthYear\cf8 \strokec8 :\cf5 \strokec5  e.target.value\})\}\
+        required\
+      \cf8 \strokec8 />\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 input \
+        type\cf8 \strokec8 =\cf11 \strokec11 "text"\cf5 \strokec5  \
+        placeholder\cf8 \strokec8 =\cf11 \strokec11 "Your city"\cf5 \strokec5 \
+        value\cf8 \strokec8 =\cf5 \strokec5 \{formData.city\}\
+        onChange\cf8 \strokec8 =\cf5 \strokec5 \{(e) \cf8 \strokec8 =>\cf5 \strokec5  \cf8 \strokec8 setFormData\cf5 \strokec5 (\{\cf8 \strokec8 ...\cf5 \strokec5 formData, \cf10 \strokec10 city\cf8 \strokec8 :\cf5 \strokec5  e.target.value\})\}\
+        required\
+      \cf8 \strokec8 />\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 select \
+        value\cf8 \strokec8 =\cf5 \strokec5 \{formData.relationship\}\
+        onChange\cf8 \strokec8 =\cf5 \strokec5 \{(e) \cf8 \strokec8 =>\cf5 \strokec5  \cf8 \strokec8 setFormData\cf5 \strokec5 (\{\cf8 \strokec8 ...\cf5 \strokec5 formData, \cf10 \strokec10 relationship\cf8 \strokec8 :\cf5 \strokec5  e.target.value\})\}\
+        required\
+      \cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 ""\cf8 \strokec8 >\cf5 \strokec5 Who are you recording \cf7 \strokec7 for\cf8 \strokec8 ?</\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "daughter"\cf8 \strokec8 >\cf5 \strokec5 My daughter\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "son"\cf8 \strokec8 >\cf5 \strokec5 My son\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "spouse"\cf8 \strokec8 >\cf5 \strokec5 My spouse\cf8 \strokec8 /\cf5 \strokec5 partner\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "grandchild"\cf8 \strokec8 >\cf5 \strokec5 My grandchild\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "friend"\cf8 \strokec8 >\cf9 \strokec9 A\cf5 \strokec5  friend\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 option value\cf8 \strokec8 =\cf11 \strokec11 "parent"\cf8 \strokec8 >\cf5 \strokec5 My parent\cf8 \strokec8 </\cf5 \strokec5 option\cf8 \strokec8 >\cf5 \strokec5 \
+      \cf8 \strokec8 </\cf5 \strokec5 select\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 button type\cf8 \strokec8 =\cf11 \strokec11 "submit"\cf8 \strokec8 >\cf5 \strokec5 Start Voice Training\cf8 \strokec8 </\cf5 \strokec5 button\cf8 \strokec8 >\cf5 \strokec5 \
+    \cf8 \strokec8 </\cf5 \strokec5 form\cf8 \strokec8 >\cf5 \strokec5 \
+  );\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 2. UPDATE: Voice Training Flow Component\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Update 
+\f3\fs26 frontend/components/VoiceTraining/VoiceTrainingFlow.jsx
+\f1\b0\fs24 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // frontend/components/VoiceTraining/VoiceTrainingFlow.jsx
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 import\cf5 \strokec5  React, \{ useState, useEffect \} \cf7 \strokec7 from\cf5 \strokec5  \cf11 \strokec11 'react'\cf5 \strokec5 ;\
+\
+\cf7 \strokec7 export\cf5 \strokec5  \cf7 \strokec7 default\cf5 \strokec5  \cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 VoiceTrainingFlow\cf5 \strokec5 () \{\
+  \cf7 \strokec7 const\cf5 \strokec5  [script, setScript] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 ([]);\
+  \cf7 \strokec7 const\cf5 \strokec5  [currentStage, setCurrentStage] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 (\cf9 \strokec9 0\cf5 \strokec5 );\
+  \cf7 \strokec7 const\cf5 \strokec5  [currentPromptIndex, setCurrentPromptIndex] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 (\cf9 \strokec9 0\cf5 \strokec5 );\
+  \cf7 \strokec7 const\cf5 \strokec5  [isRecording, setIsRecording] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 (\cf9 \strokec9 false\cf5 \strokec5 );\
+  \
+  
+\f4\i \cf6 \strokec6 // Fetch personalized script on mount
+\f1\i0 \cf5 \strokec5 \
+  \cf8 \strokec8 useEffect\cf5 \strokec5 (() \cf8 \strokec8 =>\cf5 \strokec5  \{\
+    \cf7 \strokec7 async\cf5 \strokec5  \cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 fetchScript\cf5 \strokec5 () \{\
+      \cf7 \strokec7 const\cf5 \strokec5  response \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  \cf8 \strokec8 fetch\cf5 \strokec5 (\cf11 \strokec11 '/api/voice/script'\cf5 \strokec5 );\
+      \cf7 \strokec7 const\cf5 \strokec5  data \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  response.\cf8 \strokec8 json\cf5 \strokec5 ();\
+      \cf8 \strokec8 setScript\cf5 \strokec5 (data);\
+    \}\
+    \cf8 \strokec8 fetchScript\cf5 \strokec5 ();\
+  \}, []);\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (\cf8 \strokec8 !\cf5 \strokec5 script.length) \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 <\cf5 \strokec5 div\cf8 \strokec8 >\cf5 \strokec5 Loading\cf8 \strokec8 ...</\cf5 \strokec5 div\cf8 \strokec8 >\cf5 \strokec5 ;\
+  \
+  \cf7 \strokec7 const\cf5 \strokec5  stage \cf8 \strokec8 =\cf5 \strokec5  script[currentStage];\
+  \cf7 \strokec7 const\cf5 \strokec5  prompt \cf8 \strokec8 =\cf5 \strokec5  stage.prompts[currentPromptIndex];\
+  \
+  \cf7 \strokec7 const\cf5 \strokec5  totalPrompts \cf8 \strokec8 =\cf5 \strokec5  script.\cf8 \strokec8 reduce\cf5 \strokec5 ((sum, s) \cf8 \strokec8 =>\cf5 \strokec5  sum \cf8 \strokec8 +\cf5 \strokec5  s.prompts.length, \cf9 \strokec9 0\cf5 \strokec5 );\
+  \cf7 \strokec7 const\cf5 \strokec5  currentPromptNumber \cf8 \strokec8 =\cf5 \strokec5  script\
+    .\cf8 \strokec8 slice\cf5 \strokec5 (\cf9 \strokec9 0\cf5 \strokec5 , currentStage)\
+    .\cf8 \strokec8 reduce\cf5 \strokec5 ((sum, s) \cf8 \strokec8 =>\cf5 \strokec5  sum \cf8 \strokec8 +\cf5 \strokec5  s.prompts.length, \cf9 \strokec9 0\cf5 \strokec5 ) \cf8 \strokec8 +\cf5 \strokec5  currentPromptIndex \cf8 \strokec8 +\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 ;\
+  \
+  \cf7 \strokec7 const\cf5 \strokec5  \cf8 \strokec8 handleNext\cf5 \strokec5  \cf8 \strokec8 =\cf5 \strokec5  () \cf8 \strokec8 =>\cf5 \strokec5  \{\
+    \cf7 \strokec7 if\cf5 \strokec5  (currentPromptIndex \cf8 \strokec8 <\cf5 \strokec5  stage.prompts.length \cf8 \strokec8 -\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 ) \{\
+      \cf8 \strokec8 setCurrentPromptIndex\cf5 \strokec5 (currentPromptIndex \cf8 \strokec8 +\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 );\
+    \} \cf7 \strokec7 else\cf5 \strokec5  \cf7 \strokec7 if\cf5 \strokec5  (currentStage \cf8 \strokec8 <\cf5 \strokec5  script.length \cf8 \strokec8 -\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 ) \{\
+      \cf8 \strokec8 setCurrentStage\cf5 \strokec5 (currentStage \cf8 \strokec8 +\cf5 \strokec5  \cf9 \strokec9 1\cf5 \strokec5 );\
+      \cf8 \strokec8 setCurrentPromptIndex\cf5 \strokec5 (\cf9 \strokec9 0\cf5 \strokec5 );\
+    \} \cf7 \strokec7 else\cf5 \strokec5  \{\
+      
+\f4\i \cf6 \strokec6 // Training complete!
+\f1\i0 \cf5 \strokec5 \
+      \cf8 \strokec8 handleComplete\cf5 \strokec5 ();\
+    \}\
+  \};\
+  \
+  \cf7 \strokec7 return\cf5 \strokec5  (\
+    \cf8 \strokec8 <\cf5 \strokec5 div className\cf8 \strokec8 =\cf11 \strokec11 "voice-training"\cf8 \strokec8 >\cf5 \strokec5 \
+      \cf8 \strokec8 <\cf5 \strokec5 div className\cf8 \strokec8 =\cf11 \strokec11 "progress-bar"\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 div className\cf8 \strokec8 =\cf11 \strokec11 "progress"\cf5 \strokec5  style\cf8 \strokec8 =\cf5 \strokec5 \{\{ \cf10 \strokec10 width\cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 `\cf5 \strokec5 $\{(currentPromptNumber \cf8 \strokec8 /\cf5 \strokec5  totalPrompts) \cf8 \strokec8 *\cf5 \strokec5  \cf9 \strokec9 100\cf5 \strokec5 \}\cf11 \strokec11 %`\cf5 \strokec5  \}\} \cf8 \strokec8 />\cf5 \strokec5 \
+      \cf8 \strokec8 </\cf5 \strokec5 div\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 p className\cf8 \strokec8 =\cf11 \strokec11 "progress-text"\cf8 \strokec8 >\cf5 \strokec5 \
+        Recording \{currentPromptNumber\} \cf7 \strokec7 of\cf5 \strokec5  \{totalPrompts\}\
+      \cf8 \strokec8 </\cf5 \strokec5 p\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 h2\cf8 \strokec8 >\cf5 \strokec5 \{stage.title\}\cf8 \strokec8 </\cf5 \strokec5 h2\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 div className\cf8 \strokec8 =\cf11 \strokec11 "prompt-card"\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 p className\cf8 \strokec8 =\cf11 \strokec11 "instruction"\cf8 \strokec8 >\cf5 \strokec5 \{prompt.instruction\}\cf8 \strokec8 </\cf5 \strokec5 p\cf8 \strokec8 >\cf5 \strokec5 \
+        \cf8 \strokec8 <\cf5 \strokec5 p className\cf8 \strokec8 =\cf11 \strokec11 "line-to-read"\cf8 \strokec8 >\cf5 \strokec5 \{prompt.displayLine\}\cf8 \strokec8 </\cf5 \strokec5 p\cf8 \strokec8 >\cf5 \strokec5 \
+      \cf8 \strokec8 </\cf5 \strokec5 div\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 button onClick\cf8 \strokec8 =\cf5 \strokec5 \{handleRecord\}\cf8 \strokec8 >\cf5 \strokec5 \
+        \{isRecording \cf8 \strokec8 ?\cf5 \strokec5  \cf11 \strokec11 'Stop Recording'\cf5 \strokec5  \cf8 \strokec8 :\cf5 \strokec5  \cf11 \strokec11 'Start Recording'\cf5 \strokec5 \}\
+      \cf8 \strokec8 </\cf5 \strokec5 button\cf8 \strokec8 >\cf5 \strokec5 \
+      \
+      \cf8 \strokec8 <\cf5 \strokec5 button onClick\cf8 \strokec8 =\cf5 \strokec5 \{handleNext\} disabled\cf8 \strokec8 =\cf5 \strokec5 \{\cf8 \strokec8 !\cf5 \strokec5 recordingComplete\}\cf8 \strokec8 >\cf5 \strokec5 \
+        Next\
+      \cf8 \strokec8 </\cf5 \strokec5 button\cf8 \strokec8 >\cf5 \strokec5 \
+    \cf8 \strokec8 </\cf5 \strokec5 div\cf8 \strokec8 >\cf5 \strokec5 \
+  );\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \strokec2 3. UPDATE: App Flow\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Update 
+\f3\fs26 frontend/App.jsx
+\f1\b0\fs24  to add onboarding step\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \strokec2 javascript\
+\pard\pardeftab720\partightenfactor0
+
+\f4\i \cf6 \strokec6 // frontend/App.jsx
+\f1\i0 \cf5 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 import\cf5 \strokec5  \{ useState, useEffect \} \cf7 \strokec7 from\cf5 \strokec5  \cf11 \strokec11 'react'\cf5 \strokec5 ;\
+\cf7 \strokec7 import\cf5 \strokec5  OnboardingForm \cf7 \strokec7 from\cf5 \strokec5  \cf11 \strokec11 './components/VoiceTraining/OnboardingForm'\cf5 \strokec5 ;\
+\cf7 \strokec7 import\cf5 \strokec5  VoiceTrainingFlow \cf7 \strokec7 from\cf5 \strokec5  \cf11 \strokec11 './components/VoiceTraining/VoiceTrainingFlow'\cf5 \strokec5 ;\
+\
+\cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 App\cf5 \strokec5 () \{\
+  \cf7 \strokec7 const\cf5 \strokec5  [needsOnboarding, setNeedsOnboarding] \cf8 \strokec8 =\cf5 \strokec5  \cf8 \strokec8 useState\cf5 \strokec5 (\cf9 \strokec9 true\cf5 \strokec5 );\
+  \
+  \cf8 \strokec8 useEffect\cf5 \strokec5 (() \cf8 \strokec8 =>\cf5 \strokec5  \{\
+    
+\f4\i \cf6 \strokec6 // Check if user has completed onboarding
+\f1\i0 \cf5 \strokec5 \
+    \cf7 \strokec7 async\cf5 \strokec5  \cf7 \strokec7 function\cf5 \strokec5  \cf8 \strokec8 checkOnboarding\cf5 \strokec5 () \{\
+      \cf7 \strokec7 const\cf5 \strokec5  response \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  \cf8 \strokec8 fetch\cf5 \strokec5 (\cf11 \strokec11 '/api/users/me'\cf5 \strokec5 );\
+      \cf7 \strokec7 const\cf5 \strokec5  user \cf8 \strokec8 =\cf5 \strokec5  \cf7 \strokec7 await\cf5 \strokec5  response.\cf8 \strokec8 json\cf5 \strokec5 ();\
+      \
+      \cf7 \strokec7 if\cf5 \strokec5  (user.name \cf8 \strokec8 &&\cf5 \strokec5  user.generation \cf8 \strokec8 &&\cf5 \strokec5  user.relationship) \{\
+        \cf8 \strokec8 setNeedsOnboarding\cf5 \strokec5 (\cf9 \strokec9 false\cf5 \strokec5 );\
+      \}\
+    \}\
+    \cf8 \strokec8 checkOnboarding\cf5 \strokec5 ();\
+  \}, []);\
+  \
+  \cf7 \strokec7 if\cf5 \strokec5  (needsOnboarding) \{\
+    \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 <\cf5 \strokec5 OnboardingForm onComplete\cf8 \strokec8 =\cf5 \strokec5 \{() \cf8 \strokec8 =>\cf5 \strokec5  \cf8 \strokec8 setNeedsOnboarding\cf5 \strokec5 (\cf9 \strokec9 false\cf5 \strokec5 )\} \cf8 \strokec8 />\cf5 \strokec5 ;\
+  \}\
+  \
+  \cf7 \strokec7 return\cf5 \strokec5  \cf8 \strokec8 <\cf5 \strokec5 VoiceTrainingFlow \cf8 \strokec8 />\cf5 \strokec5 ;\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55357 \u56785 \u65039  DELETE OLD STRUCTURE\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\fs24 \cf0 Remove these files/code:
+\f1\b0 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf5 \strokec5 \uc0\u10060  DELETE: /backend/data/oldVoiceScript.js (if exists)\
+\uc0\u10060  DELETE: Any hardcoded 3-act script arrays\
+\uc0\u10060  DELETE: Old non-personalized prompt structures\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 \strokec2 Keep but update:
+\f1\b0 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf5 \strokec5 \uc0\u9989  KEEP: Recording logic (microphone access, audio processing)\
+\uc0\u9989  KEEP: ElevenLabs API integration\
+\uc0\u9989  KEEP: Audio storage logic\
+\uc0\u9989  UPDATE: How you fetch and display prompts\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u55357 \u56522  DATA FLOW\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\b0\fs22 \cf4 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf5 \strokec5 1. User signs up/logs in\
+   \uc0\u8595 \
+2. OnboardingForm collects: name, birth year, city, relationship\
+   \uc0\u8595 \
+3. POST /api/users/onboarding \uc0\u8594  saves to User model\
+   \uc0\u8595 \
+4. VoiceTrainingFlow mounts\
+   \uc0\u8595 \
+5. GET /api/voice/script \uc0\u8594  returns personalized 14-stage script\
+   \uc0\u8595 \
+6. Frontend displays stage.prompts[i].displayLine (already personalized)\
+   \uc0\u8595 \
+7. User records each prompt\
+   \uc0\u8595 \
+8. POST /api/voice/record \uc0\u8594  saves audio chunks\
+   \uc0\u8595 \
+9. After all 52 prompts complete:\
+   POST /api/voice/train \uc0\u8594  sends to ElevenLabs\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 \
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 \strokec2 \uc0\u9989  CHECKLIST FOR REPLIT\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\f1\b0\fs24 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Create 
+\f5\fs26 backend/data/voiceTrainingScript.js
+\f1\fs24 \
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Create 
+\f5\fs26 backend/data/personalizationHelper.js
+\f1\fs24 \
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Update 
+\f5\fs26 backend/models/User.js
+\f1\fs24  with new fields\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Add 
+\f5\fs26 GET /api/voice/script
+\f1\fs24  endpoint\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Add 
+\f5\fs26 POST /api/users/onboarding
+\f1\fs24  endpoint\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Create 
+\f5\fs26 frontend/components/VoiceTraining/OnboardingForm.jsx
+\f1\fs24 \
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Update 
+\f5\fs26 frontend/components/VoiceTraining/VoiceTrainingFlow.jsx
+\f1\fs24 \
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Update 
+\f5\fs26 frontend/App.jsx
+\f1\fs24  to include onboarding step\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Delete old 3-act script files\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Test personalization with different user contexts\
+}
