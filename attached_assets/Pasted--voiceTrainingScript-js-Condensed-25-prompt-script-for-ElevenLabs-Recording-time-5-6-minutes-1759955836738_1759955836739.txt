@@ -1,19 +1,7 @@
-// Condensed 25-Prompt Voice Training Script for ElevenLabs
+// voiceTrainingScript.js - Condensed 25-prompt script for ElevenLabs
 // Recording time: 5-6 minutes
 
-export interface VoicePrompt {
-  instruction: string;
-  lineType: 'simple' | 'timeOfDay' | 'timeOfDayCity' | 'city' | 'generation' | 'relationship' | 'relationshipGoodbye';
-  line: string | Record<string, string>;
-}
-
-export interface VoiceStage {
-  stage: number;
-  title: string;
-  prompts: VoicePrompt[];
-}
-
-export const voiceTrainingScript: VoiceStage[] = [
+const voiceTrainingScript = [
   
   // ============================================
   // ACT 1: ESTABLISH VOICE (6 prompts)
@@ -24,6 +12,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Meet Your Voice",
     prompts: [
       {
+        id: 1,
         instruction: "Let's start with a personalized greeting.",
         lineType: "timeOfDay",
         line: {
@@ -34,11 +23,13 @@ export const voiceTrainingScript: VoiceStage[] = [
         }
       },
       {
+        id: 2,
         instruction: "Now say it like you're hosting a cooking show.",
         lineType: "simple",
         line: "Welcome back to the kitchen! Today we're making something special, so grab your apron and let's get started!"
       },
       {
+        id: 3,
         instruction: "Now you're a golf announcer whispering at the Masters.",
         lineType: "simple",
         line: "And here we are on the eighteenth hole. The crowd is silent. This putt could change everything."
@@ -51,11 +42,13 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Tongue Twister Warm-Up",
     prompts: [
       {
+        id: 4,
         instruction: "Let's warm up that voice! Say this three times fast.",
         lineType: "simple",
         line: "She sells seashells by the seashore. She sells seashells by the seashore. She sells seashells by the seashore."
       },
       {
+        id: 5,
         instruction: "Now this one - don't trip!",
         lineType: "simple",
         line: "Peter Piper picked a peck of pickled peppers. How many pickled peppers did Peter Piper pick?"
@@ -68,6 +61,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Movie Trailer Voice",
     prompts: [
       {
+        id: 6,
         instruction: "Time for your movie trailer voice. Deep and dramatic.",
         lineType: "simple",
         line: "In a world where nothing is as it seems, one person will discover the truth that changes everything."
@@ -84,6 +78,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "The Absurd Storyteller",
     prompts: [
       {
+        id: 7,
         instruction: "You're telling a weird fairy tale. Make it dramatic.",
         lineType: "generation",
         line: {
@@ -97,6 +92,7 @@ export const voiceTrainingScript: VoiceStage[] = [
         }
       },
       {
+        id: 8,
         instruction: "The action sequence! Things are getting wild!",
         lineType: "simple",
         line: "Suddenly, an army of angry pelicans descended from the sky, demanding their tax returns! Gerald grabbed his calculator and fought back with spreadsheets and pivot tables!"
@@ -109,16 +105,19 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Character Voices",
     prompts: [
       {
+        id: 9,
         instruction: "You're David Attenborough observing animals in the wild.",
         lineType: "simple",
         line: "And here we see the majestic creature in its natural habitat, carefully stalking its prey through the tall grass. Every movement is calculated. Every step, deliberate."
       },
       {
+        id: 10,
         instruction: "You're selling the most amazing product ever invented. Be enthusiastic!",
         lineType: "simple",
         line: "But wait, there's more! Order now and we'll double your offer! That's right, you get two for the price of one! Don't wait! Operators are standing by!"
       },
       {
+        id: 11,
         instruction: "Now you're a smooth radio DJ.",
         lineType: "timeOfDayCity",
         line: {
@@ -136,26 +135,31 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Emotional Moments",
     prompts: [
       {
+        id: 12,
         instruction: "Say this line like you just won the lottery.",
         lineType: "simple",
         line: "I can't believe it! This is incredible! This is the best day of my entire life!"
       },
       {
+        id: 13,
         instruction: "Now like you're a detective who just solved the case.",
         lineType: "simple",
         line: "So that's how it happened. I should have seen it from the beginning. It was right in front of me the whole time."
       },
       {
+        id: 14,
         instruction: "Like a proud parent at graduation.",
         lineType: "simple",
         line: "I'm so proud of you. All that hard work paid off. This is your moment. You did it."
       },
       {
+        id: 15,
         instruction: "Now whisper like it's a secret.",
         lineType: "simple",
         line: "Come here, I have to tell you something... but don't tell anyone else. This is just between you and me, okay?"
       },
       {
+        id: 16,
         instruction: "Practice speaking to someone you love.",
         lineType: "relationship",
         line: {
@@ -180,11 +184,13 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Wisdom & Advice",
     prompts: [
       {
+        id: 17,
         instruction: "Give advice to your younger self. Be real.",
         lineType: "simple",
         line: "Stop worrying so much about what other people think. Life's too short for that. Do what makes you happy. Trust your gut. You'll be fine."
       },
       {
+        id: 18,
         instruction: "Encourage someone having a rough day.",
         lineType: "simple",
         line: "Today was tough, I know. But you got through it. That counts for something. Tomorrow's a fresh start. You're tougher than you realize."
@@ -197,6 +203,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "A Little Humor",
     prompts: [
       {
+        id: 19,
         instruction: "Tell a dad joke with confidence.",
         lineType: "generation",
         line: {
@@ -217,6 +224,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Memory & Heart",
     prompts: [
       {
+        id: 20,
         instruction: "Talk about a moment you'll never forget.",
         lineType: "generation",
         line: {
@@ -230,6 +238,7 @@ export const voiceTrainingScript: VoiceStage[] = [
         }
       },
       {
+        id: 21,
         instruction: "Talk about a place that feels like home.",
         lineType: "city",
         line: "There's this spot in {city} I go to when I need to think. Quiet. Peaceful. Just me and my thoughts. Everyone needs a place like that. Somewhere you can just breathe."
@@ -242,16 +251,19 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "Numbers & Dates",
     prompts: [
       {
+        id: 22,
         instruction: "Count from one to ten like you're teaching a kid.",
         lineType: "simple",
         line: "One, two, three, four, five, six, seven, eight, nine, ten. Good job!"
       },
       {
+        id: 23,
         instruction: "Say a date and time clearly.",
         lineType: "simple",
         line: "Today is March fifteenth, two thousand twenty-five, at three-thirty in the afternoon."
       },
       {
+        id: 24,
         instruction: "Say a phone number and address.",
         lineType: "simple",
         line: "You can reach me at five-five-five, two-one-two, three-four-five-six. I live at four-twenty-seven Oak Street, apartment two-B."
@@ -264,6 +276,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     title: "The Big Finish",
     prompts: [
       {
+        id: 25,
         instruction: "Say goodbye with love.",
         lineType: "relationshipGoodbye",
         line: {
@@ -280,3 +293,5 @@ export const voiceTrainingScript: VoiceStage[] = [
   }
   
 ];
+
+module.exports = voiceTrainingScript;
