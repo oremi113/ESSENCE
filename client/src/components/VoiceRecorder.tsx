@@ -216,8 +216,8 @@ export default function VoiceRecorder({
 
   const reRecord = () => {
     setCurrentRecording(null);
-    // Clear the recording from parent's recordings array by passing null blob
-    onRecordingComplete(null as any, currentPromptIndex, '');
+    // Note: We only clear the local UI state. The user needs to record again to save.
+    // The existing recording in the database remains until overwritten by a new recording.
   };
 
   const formatTime = (seconds: number) => {

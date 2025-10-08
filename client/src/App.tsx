@@ -236,6 +236,12 @@ function Router() {
   };
 
   const handleRecordingComplete = (audioBlob: Blob, promptIndex: number, passageText: string) => {
+    // Safety check: only process if we have a valid Blob
+    if (!audioBlob || !(audioBlob instanceof Blob)) {
+      console.error('Invalid audio blob received:', audioBlob);
+      return;
+    }
+    
     // Update local state immediately for responsive UI
     const newRecordings = [...recordings];
     newRecordings[promptIndex] = audioBlob;
