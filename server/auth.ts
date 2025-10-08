@@ -78,32 +78,31 @@ export async function hashPassword(password: string): Promise<string> {
 
 // Middleware to require authentication
 export function requireAuth(req: any, res: any, next: any) {
-  console.log('[AUTH] Checking authentication. isAuthenticated:', req.isAuthenticated(), 'NODE_ENV:', process.env.NODE_ENV);
-  
-  if (req.isAuthenticated()) {
-    console.log('[AUTH] User is authenticated:', req.user?.email);
-    return next();
-  }
-  
-  // DEV MODE: Create a mock authenticated user if not authenticated
+  // DEV MODE: Bypass authentication completely in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('[AUTH] DEV MODE: Bypassing authentication with mock user');
-    req.user = {
-      id: 'dev-user-123',
-      email: 'dev@test.com',
-      name: 'Dev User',
-      age: 30,
-      city: 'San Francisco',
-      state: 'CA',
-      country: 'USA',
-      timezone: 'America/Los_Angeles',
-      voiceModelId: null,
-      voiceTrainingComplete: 0,
-      createdAt: new Date().toISOString()
-    };
+    if (!req.user) {
+      console.log('[AUTH] DEV MODE: Creating mock user');
+      req.user = {
+        id: 'dev-user-123',
+        email: 'dev@test.com',
+        name: 'Dev User',
+        age: 30,
+        city: 'San Francisco',
+        state: 'CA',
+        country: 'USA',
+        timezone: 'America/Los_Angeles',
+        voiceModelId: null,
+        voiceTrainingComplete: 0,
+        createdAt: new Date().toISOString()
+      };
+    }
     return next();
   }
   
-  console.log('[AUTH] Authentication failed, returning 401');
+  // PRODUCTION: Require real authentication
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  
   res.status(401).json({ error: 'Authentication required' });
 }

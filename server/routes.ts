@@ -38,6 +38,17 @@ function getUserId(req: any): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Debug endpoint to check auth status
+  app.get("/api/debug/auth", (req, res) => {
+    res.json({
+      isAuthenticated: req.isAuthenticated?.() ?? false,
+      hasUser: !!req.user,
+      user: req.user,
+      nodeEnv: process.env.NODE_ENV,
+      hasSession: !!req.session,
+    });
+  });
+
   // Authentication routes
   app.post("/api/signup", async (req, res, next) => {
     const serverInfo = {
