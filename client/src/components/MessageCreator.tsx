@@ -329,7 +329,7 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
           )}
 
           {/* Step 3: Message Editing */}
-          {selectedTemplate && (
+          {(selectedTemplate || content.trim()) && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="message-title">Step 3: Customize your message</Label>
