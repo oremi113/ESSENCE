@@ -1,0 +1,205 @@
+Continuation of voiceTrainingScript3Stage.js
+javascript      {
+        id: 6,
+        instruction: "Share a childhood memory. Let yourself get nostalgic.",
+        emotionalTone: "nostalgic/reflective",
+        lineType: "generation",
+        line: {
+          "1950s": "I remember summer days in the fifties. We'd play outside from morning till night, until the streetlights came on. No phones, no screens, just us kids running around the neighborhood. And you know what? We were perfectly happy. Those were simpler times, but they were good times. Really good times.",
+          "1960s": "Growing up in the sixties, everything felt like it was changing. The music, the culture, the whole world was shifting. My parents didn't always understand it, but we felt like we were part of something bigger, you know? Looking back now, those were electric times. I'm glad I got to see it all happen.",
+          "1970s": "I remember the seventies so clearly. We'd ride bikes everywhere, no helmets, no worries. We'd stay out until it got dark, and nobody really worried about it the way they do now. Different times, you know? But man, I have such good memories from back then. Wouldn't trade them for anything.",
+          "1980s": "The eighties were wild. Big hair, bright colors, MTV actually playing music videos all day long. We had to wait all week to watch our favorite TV show. No streaming, no recording. If you missed it, you missed it. But somehow that made it more special, you know? We appreciated things more.",
+          "1990s": "Growing up in the nineties, we were right on that edge. The internet was starting, but we still went outside and hung out in person. We'd make plans without texting, just show up at someone's house and see if they were home. Seems crazy now, but it worked. Those were good times.",
+          "2000s": "Being a kid in the two thousands was different. YouTube, social media, smartphones, it was all starting to take off. My childhood looks so different from my parents'. But you know what? It's the only one I knew, and I wouldn't trade it. Every generation has their thing, and that was ours.",
+          "default": "I remember when I was a kid. Summer days that felt endless, playing outside, laughing until our stomachs hurt. We didn't have much, but we had each other, and honestly? That was enough. Those simple moments, those are the memories I hold onto. Those are the ones that matter."
+        }
+      },
+      {
+        id: 7,
+        instruction: "Talk about someone who's always been there for you. Get a little emotional.",
+        emotionalTone: "grateful/emotional",
+        lineType: "simple",
+        line: "There's this person in my life who's always been there for me. Through the good times and the bad times, they never wavered. Never gave up on me, even when I probably gave them plenty of reasons to. They taught me what real loyalty looks like, what friendship actually means. I don't know where I'd be without them. Honestly, I don't even want to think about it."
+      },
+      {
+        id: 8,
+        instruction: "Give advice to your younger self. Be honest and real.",
+        emotionalTone: "wise/reflective",
+        lineType: "generation",
+        line: {
+          "1950s": "If I could go back and talk to my younger self, I'd say this: Stop trying so hard to fit in. The world's changing faster than you realize, and the people who matter won't care about that stuff anyway. Just be yourself. Trust your instincts. It'll work out better than you think.",
+          "1960s": "What would I tell my younger self? Don't worry so much about what everyone thinks. You're living through incredible times. The revolution isn't just out there in the world, it's inside you too. Trust your gut, do what feels right, and you'll be fine. Better than fine, actually.",
+          "1970s": "If I could tell my younger self anything, it'd be this: Stop worrying so much about everything. Life doesn't go according to plan, and that's okay. Actually, that's more than okay. Some of the best things that happened to me were the ones I never saw coming. Just relax and trust the process.",
+          "1980s": "I'd tell my younger self: Take more risks. You're young, you can afford to mess up. Don't play it so safe all the time. The biggest regrets you'll have aren't the things you did wrong, they're the things you were too scared to try. So go for it. What's the worst that could happen?",
+          "1990s": "Here's what I'd tell my younger self: Stop stressing so much about the future. Technology's going to change everything, but you'll figure it out. Everyone does. Just focus on what's right in front of you, enjoy the moment, and the rest will fall into place. I promise.",
+          "2000s": "If I could go back, I'd tell myself: Get off social media more. Seriously. Real life is happening around you, and the people in front of you matter way more than the people online. Don't miss out on actual moments because you're worried about posting them. Be present.",
+          "default": "What would I tell my younger self? Simple. Stop worrying so much about what other people think. Life's too short for that. Do what makes you happy. Trust your gut. Follow your heart. And guess what? It's all going to work out fine. Better than you ever imagined."
+        }
+      },
+      {
+        id: 9,
+        instruction: "Share a moment when you felt really proud of yourself.",
+        emotionalTone: "proud/accomplished",
+        lineType: "simple",
+        line: "I remember this one time when I finally did something I'd been scared to do for years. And when it was done, when I'd actually pulled it off, I just stood there thinking, 'I did it. I really did it.' That feeling of realizing you're stronger than you thought? Braver than you gave yourself credit for? That's something you don't forget. That stays with you."
+      },
+      {
+        id: 10,
+        instruction: "Talk about what a perfect day looks like for you. Sound content and happy.",
+        emotionalTone: "content/happy",
+        lineType: "city",
+        line: "My perfect day? It's actually pretty simple. I'd wake up without an alarm, make a really good cup of coffee, and just take my time with breakfast. No rush, no stress. Then maybe take a walk around {city}, enjoy the weather, clear my head. Later, I'd spend time with people I love. Maybe cook a nice dinner together, nothing fancy. Just good food, good company, good conversation. That's it. That's my perfect day."
+      },
+      {
+        id: 11,
+        instruction: "Share something you're genuinely grateful for. Mean it.",
+        emotionalTone: "grateful/warm",
+        lineType: "simple",
+        line: "You know what I'm really grateful for? The people in my life who've stuck around. The ones who've seen me at my worst and didn't run away. The ones who celebrate with me when things are good and sit with me when things are hard. That's real. That's what matters. And I don't say it enough, but I'm grateful for every single one of them."
+      },
+      {
+        id: 12,
+        instruction: "Share a lesson life taught you the hard way.",
+        emotionalTone: "wise/honest",
+        lineType: "simple",
+        line: "Life taught me something the hard way: You can't control everything. And believe me, I tried. But the more you try to force things to go your way, the more they fall apart. Sometimes you just have to let go, trust the process, and see what happens. It's scary as hell, but it's also kind of freeing. Turns out, not everything needs to be controlled."
+      },
+      {
+        id: 13,
+        instruction: "Talk about a time you were scared but did it anyway.",
+        emotionalTone: "vulnerable/brave",
+        lineType: "simple",
+        line: "I remember being absolutely terrified before doing something I'd never done before. My hands were shaking, my heart was pounding, and I kept thinking, 'What if I fail? What if this goes horribly wrong?' But I did it anyway. And you know what? It turned out okay. Not perfect, but okay. And I learned something important that day: Being scared doesn't mean you can't do it. It just means it matters."
+      },
+      {
+        id: 14,
+        instruction: "Say something encouraging to someone having a tough day. Really mean it.",
+        emotionalTone: "encouraging/supportive",
+        lineType: "simple",
+        line: "Hey, if you're having a rough day, I just want you to know something. It's okay. You don't have to be strong all the time. You don't have to have it all figured out. Just getting through today is enough. Tomorrow's a fresh start, and things will get better. I promise. You're tougher than you think you are, and you're going to be okay."
+      },
+      {
+        id: 15,
+        instruction: "Share what you've learned about what really matters in life.",
+        emotionalTone: "reflective/wise",
+        lineType: "simple",
+        line: "Here's what I've figured out after all these years. What really matters isn't the big stuff. It's not the job title or the house or the car. It's the people. It's the moments. It's the late-night conversations, the shared meals, the inside jokes. That's what you remember. That's what makes life worth living. The rest is just noise."
+      },
+      {
+        id: 16,
+        instruction: "Tell someone you believe in them. Sound confident and warm.",
+        emotionalTone: "encouraging/confident",
+        lineType: "simple",
+        line: "Hey, I want you to know something. I believe in you. I know you're doubting yourself right now, wondering if you can do this, but I've seen what you're capable of. You're stronger than you think. You've got this. Even when it feels impossible, even when you want to give up, keep going. You're going to make it. I know you are."
+      },
+      {
+        id: 17,
+        instruction: "Share what you've learned about love over the years.",
+        emotionalTone: "wise/warm",
+        lineType: "simple",
+        line: "Here's what I've learned about love over the years. It's not always fireworks and grand gestures. Most of the time, it's quiet. It's showing up. It's being there when it's hard. It's choosing each other, over and over again, even on the days when it's not easy. The movies got it all wrong. Real love is in the everyday moments, the little things. That's where the magic actually is."
+      }
+    ],
+    completionMessage: {
+      title: "⭐ Excellent Work!",
+      body: "You're capturing so much emotion! Your voice is really taking shape now.",
+      progress: "68% Complete",
+      cta: "Finish Strong - Stage 3",
+      alternativeCta: "Save & Finish Later"
+    }
+  },
+  
+  // ==========================================
+  // STAGE 3: FINAL TOUCH (8 prompts, 3-4 min)
+  // ==========================================
+  {
+    stage: 3,
+    title: "Final Touch - Complete Your Voice",
+    description: "Record the final 8 prompts to finish your voice training",
+    estimatedTime: "3-4 minutes",
+    prompts: [
+      {
+        id: 18,
+        instruction: "Speak directly to the person you're recording for. Be genuine and loving.",
+        emotionalTone: "loving/intimate",
+        lineType: "relationship",
+        line: {
+          daughter: "Sweetheart, I want you to know something. I'm so proud of the woman you've become. You're strong, you're kind, you're everything I hoped you'd be and so much more. Keep being exactly who you are. The world needs more people like you. I love you so, so much.",
+          son: "Buddy, I need to tell you something. You've grown into an incredible man. I'm so proud of who you are, the choices you're making, the person you're becoming. Keep trusting yourself. Keep being you. You're doing great, and I believe in you. Always have, always will. Love you, son.",
+          spouse: "Hey love, I don't say this enough, but you're my person. You've seen me at my best and my worst, and you're still here. That means everything to me. I love you. Even when you drive me crazy. Especially then, actually. You make life better, and I'm grateful for you every single day.",
+          grandchild: "Hey kiddo, I want you to know something really important. You are so, so loved. More than you could ever imagine. Whatever happens in life, wherever you go, whatever you do, remember that. You've got people cheering for you, believing in you. And I'm one of them. I love you so much, sweetheart.",
+          friend: "My friend, I just want to say thank you. For being there, for listening, for making me laugh when I needed it most. You've seen me through some stuff, and you never bailed. That's rare, and I don't take it for granted. You're one of the good ones. Love you, friend.",
+          parent: "Mom, Dad... I don't say this enough, but thank you. For everything you've done, everything you've given me, all the sacrifices you made that I probably never even noticed. I love you. I hope I've made you proud, because you've made me who I am.",
+          default: "I just want you to know that you matter to me. More than you probably realize. You've made my life better just by being in it, and I'm grateful for you. Whatever you're going through, whatever happens, remember that you're not alone. I'm here. I care. And I love you."
+        }
+      },
+      {
+        id: 19,
+        instruction: "Share a hope you have for the future. Sound optimistic.",
+        emotionalTone: "hopeful/optimistic",
+        lineType: "simple",
+        line: "You know what I hope for? I hope we all slow down a little. Take more time to appreciate the small stuff. Spend more time with the people we love. Worry less about things that don't really matter in the end. Life's short, and we forget that sometimes. I hope we all remember to just... live. Really, truly live."
+      },
+      {
+        id: 20,
+        instruction: "Talk about what home means to you.",
+        emotionalTone: "reflective/warm",
+        lineType: "city",
+        line: "When I think about home, it's not really about a place. I mean, sure, I love {city}, but home is more than that. Home is where the people are. It's that feeling when you walk in and everything just feels right. It's where you can be yourself, completely, without any masks or pretending. That's home. And I'm really lucky to have that."
+      },
+      {
+        id: 21,
+        instruction: "Share a piece of simple wisdom. Keep it real.",
+        emotionalTone: "wise/warm",
+        lineType: "simple",
+        line: "Here's something I wish someone had told me when I was younger. Be kind. To others, yes, but also to yourself. We're all doing the best we can with what we have. Nobody's perfect. We all mess up. And that's okay. So be patient with yourself. Give yourself the same grace you'd give to someone you love. You deserve that too."
+      },
+      {
+        id: 22,
+        instruction: "For voice quality: Count clearly and warmly, like teaching someone.",
+        emotionalTone: "teaching/warm",
+        lineType: "simple",
+        line: "Okay, let's count together. Ready? One, two, three, four, five, six, seven, eight, nine, ten. Good! Now let's go backwards. Ten, nine, eight, seven, six, five, four, three, two, one. Perfect! See? You're really good at this."
+      },
+      {
+        id: 23,
+        instruction: "For voice quality: Say numbers, dates, and contact info clearly.",
+        emotionalTone: "clear/neutral",
+        lineType: "city",
+        line: "Just so you have my information: You can reach me at five-five-five, two-one-two, three-four-five-six. My address is four-twenty-seven Oak Street, apartment two-B, {city}. And today's date is March fifteenth, two thousand twenty-five, around three-thirty in the afternoon."
+      },
+      {
+        id: 24,
+        instruction: "Add a light moment of humor. Keep it natural.",
+        emotionalTone: "playful/light",
+        lineType: "simple",
+        line: "You know what always makes me laugh? When you're walking and you trip over literally nothing. Just your own feet. And then you do that quick look around to see if anyone saw. We all do it. Every single one of us. It's ridiculous, but it's human. Sometimes you just gotta laugh at yourself, you know?"
+      },
+      {
+        id: 25,
+        instruction: "End with a heartfelt, personalized goodbye. Make it count.",
+        emotionalTone: "loving/warm",
+        lineType: "relationshipGoodbye",
+        line: {
+          daughter: "Alright sweetheart, that's everything. I love you so much. More than words can say. I'm always here for you, always in your corner, always cheering for you. Whatever you need, whatever happens, you've got me. Take care of yourself. I love you. Bye for now, kiddo.",
+          son: "Okay buddy, I think we're done. I'm proud of you. So incredibly proud. And I love you. Remember that when things get hard. You've got people who believe in you, and I'm at the top of that list. Take care, son. Love you. Talk soon.",
+          spouse: "Alright love, that's it. I love you. You know that, right? Even when I don't say it enough, even when life gets crazy, I love you. You're my favorite person, my best friend, my everything. Always have been. Take care of yourself. I'll see you soon. Love you always.",
+          grandchild: "Okay kiddo, that's all from me for now. Remember: You're so loved. So, so loved. Be good, have fun, and know you can always talk to me about anything. Anything at all. Love you to the moon and back, sweetheart. Bye for now!",
+          friend: "Alright my friend, that's a wrap. Thanks for being you. Thanks for being in my life. You make everything better, and I hope you know that. Take care of yourself, okay? I'll talk to you soon. Love you, friend. Stay awesome. Bye!",
+          parent: "Okay, I think that's everything. I love you. Thank you for everything you've done for me, everything you've taught me, all the ways you've shaped who I am. I hope I make you proud. Take care of yourself. I'll call you soon. Love you so much. Bye.",
+          default: "Alright, that's a wrap. Thank you for listening to all of this. I hope this brings you joy whenever you hear it. Remember you're loved, you're valued, and you're doing better than you think. Take care of yourself. Love you. Bye for now!"
+        }
+      }
+    ],
+    completionMessage: {
+      title: "🏆 Congratulations!",
+      body: "You did it! Your voice is fully trained and ready to create unlimited personalized messages.",
+      progress: "100% Complete",
+      cta: "Create Your First Message",
+      celebration: "confetti"
+    }
+  }
+  
+];
+
+module.exports = voiceTrainingScript3Stage;
