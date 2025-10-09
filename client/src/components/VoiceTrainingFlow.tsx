@@ -270,7 +270,7 @@ export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveR
   }
 
   if (currentView === 'recording') {
-    if (loadingPrompt) {
+    if (loadingPrompt || !currentPromptData) {
       return (
         <div className="max-w-3xl mx-auto p-6 space-y-6">
           <Skeleton className="h-8 w-64" />
