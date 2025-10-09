@@ -41,6 +41,21 @@ Preferred communication style: Simple, everyday language.
 - **Enhanced signup flow**: Added required age and city fields for better personalization
 - **Improved personalization**: Voice training prompts now properly use user's age and city data
 
+### 3-Stage Voice Training System (October 2025)
+- **Staged training flow**: 25 prompts organized into 3 stages (5/12/8 prompts) with save & resume functionality
+- **Real audio recording**: Implemented MediaRecorder API for actual microphone capture (replaced placeholder)
+- **Backend state sync**: Stage selection updates backend currentStage before recording begins
+- **Progress tracking**: User-level progress with completed prompts array and stage completion flags
+- **Milestone celebrations**: Modal celebrations between stages to maintain user engagement
+- **State management**: Proper cleanup between prompts, no setState during render, useEffect for edge cases
+- **New API endpoints**: 
+  - GET /api/voice/training/current - Returns current prompt with progress
+  - POST /api/voice/training/save-progress - Saves recording and updates progress
+  - POST /api/voice/training/set-stage - Updates user's current stage
+  - GET /api/voice/training/stages - Returns all stage statuses
+- **Components**: StageSelector, MilestoneCelebration, VoiceTrainingFlow orchestrator
+- **Flow**: Stage selection → Recording with review → Save to DB → Progress update → Next prompt/celebration
+
 ### Recommendations for Production
 1. **End-to-end testing**: Test complete flow (signup → recording → TTS → playback/export) with real user data
 2. **API monitoring**: Track ElevenLabs API response times and retry rates to validate improvements
