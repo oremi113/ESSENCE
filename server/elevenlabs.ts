@@ -75,52 +75,78 @@ export class ElevenLabsService {
    * Create a new voice from training samples
    */
   async createVoice(name: string, description: string, files: { name: string; data: Buffer; mimeType?: string }[]): Promise<string> {
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
+    const maxRetries = 3;
     
-    // Add each audio file with proper MIME type and validation
-    files.forEach((file, index) => {
-      const mimeType = file.mimeType || 'audio/wav';
-      
-      // Check if MIME type is supported by ElevenLabs
-      const supportedFormats = ['audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/m4a', 'audio/flac'];
-      if (!supportedFormats.some(format => mimeType.includes(format.split('/')[1]))) {
-        console.warn(`Potentially unsupported audio format: ${mimeType}. May cause voice creation issues.`);
-      }
-      
-      const extension = mimeType.includes('webm') ? 'webm' : 
-                      mimeType.includes('mp3') ? 'mp3' :
-                      mimeType.includes('mpeg') ? 'mp3' :
-                      mimeType.includes('m4a') ? 'm4a' :
-                      mimeType.includes('flac') ? 'flac' : 'wav';
-      const fileName = file.name.replace(/\.\w+$/, `.${extension}`);
-      
-      const blob = new Blob([file.data], { type: mimeType });
-      formData.append('files', blob, fileName);
-    });
-
-    const response = await fetch(`${this.baseUrl}/voices/add`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': this.apiKey,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const errorData = await response.json() as ElevenLabsError;
-        errorMessage = errorData.detail?.message || errorMessage;
-      } catch {
-        // Response isn't JSON, use status text
-      }
-      throw new Error(`Failed to create voice: ${errorMessage}`);
-    }
+        // Important: FormData must be rebuilt on each attempt because it can only be consumed once
+        // Moving this outside the loop would cause retries to fail with empty/consumed form data
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        
+        // Add each audio file with proper MIME type and validation
+        files.forEach((file, index) => {
+          const mimeType = file.mimeType || 'audio/wav';
+          
+          // Check if MIME type is supported by ElevenLabs
+          const supportedFormats = ['audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/m4a', 'audio/flac'];
+          if (!supportedFormats.some(format => mimeType.includes(format.split('/')[1]))) {
+            console.warn(`Potentially unsupported audio format: ${mimeType}. May cause voice creation issues.`);
+          }
+          
+          const extension = mimeType.includes('webm') ? 'webm' : 
+                          mimeType.includes('mp3') ? 'mp3' :
+                          mimeType.includes('mpeg') ? 'mp3' :
+                          mimeType.includes('m4a') ? 'm4a' :
+                          mimeType.includes('flac') ? 'flac' : 'wav';
+          const fileName = file.name.replace(/\.\w+$/, `.${extension}`);
+          
+          const blob = new Blob([file.data], { type: mimeType });
+          formData.append('files', blob, fileName);
+        });
 
-    const result = await response.json() as { voice_id: string };
-    return result.voice_id;
+        const response = await fetch(`${this.baseUrl}/voices/add`, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': this.apiKey,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          if (response.status === 429 && attempt < maxRetries) {
+            const retryAfter = parseInt(response.headers.get('retry-after') || '2');
+            console.log(`Rate limited on attempt ${attempt}/${maxRetries}. Retrying after ${retryAfter}s...`);
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            continue;
+          }
+          
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json() as ElevenLabsError;
+            errorMessage = errorData.detail?.message || errorMessage;
+          } catch {
+            // Response isn't JSON, use status text
+          }
+          throw new Error(`Failed to create voice: ${errorMessage}`);
+        }
+
+        const result = await response.json() as { voice_id: string };
+        console.log(`Voice created successfully on attempt ${attempt}${attempt > 1 ? ` (after ${attempt - 1} ${attempt === 2 ? 'retry' : 'retries'})` : ''}`);
+        return result.voice_id;
+      } catch (error) {
+        if (attempt === maxRetries) {
+          // Log once and rethrow - don't duplicate error logging
+          throw error;
+        }
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.log(`Voice creation attempt ${attempt}/${maxRetries} failed. Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw new Error('Max retries exceeded for voice creation');
   }
 
   /**
