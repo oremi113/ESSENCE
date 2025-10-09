@@ -596,7 +596,12 @@ function Router() {
             currentUser={user}
             currentProfile={currentProfile}
             onSaveRecording={async (audioBlob: Blob, phraseIndex: number, phraseText: string) => {
-              await saveRecordingMutation.mutateAsync({ audioBlob, phraseIndex, phraseText });
+              // Use existing recording mutation which handles all voice model logic
+              await saveRecordingMutation.mutateAsync({ 
+                audioBlob, 
+                phraseIndex, 
+                phraseText 
+              });
             }}
           />
         )}
