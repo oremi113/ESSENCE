@@ -1,0 +1,278 @@
+PART 3: DATABASE SCHEMA UPDATES (COMPLETE)
+File: backend/models/User.js
+Add these NEW fields to your existing User schema:
+javascriptconst mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  
+  // ===== EXISTING FIELDS (KEEP THESE) =====
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  password: { 
+    type: String, 
+    required: true 
+  },
+  
+  // Personalization fields (from onboarding)
+  name: { 
+    type: String, 
+    required: true,
+    trim: true,
+    maxLength: 50
+  },
+  city: { 
+    type: String, 
+    required: true,
+    trim: true,
+    maxLength: 50
+  },
+  birthYear: { 
+    type: Number, 
+    required: true,
+    min: 1930,
+    max: 2010
+  },
+  generation: { 
+    type: String, 
+    required: true,
+    enum: ['1950s', '1960s', '1970s', '1980s', '1990s', '2000s', 'default']
+  },
+  relationship: { 
+    type: String, 
+    required: true,
+    enum: ['daughter', 'son', 'spouse', 'grandchild', 'friend', 'parent', 'default']
+  },
+  
+  onboardingCompleted: { 
+    type: Boolean, 
+    default: false 
+  },
+  
+  // ===== NEW: VOICE TRAINING PROGRESS =====
+  voiceTraining: {
+    // Current position in training
+    currentStage: { 
+      type: Number, 
+      default: 1, 
+      min: 1, 
+      max: 3 
+    },
+    
+    // Current prompt index within the stage (0-based)
+    currentPromptIndex: { 
+      type: Number, 
+      default: 0,
+      min: 0
+    },
+    
+    // Array of completed prompt IDs (1-25)
+    completedPrompts: [{ 
+      type: Number,
+      min: 1,
+      max: 25
+    }],
+    
+    // Stage completion flags
+    stage1Complete: { 
+      type: Boolean, 
+      default: false 
+    },
+    stage2Complete: { 
+      type: Boolean, 
+      default: false 
+    },
+    stage3Complete: { 
+      type: Boolean, 
+      default: false 
+    },
+    
+    // When they last saved progress
+    lastSaved: { 
+      type: Date 
+    },
+    
+    // Total recording time in seconds (for analytics)
+    totalRecordingTime: { 
+      type: Number, 
+      default: 0,
+      min: 0
+    },
+    
+    // When training was started
+    trainingStartedAt: {
+      type: Date
+    },
+    
+    // When training was completed
+    trainingCompletedAt: {
+      type: Date
+    }
+  },
+  
+  // ===== EXISTING FIELDS (KEEP THESE) =====
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+  
+});
+
+// Update the updatedAt field before saving
+userSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+// Virtual field for overall training progress percentage
+userSchema.virtual('voiceTraining.progressPercentage').get(function() {
+  return Math.round((this.voiceTraining.completedPrompts.length / 25) * 100);
+});
+
+// Virtual field for checking if training is complete
+userSchema.virtual('voiceTraining.isComplete').get(function() {
+  return this.voiceTraining.stage3Complete && 
+         this.voiceTraining.completedPrompts.length === 25;
+});
+
+// Method to check if a specific prompt is completed
+userSchema.methods.isPromptCompleted = function(promptId) {
+  return this.voiceTraining.completedPrompts.includes(promptId);
+};
+
+// Method to get next prompt info
+userSchema.methods.getNextPrompt = function() {
+  const script = require('../data/voiceTrainingScript3Stage');
+  const currentStage = script.find(s => s.stage === this.voiceTraining.currentStage);
+  
+  if (!currentStage) {
+    return null;
+  }
+  
+  const nextPrompt = currentStage.prompts[this.voiceTraining.currentPromptIndex];
+  return nextPrompt || null;
+};
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
+Migration Script (For Existing Users)
+File: backend/migrations/addVoiceTrainingFields.js
+javascriptconst mongoose = require('mongoose');
+const User = require('../models/User');
+
+/**
+ * Migration: Add voiceTraining fields to existing users
+ * Run this once after updating the User model
+ */
+async function migrateVoiceTrainingFields() {
+  try {
+    console.log('🔄 Starting voice training migration...');
+    
+    // Connect to database
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    
+    // Find users without voiceTraining field
+    const usersToUpdate = await User.find({
+      voiceTraining: { $exists: false }
+    });
+    
+    console.log(`📊 Found ${usersToUpdate.length} users to migrate`);
+    
+    // Update each user
+    for (const user of usersToUpdate) {
+      user.voiceTraining = {
+        currentStage: 1,
+        currentPromptIndex: 0,
+        completedPrompts: [],
+        stage1Complete: false,
+        stage2Complete: false,
+        stage3Complete: false,
+        totalRecordingTime: 0
+      };
+      
+      await user.save();
+      console.log(`✅ Migrated user: ${user.email}`);
+    }
+    
+    console.log('✅ Migration complete!');
+    console.log(`📊 Updated ${usersToUpdate.length} users`);
+    
+    process.exit(0);
+    
+  } catch (error) {
+    console.error('❌ Migration error:', error);
+    process.exit(1);
+  }
+}
+
+// Run migration
+migrateVoiceTrainingFields();
+How to run the migration:
+bashnode backend/migrations/addVoiceTrainingFields.js
+
+Database Indexes (For Performance)
+Add to User model or separate migration:
+javascript// Add indexes for faster queries
+userSchema.index({ 'voiceTraining.currentStage': 1 });
+userSchema.index({ 'voiceTraining.stage3Complete': 1 });
+userSchema.index({ 'voiceTraining.lastSaved': 1 });
+
+Example Queries
+Check if user has completed training:
+javascriptconst user = await User.findById(userId);
+const isComplete = user.voiceTraining.isComplete; // uses virtual field
+Get all users who completed Stage 1 but not Stage 2:
+javascriptconst users = await User.find({
+  'voiceTraining.stage1Complete': true,
+  'voiceTraining.stage2Complete': false
+});
+Get users who started but didn't complete training (for follow-up):
+javascriptconst incompletedUsers = await User.find({
+  'voiceTraining.completedPrompts.0': { $exists: true }, // Has at least 1 prompt
+  'voiceTraining.stage3Complete': false,
+  'voiceTraining.lastSaved': { 
+    $lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last saved > 7 days ago
+  }
+});
+
+Sample User Document (After Migration)
+json{
+  "_id": "507f1f77bcf86cd799439011",
+  "email": "user@example.com",
+  "password": "$2b$10$...",
+  "name": "Michael",
+  "city": "Chicago",
+  "birthYear": 1975,
+  "generation": "1970s",
+  "relationship": "daughter",
+  "onboardingCompleted": true,
+  "voiceTraining": {
+    "currentStage": 2,
+    "currentPromptIndex": 5,
+    "completedPrompts": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "stage1Complete": true,
+    "stage2Complete": false,
+    "stage3Complete": false,
+    "lastSaved": "2025-10-08T15:30:00.000Z",
+    "totalRecordingTime": 420,
+    "trainingStartedAt": "2025-10-08T15:00:00.000Z"
+  },
+  "createdAt": "2025-10-01T10:00:00.000Z",
+  "updatedAt": "2025-10-08T15:30:00.000Z"
+}
+
+Validation Rules Summary
+FieldTypeRequiredMinMaxDefaultcurrentStageNumberYes131currentPromptIndexNumberYes0-0completedPromptsArray[Number]Yes125[]stage1CompleteBooleanYes--falsestage2CompleteBooleanYes--falsestage3CompleteBooleanYes--falselastSavedDateNo---totalRecordingTimeNumberYes0-0
+
+Part 3 Complete! This gives you everything for the database layer.
