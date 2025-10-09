@@ -1,5 +1,5 @@
-// Absurd, engaging voice training script optimized for voice quality
-// 25 prompts across 3 acts - designed to capture natural vocal variety
+// Voice training script with A/B testing capability
+// Change ACTIVE_SCRIPT to switch between versions
 
 export interface VoicePrompt {
   id?: number;
@@ -14,12 +14,12 @@ export interface VoiceStage {
   prompts: VoicePrompt[];
 }
 
-export const voiceTrainingScript: VoiceStage[] = [
+// ============================================
+// VERSION A: ABSURD & ENGAGING (Current)
+// ============================================
+const ABSURD_SCRIPT: VoiceStage[] = [
   
-  // ============================================
   // ACT 1: ABSURD INTRODUCTIONS (5 prompts)
-  // ============================================
-  
   {
     stage: 1,
     title: "Welcome to the Weirdness",
@@ -62,10 +62,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     ]
   },
   
-  // ============================================
   // ACT 2: ABSURD ADVENTURES (10 prompts)
-  // ============================================
-  
   {
     stage: 2,
     title: "Tales from the Weird Side",
@@ -94,7 +91,7 @@ export const voiceTrainingScript: VoiceStage[] = [
         id: 8,
         instruction: "The epic battle scene - go all out!",
         lineType: "simple",
-        line: "Suddenly, an army of angry pelicans descended from the sky! They were furious because Gerald owed them money from a timeshare deal gone wrong. Gerald grabbed the only weapon he had: his calculator! He fought them off with the power of mathematics, hurling tax returns and quarterly earnings reports at them like ninja stars. The pelicans never stood a chance against his pivot tables!",
+        line: "Suddenly, an army of angry pelicans descended from the sky! They were furious because Gerald owed them money from a timeshare deal gone wrong. Gerald grabbed the only weapon he had: his calculator! He fought them off with the power of mathematics, hurling tax returns and quarterly earnings reports at them like ninja stars. The pelicans never stood a chance against his pivot tables!"
       },
       {
         id: 9,
@@ -149,10 +146,7 @@ export const voiceTrainingScript: VoiceStage[] = [
     ]
   },
   
-  // ============================================
   // ACT 3: HEARTFELT (BUT STILL WEIRD) (10 prompts)
-  // ============================================
-  
   {
     stage: 3,
     title: "Getting Real (But Make It Weird)",
@@ -251,5 +245,201 @@ export const voiceTrainingScript: VoiceStage[] = [
       }
     ]
   }
-  
 ];
+
+// ============================================
+// VERSION B: EMOTIONAL & HEARTFELT
+// ============================================
+const EMOTIONAL_SCRIPT: VoiceStage[] = [
+  
+  // STAGE 1: QUICK START (5 prompts)
+  {
+    stage: 1,
+    title: "Quick Start",
+    prompts: [
+      {
+        id: 1,
+        instruction: "Start with a warm, natural greeting. Talk like you're meeting a friend.",
+        lineType: "simple",
+        line: "Good morning! My name is Michael, and I'm here in Chicago. It's a beautiful morning, and I'm excited to be doing this. This is actually kind of fun! Let's see how my voice sounds."
+      },
+      {
+        id: 2,
+        instruction: "Talk about something simple that makes you happy. Keep it light and genuine.",
+        lineType: "simple",
+        line: "You know what always makes me smile? A really good cup of coffee in the morning. There's something about that first sip, when it's hot and fresh, that just makes everything feel right. It's the little things, you know? Those simple moments that make your day better. That's what I'm grateful for."
+      },
+      {
+        id: 3,
+        instruction: "Share a quick story about your day or week. Be casual and natural.",
+        lineType: "simple",
+        line: "So this week has been pretty good, actually. I got out for a walk around Chicago, which was nice. The weather's been decent, and it felt good to get some fresh air and clear my head. Nothing too exciting, just life. But sometimes those quiet, normal days are exactly what you need, you know?"
+      },
+      {
+        id: 4,
+        instruction: "Talk about a place you love. Let yourself get a little nostalgic.",
+        lineType: "simple",
+        line: "There's this spot in Chicago that I really love. It's nothing fancy, just a quiet place where I can sit and think. Maybe it's a park bench, maybe it's a coffee shop corner, doesn't really matter. But when I'm there, everything just feels peaceful. Everyone needs a place like that, you know? Somewhere you can just breathe and be yourself."
+      },
+      {
+        id: 5,
+        instruction: "End this first stage with encouragement. Sound warm and supportive.",
+        lineType: "simple",
+        line: "You know what? If you're listening to this, I just want you to know something. Whatever you're going through right now, you're doing better than you think. I mean that. Life's hard sometimes, but you're here. You're showing up. And that counts for something. So give yourself some credit, okay? You've earned it."
+      }
+    ]
+  },
+  
+  // STAGE 2: BUILD EMOTION (12 prompts)
+  {
+    stage: 2,
+    title: "Build Emotion",
+    prompts: [
+      {
+        id: 6,
+        instruction: "Share a childhood memory. Let yourself get nostalgic.",
+        lineType: "simple",
+        line: "I remember when I was a kid. Summer days that felt endless, playing outside, laughing until our stomachs hurt. We didn't have much, but we had each other, and honestly? That was enough. Those simple moments, those are the memories I hold onto. Those are the ones that matter."
+      },
+      {
+        id: 7,
+        instruction: "Talk about someone who's always been there for you. Get a little emotional.",
+        lineType: "simple",
+        line: "There's this person in my life who's always been there for me. Through the good times and the bad times, they never wavered. Never gave up on me, even when I probably gave them plenty of reasons to. They taught me what real loyalty looks like, what friendship actually means. I don't know where I'd be without them. Honestly, I don't even want to think about it."
+      },
+      {
+        id: 8,
+        instruction: "Give advice to your younger self. Be honest and real.",
+        lineType: "simple",
+        line: "What would I tell my younger self? Simple. Stop worrying so much about what other people think. Life's too short for that. Do what makes you happy. Trust your gut. Follow your heart. And guess what? It's all going to work out fine. Better than you ever imagined."
+      },
+      {
+        id: 9,
+        instruction: "Share a moment when you felt really proud of yourself.",
+        lineType: "simple",
+        line: "I remember this one time when I finally did something I'd been scared to do for years. And when it was done, when I'd actually pulled it off, I just stood there thinking, 'I did it. I really did it.' That feeling of realizing you're stronger than you thought? Braver than you gave yourself credit for? That's something you don't forget. That stays with you."
+      },
+      {
+        id: 10,
+        instruction: "Talk about what a perfect day looks like for you. Sound content and happy.",
+        lineType: "simple",
+        line: "My perfect day? It's actually pretty simple. I'd wake up without an alarm, make a really good cup of coffee, and just take my time with breakfast. No rush, no stress. Then maybe take a walk around Chicago, enjoy the weather, clear my head. Later, I'd spend time with people I love. Maybe cook a nice dinner together, nothing fancy. Just good food, good company, good conversation. That's it. That's my perfect day."
+      },
+      {
+        id: 11,
+        instruction: "Share something you're genuinely grateful for. Mean it.",
+        lineType: "simple",
+        line: "You know what I'm really grateful for? The people in my life who've stuck around. The ones who've seen me at my worst and didn't run away. The ones who celebrate with me when things are good and sit with me when things are hard. That's real. That's what matters. And I don't say it enough, but I'm grateful for every single one of them."
+      },
+      {
+        id: 12,
+        instruction: "Share a lesson life taught you the hard way.",
+        lineType: "simple",
+        line: "Life taught me something the hard way: You can't control everything. And believe me, I tried. But the more you try to force things to go your way, the more they fall apart. Sometimes you just have to let go, trust the process, and see what happens. It's scary as hell, but it's also kind of freeing. Turns out, not everything needs to be controlled."
+      },
+      {
+        id: 13,
+        instruction: "Talk about a time you were scared but did it anyway.",
+        lineType: "simple",
+        line: "I remember being absolutely terrified before doing something I'd never done before. My hands were shaking, my heart was pounding, and I kept thinking, 'What if I fail? What if this goes horribly wrong?' But I did it anyway. And you know what? It turned out okay. Not perfect, but okay. And I learned something important that day: Being scared doesn't mean you can't do it. It just means it matters."
+      },
+      {
+        id: 14,
+        instruction: "Say something encouraging to someone having a tough day. Really mean it.",
+        lineType: "simple",
+        line: "Hey, if you're having a rough day, I just want you to know something. It's okay. You don't have to be strong all the time. You don't have to have it all figured out. Just getting through today is enough. Tomorrow's a fresh start, and things will get better. I promise. You're tougher than you think you are, and you're going to be okay."
+      },
+      {
+        id: 15,
+        instruction: "Share what you've learned about what really matters in life.",
+        lineType: "simple",
+        line: "Here's what I've figured out after all these years. What really matters isn't the big stuff. It's not the job title or the house or the car. It's the people. It's the moments. It's the late-night conversations, the shared meals, the inside jokes. That's what you remember. That's what makes life worth living. The rest is just noise."
+      },
+      {
+        id: 16,
+        instruction: "Tell someone you believe in them. Sound confident and warm.",
+        lineType: "simple",
+        line: "Hey, I want you to know something. I believe in you. I know you're doubting yourself right now, wondering if you can do this, but I've seen what you're capable of. You're stronger than you think. You've got this. Even when it feels impossible, even when you want to give up, keep going. You're going to make it. I know you are."
+      },
+      {
+        id: 17,
+        instruction: "Share what you've learned about love over the years.",
+        lineType: "simple",
+        line: "Here's what I've learned about love over the years. It's not always fireworks and grand gestures. Most of the time, it's quiet. It's showing up. It's being there when it's hard. It's choosing each other, over and over again, even on the days when it's not easy. The movies got it all wrong. Real love is in the everyday moments, the little things. That's where the magic actually is."
+      }
+    ]
+  },
+  
+  // STAGE 3: FINAL TOUCH (8 prompts)
+  {
+    stage: 3,
+    title: "Final Touch",
+    prompts: [
+      {
+        id: 18,
+        instruction: "Speak directly to the person you're recording for. Be genuine and loving.",
+        lineType: "simple",
+        line: "I just want you to know that you matter to me. More than you probably realize. You've made my life better just by being in it, and I'm grateful for you. Whatever you're going through, whatever happens, remember that you're not alone. I'm here. I care. And I love you."
+      },
+      {
+        id: 19,
+        instruction: "Share a hope you have for the future. Sound optimistic.",
+        lineType: "simple",
+        line: "You know what I hope for? I hope we all slow down a little. Take more time to appreciate the small stuff. Spend more time with the people we love. Worry less about things that don't really matter in the end. Life's short, and we forget that sometimes. I hope we all remember to just... live. Really, truly live."
+      },
+      {
+        id: 20,
+        instruction: "Talk about what home means to you.",
+        lineType: "simple",
+        line: "When I think about home, it's not really about a place. I mean, sure, I love Chicago, but home is more than that. Home is where the people are. It's that feeling when you walk in and everything just feels right. It's where you can be yourself, completely, without any masks or pretending. That's home. And I'm really lucky to have that."
+      },
+      {
+        id: 21,
+        instruction: "Share a piece of simple wisdom. Keep it real.",
+        lineType: "simple",
+        line: "Here's something I wish someone had told me when I was younger. Be kind. To others, yes, but also to yourself. We're all doing the best we can with what we have. Nobody's perfect. We all mess up. And that's okay. So be patient with yourself. Give yourself the same grace you'd give to someone you love. You deserve that too."
+      },
+      {
+        id: 22,
+        instruction: "For voice quality: Count clearly and warmly, like teaching someone.",
+        lineType: "simple",
+        line: "Okay, let's count together. Ready? One, two, three, four, five, six, seven, eight, nine, ten. Good! Now let's go backwards. Ten, nine, eight, seven, six, five, four, three, two, one. Perfect! See? You're really good at this."
+      },
+      {
+        id: 23,
+        instruction: "For voice quality: Say numbers, dates, and contact info clearly.",
+        lineType: "simple",
+        line: "Just so you have my information: You can reach me at five-five-five, two-one-two, three-four-five-six. My address is four-twenty-seven Oak Street, apartment two-B, Chicago. And today's date is March fifteenth, two thousand twenty-five, around three-thirty in the afternoon."
+      },
+      {
+        id: 24,
+        instruction: "Add a light moment of humor. Keep it natural.",
+        lineType: "simple",
+        line: "You know what always makes me laugh? When you're walking and you trip over literally nothing. Just your own feet. And then you do that quick look around to see if anyone saw. We all do it. Every single one of us. It's ridiculous, but it's human. Sometimes you just gotta laugh at yourself, you know?"
+      },
+      {
+        id: 25,
+        instruction: "End with a heartfelt, personalized goodbye. Make it count.",
+        lineType: "simple",
+        line: "Alright, that's a wrap. Thank you for listening to all of this. I hope this brings you joy whenever you hear it. Remember you're loved, you're valued, and you're doing better than you think. Take care of yourself. Love you. Bye for now!"
+      }
+    ]
+  }
+];
+
+// ============================================
+// ACTIVE SCRIPT SELECTOR
+// ============================================
+// Change this line to switch between versions for A/B testing:
+// - 'absurd' = Absurd & Engaging (with personalization)
+// - 'emotional' = Emotional & Heartfelt (simpler, more direct)
+
+export const ACTIVE_SCRIPT: 'absurd' | 'emotional' = 'absurd';  // ← CHANGE THIS LINE TO TEST
+
+const SCRIPT_VERSIONS = {
+  absurd: ABSURD_SCRIPT,
+  emotional: EMOTIONAL_SCRIPT
+};
+
+// Export the active script
+export const voiceTrainingScript = SCRIPT_VERSIONS[ACTIVE_SCRIPT];
