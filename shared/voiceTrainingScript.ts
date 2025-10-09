@@ -434,7 +434,7 @@ const EMOTIONAL_SCRIPT: VoiceStage[] = [
 // - 'absurd' = Absurd & Engaging (with personalization)
 // - 'emotional' = Emotional & Heartfelt (simpler, more direct)
 
-export const ACTIVE_SCRIPT: 'absurd' | 'emotional' = 'absurd';  // ← CHANGE THIS LINE TO TEST
+export const ACTIVE_SCRIPT: 'absurd' | 'emotional' = 'emotional';  // ← CHANGE THIS LINE TO TEST
 
 const SCRIPT_VERSIONS = {
   absurd: ABSURD_SCRIPT,
