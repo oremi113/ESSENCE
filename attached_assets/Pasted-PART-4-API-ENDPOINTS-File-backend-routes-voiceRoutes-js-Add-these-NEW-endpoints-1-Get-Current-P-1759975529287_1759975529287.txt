@@ -1,0 +1,126 @@
+PART 4: API ENDPOINTS
+File: backend/routes/voiceRoutes.js
+Add these NEW endpoints:
+
+1. Get Current Prompt
+javascriptrouter.get('/training/current', async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const script = require('../data/voiceTrainingScript3Stage');
+    const { getPersonalizedLine, getTimeOfDay } = require('../data/personalizationHelper');
+    
+    const currentStage = script.find(s => s.stage === user.voiceTraining.currentStage);
+    const currentPrompt = currentStage.prompts[user.voiceTraining.currentPromptIndex];
+    
+    if (!currentPrompt) {
+      return res.json({ complete: true, stage: user.voiceTraining.currentStage });
+    }
+    
+    const userContext = {
+      name: user.name,
+      city: user.city,
+      generation: user.generation,
+      relationship: user.relationship,
+      timeOfDay: getTimeOfDay()
+    };
+    
+    const displayLine = getPersonalizedLine(currentPrompt, userContext);
+    
+    res.json({
+      stage: currentStage.stage,
+      stageTitle: currentStage.title,
+      stageDescription: currentStage.description,
+      estimatedTime: currentStage.estimatedTime,
+      promptNumber: user.voiceTraining.completedPrompts.length + 1,
+      totalPrompts: 25,
+      progressPercentage: Math.round((user.voiceTraining.completedPrompts.length / 25) * 100),
+      currentPrompt: {
+        id: currentPrompt.id,
+        instruction: currentPrompt.instruction,
+        displayLine: displayLine
+      }
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+2. Save Progress
+javascriptrouter.post('/training/save-progress', async (req, res) => {
+  try {
+    const { promptId, audioBlob, duration } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    // Save the recording (your existing logic)
+    // ... 
+    
+    // Update progress
+    if (!user.voiceTraining.completedPrompts.includes(promptId)) {
+      user.voiceTraining.completedPrompts.push(promptId);
+    }
+    
+    user.voiceTraining.totalRecordingTime += duration || 0;
+    user.voiceTraining.lastSaved = new Date();
+    
+    // Move to next prompt
+    const script = require('../data/voiceTrainingScript3Stage');
+    const currentStage = script.find(s => s.stage === user.voiceTraining.currentStage);
+    
+    if (user.voiceTraining.currentPromptIndex < currentStage.prompts.length - 1) {
+      user.voiceTraining.currentPromptIndex++;
+    } else {
+      // Stage complete
+      if (user.voiceTraining.currentStage === 1) {
+        user.voiceTraining.stage1Complete = true;
+        user.voiceTraining.currentStage = 2;
+      } else if (user.voiceTraining.currentStage === 2) {
+        user.voiceTraining.stage2Complete = true;
+        user.voiceTraining.currentStage = 3;
+      } else if (user.voiceTraining.currentStage === 3) {
+        user.voiceTraining.stage3Complete = true;
+      }
+      user.voiceTraining.currentPromptIndex = 0;
+    }
+    
+    await user.save();
+    
+    res.json({ 
+      success: true, 
+      progress: user.voiceTraining.completedPrompts.length,
+      stageComplete: user.voiceTraining.currentPromptIndex === 0
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+3. Get Stage Status
+javascriptrouter.get('/training/stages', async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const script = require('../data/voiceTrainingScript3Stage');
+    
+    const stages = script.map(stage => ({
+      stage: stage.stage,
+      title: stage.title,
+      description: stage.description,
+      estimatedTime: stage.estimatedTime,
+      promptCount: stage.prompts.length,
+      complete: user.voiceTraining[`stage${stage.stage}Complete`],
+      locked: stage.stage > user.voiceTraining.currentStage,
+      current: stage.stage === user.voiceTraining.currentStage
+    }));
+    
+    res.json({
+      stages,
+      overallProgress: Math.round((user.voiceTraining.completedPrompts.length / 25) * 100),
+      completedPrompts: user.voiceTraining.completedPrompts.length,
+      totalPrompts: 25
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
