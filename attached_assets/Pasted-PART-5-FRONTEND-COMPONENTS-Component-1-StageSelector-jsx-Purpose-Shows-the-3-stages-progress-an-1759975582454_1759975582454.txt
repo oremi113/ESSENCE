@@ -1,0 +1,257 @@
+PART 5: FRONTEND COMPONENTS
+Component 1: StageSelector.jsx
+Purpose: Shows the 3 stages, progress, and allows navigation
+jsximport React, { useState, useEffect } from 'react';
+
+export default function StageSelector({ onSelectStage }) {
+  const [stages, setStages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStages();
+  }, []);
+
+  const fetchStages = async () => {
+    try {
+      const res = await fetch('/api/voice/training/stages');
+      const data = await res.json();
+      setStages(data.stages);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching stages:', error);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="stage-selector">
+      <h2>Voice Training Progress</h2>
+      <div className="overall-progress">
+        <div className="progress-bar">
+          <div 
+            className="progress-fill" 
+            style={{ width: `${stages[0]?.overallProgress || 0}%` }}
+          />
+        </div>
+        <p>{stages[0]?.completedPrompts || 0} of 25 prompts complete</p>
+      </div>
+
+      <div className="stages-list">
+        {stages.map(stage => (
+          <div 
+            key={stage.stage} 
+            className={`stage-card ${stage.complete ? 'complete' : ''} ${stage.locked ? 'locked' : ''}`}
+          >
+            <div className="stage-icon">
+              {stage.complete ? '✅' : stage.locked ? '🔒' : '▶️'}
+            </div>
+            <div className="stage-info">
+              <h3>{stage.title}</h3>
+              <p>{stage.description}</p>
+              <span className="stage-meta">
+                {stage.promptCount} prompts • {stage.estimatedTime}
+              </span>
+            </div>
+            {!stage.locked && (
+              <button 
+                onClick={() => onSelectStage(stage.stage)}
+                className="stage-button"
+              >
+                {stage.complete ? 'Review' : stage.current ? 'Continue' : 'Start'}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+Component 2: MilestoneCelebration.jsx
+Purpose: Shows celebrations when stages complete
+jsximport React, { useEffect } from 'react';
+
+export default function MilestoneCelebration({ stage, onClose }) {
+  
+  const milestones = {
+    1: {
+      emoji: '🎉',
+      title: 'Great Start!',
+      message: "Your voice is 20% trained. Keep going!",
+      progress: 20
+    },
+    2: {
+      emoji: '⭐',
+      title: 'Excellent Work!',
+      message: "You're 68% done. Almost there!",
+      progress: 68
+    },
+    3: {
+      emoji: '🏆',
+      title: 'Amazing!',
+      message: "Your voice is fully trained and ready!",
+      progress: 100
+    }
+  };
+
+  const milestone = milestones[stage];
+
+  useEffect(() => {
+    if (stage === 3) {
+      // Trigger confetti animation
+      triggerConfetti();
+    }
+  }, [stage]);
+
+  const triggerConfetti = () => {
+    // Simple confetti effect (you can use a library like canvas-confetti)
+    console.log('🎊 Confetti!');
+  };
+
+  return (
+    <div className="milestone-modal">
+      <div className="milestone-content">
+        <div className="milestone-emoji">{milestone.emoji}</div>
+        <h2>{milestone.title}</h2>
+        <p>{milestone.message}</p>
+        
+        <div className="progress-circle">
+          <svg width="120" height="120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e0e0" strokeWidth="10"/>
+            <circle 
+              cx="60" 
+              cy="60" 
+              r="50" 
+              fill="none" 
+              stroke="#4CAF50" 
+              strokeWidth="10"
+              strokeDasharray={`${milestone.progress * 3.14} 314`}
+              transform="rotate(-90 60 60)"
+            />
+            <text x="60" y="70" textAnchor="middle" fontSize="24" fontWeight="bold">
+              {milestone.progress}%
+            </text>
+          </svg>
+        </div>
+
+        <button onClick={onClose} className="continue-button">
+          {stage === 3 ? 'Create Your First Message' : 'Continue Training'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+Component 3: Update VoiceTrainingFlow.jsx
+Key changes:
+jsximport { useState, useEffect } from 'react';
+import StageSelector from './StageSelector';
+import MilestoneCelebration from './MilestoneCelebration';
+
+export default function VoiceTrainingFlow() {
+  const [currentView, setCurrentView] = useState('stages'); // 'stages' | 'recording' | 'celebration'
+  const [selectedStage, setSelectedStage] = useState(null);
+  const [currentPrompt, setCurrentPrompt] = useState(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [completedStage, setCompletedStage] = useState(null);
+
+  const handleSelectStage = (stageNum) => {
+    setSelectedStage(stageNum);
+    setCurrentView('recording');
+    fetchCurrentPrompt();
+  };
+
+  const fetchCurrentPrompt = async () => {
+    const res = await fetch('/api/voice/training/current');
+    const data = await res.json();
+    
+    if (data.complete) {
+      // Stage complete - show celebration
+      setCompletedStage(data.stage);
+      setShowCelebration(true);
+    } else {
+      setCurrentPrompt(data);
+    }
+  };
+
+  const handleRecordingComplete = async (audioBlob) => {
+    // Save recording
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    formData.append('promptId', currentPrompt.currentPrompt.id);
+    
+    const res = await fetch('/api/voice/training/save-progress', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await res.json();
+    
+    if (data.stageComplete) {
+      setCompletedStage(selectedStage);
+      setShowCelebration(true);
+    } else {
+      // Load next prompt
+      fetchCurrentPrompt();
+    }
+  };
+
+  const handleCelebrationClose = () => {
+    setShowCelebration(false);
+    if (completedStage === 3) {
+      // All done - redirect to message creation
+      window.location.href = '/create-message';
+    } else {
+      // Back to stage selector
+      setCurrentView('stages');
+    }
+  };
+
+  return (
+    <div className="voice-training-flow">
+      {currentView === 'stages' && (
+        <StageSelector onSelectStage={handleSelectStage} />
+      )}
+      
+      {currentView === 'recording' && currentPrompt && (
+        <div className="recording-view">
+          <div className="progress-header">
+            <h3>Stage {currentPrompt.stage} of 3: {currentPrompt.stageTitle}</h3>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${currentPrompt.progressPercentage}%` }}
+              />
+            </div>
+            <p>Prompt {currentPrompt.promptNumber} of 25 ({currentPrompt.progressPercentage}%)</p>
+          </div>
+
+          <div className="prompt-card">
+            <p className="instruction">{currentPrompt.currentPrompt.instruction}</p>
+            <p className="display-line">{currentPrompt.currentPrompt.displayLine}</p>
+          </div>
+
+          {/* Your existing recording UI */}
+          <RecordingControls onComplete={handleRecordingComplete} />
+
+          <button 
+            onClick={() => setCurrentView('stages')} 
+            className="save-later-button"
+          >
+            💾 Save & Finish Later
+          </button>
+        </div>
+      )}
+
+      {showCelebration && (
+        <MilestoneCelebration 
+          stage={completedStage} 
+          onClose={handleCelebrationClose} 
+        />
+      )}
+    </div>
+  );
+}
+
+That's Part 5 complete! Ready for Part 6: Final Instructions?RetryO
