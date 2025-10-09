@@ -1,0 +1,72 @@
+FINAL 74 LINES - COMPLETING PART 2A
+Here are the remaining prompts (19-25) and Stage 3's completion message:
+javascript      {
+        id: 19,
+        instruction: "Share a hope you have for the future. Sound optimistic.",
+        emotionalTone: "hopeful/optimistic",
+        lineType: "simple",
+        line: "You know what I hope for? I hope we all slow down a little. Take more time to appreciate the small stuff. Spend more time with the people we love. Worry less about things that don't really matter in the end. Life's short, and we forget that sometimes. I hope we all remember to just... live. Really, truly live."
+      },
+      {
+        id: 20,
+        instruction: "Talk about what home means to you.",
+        emotionalTone: "reflective/warm",
+        lineType: "city",
+        line: "When I think about home, it's not really about a place. I mean, sure, I love {city}, but home is more than that. Home is where the people are. It's that feeling when you walk in and everything just feels right. It's where you can be yourself, completely, without any masks or pretending. That's home. And I'm really lucky to have that."
+      },
+      {
+        id: 21,
+        instruction: "Share a piece of simple wisdom. Keep it real.",
+        emotionalTone: "wise/warm",
+        lineType: "simple",
+        line: "Here's something I wish someone had told me when I was younger. Be kind. To others, yes, but also to yourself. We're all doing the best we can with what we have. Nobody's perfect. We all mess up. And that's okay. So be patient with yourself. Give yourself the same grace you'd give to someone you love. You deserve that too."
+      },
+      {
+        id: 22,
+        instruction: "For voice quality: Count clearly and warmly, like teaching someone.",
+        emotionalTone: "teaching/warm",
+        lineType: "simple",
+        line: "Okay, let's count together. Ready? One, two, three, four, five, six, seven, eight, nine, ten. Good! Now let's go backwards. Ten, nine, eight, seven, six, five, four, three, two, one. Perfect! See? You're really good at this."
+      },
+      {
+        id: 23,
+        instruction: "For voice quality: Say numbers, dates, and contact info clearly.",
+        emotionalTone: "clear/neutral",
+        lineType: "city",
+        line: "Just so you have my information: You can reach me at five-five-five, two-one-two, three-four-five-six. My address is four-twenty-seven Oak Street, apartment two-B, {city}. And today's date is March fifteenth, two thousand twenty-five, around three-thirty in the afternoon."
+      },
+      {
+        id: 24,
+        instruction: "Add a light moment of humor. Keep it natural.",
+        emotionalTone: "playful/light",
+        lineType: "simple",
+        line: "You know what always makes me laugh? When you're walking and you trip over literally nothing. Just your own feet. And then you do that quick look around to see if anyone saw. We all do it. Every single one of us. It's ridiculous, but it's human. Sometimes you just gotta laugh at yourself, you know?"
+      },
+      {
+        id: 25,
+        instruction: "End with a heartfelt, personalized goodbye. Make it count.",
+        emotionalTone: "loving/warm",
+        lineType: "relationshipGoodbye",
+        line: {
+          daughter: "Alright sweetheart, that's everything. I love you so much. More than words can say. I'm always here for you, always in your corner, always cheering for you. Whatever you need, whatever happens, you've got me. Take care of yourself. I love you. Bye for now, kiddo.",
+          son: "Okay buddy, I think we're done. I'm proud of you. So incredibly proud. And I love you. Remember that when things get hard. You've got people who believe in you, and I'm at the top of that list. Take care, son. Love you. Talk soon.",
+          spouse: "Alright love, that's it. I love you. You know that, right? Even when I don't say it enough, even when life gets crazy, I love you. You're my favorite person, my best friend, my everything. Always have been. Take care of yourself. I'll see you soon. Love you always.",
+          grandchild: "Okay kiddo, that's all from me for now. Remember: You're so loved. So, so loved. Be good, have fun, and know you can always talk to me about anything. Anything at all. Love you to the moon and back, sweetheart. Bye for now!",
+          friend: "Alright my friend, that's a wrap. Thanks for being you. Thanks for being in my life. You make everything better, and I hope you know that. Take care of yourself, okay? I'll talk to you soon. Love you, friend. Stay awesome. Bye!",
+          parent: "Okay, I think that's everything. I love you. Thank you for everything you've done for me, everything you've taught me, all the ways you've shaped who I am. I hope I make you proud. Take care of yourself. I'll call you soon. Love you so much. Bye.",
+          default: "Alright, that's a wrap. Thank you for listening to all of this. I hope this brings you joy whenever you hear it. Remember you're loved, you're valued, and you're doing better than you think. Take care of yourself. Love you. Bye for now!"
+        }
+      }
+    ],
+    completionMessage: {
+      title: "🏆 Congratulations!",
+      body: "You did it! Your voice is fully trained and ready to create unlimited personalized messages.",
+      progress: "100% Complete",
+      cta: "Create Your First Message",
+      celebration: "confetti"
+    }
+  }
+  
+];
+
+module.exports = voiceTrainingScript3Stage;
