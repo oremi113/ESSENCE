@@ -13,6 +13,7 @@ import { getTotalPrompts } from "@shared/personalizationHelper";
 import WelcomeOnboarding from "@/components/WelcomeOnboarding";
 import Navigation from "@/components/Navigation";
 import VoiceRecorder from "@/components/VoiceRecorder";
+import VoiceTrainingFlow from "@/components/VoiceTrainingFlow";
 import MessageCreator from "@/components/MessageCreator";
 import PlaybackLibrary from "@/components/PlaybackLibrary";
 import UserProfiles from "@/components/UserProfiles";
@@ -591,15 +592,12 @@ function Router() {
 
       <main className="pb-8">
         {currentView === 'training' && user && currentProfile && (
-          <VoiceRecorder
+          <VoiceTrainingFlow
             currentUser={user}
             currentProfile={currentProfile}
-            currentPromptIndex={currentRecordingIndex}
-            onRecordingComplete={handleRecordingComplete}
-            onClearRecording={handleClearRecording}
-            onNext={() => setCurrentRecordingIndex(prev => Math.min(prev + 1, totalPrompts - 1))}
-            onPrevious={() => setCurrentRecordingIndex(prev => Math.max(prev - 1, 0))}
-            recordings={recordings}
+            onSaveRecording={async (audioBlob: Blob, phraseIndex: number, phraseText: string) => {
+              await saveRecordingMutation.mutateAsync({ audioBlob, phraseIndex, phraseText });
+            }}
           />
         )}
         

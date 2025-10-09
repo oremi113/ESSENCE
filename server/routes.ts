@@ -720,6 +720,242 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================
+  // STAGED VOICE TRAINING ROUTES (NEW)
+  // ==========================================
+  
+  // Get current training prompt with progress
+  app.get("/api/voice/training/current", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      
+      // Get user from database
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Import voice training script
+      const { voiceTrainingScript } = await import("@shared/voiceTrainingScript");
+      const { getPersonalizedLine, getTimeOfDay, getGeneration } = await import("@shared/personalizationHelper");
+      
+      // Find current stage
+      const currentStage = voiceTrainingScript.find(s => s.stage === user.currentStage);
+      if (!currentStage) {
+        return res.json({ complete: true, stage: user.currentStage });
+      }
+      
+      // Get current prompt
+      const currentPrompt = currentStage.prompts[user.currentPromptIndex];
+      
+      if (!currentPrompt) {
+        // Stage complete
+        return res.json({ 
+          stageComplete: true, 
+          stage: user.currentStage,
+          nextStage: user.currentStage < 3 ? user.currentStage + 1 : null
+        });
+      }
+      
+      // Build user context for personalization
+      const birthYear = user.age ? new Date().getFullYear() - user.age : 0;
+      const userContext = {
+        name: user.name || 'there',
+        city: user.city || undefined,
+        hometown: user.city || undefined,
+        timeOfDay: getTimeOfDay(),
+        generation: getGeneration(birthYear),
+        relationship: 'default' as any
+      };
+      
+      // Get personalized line
+      const displayLine = getPersonalizedLine(currentPrompt, userContext);
+      
+      // Calculate progress
+      const completedCount = user.completedPrompts?.length || 0;
+      const progressPercentage = Math.round((completedCount / 25) * 100);
+      
+      res.json({
+        stage: currentStage.stage,
+        stageTitle: currentStage.title,
+        stageDescription: currentStage.description,
+        estimatedTime: currentStage.estimatedTime,
+        promptNumber: completedCount + 1,
+        totalPrompts: 25,
+        progressPercentage,
+        currentPrompt: {
+          id: currentPrompt.id,
+          instruction: currentPrompt.instruction,
+          displayLine: displayLine
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error getting current prompt:", error);
+      res.status(500).json({ error: "Failed to get current prompt" });
+    }
+  });
+  
+  // Save progress and move to next prompt
+  app.post("/api/voice/training/save-progress", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const { promptId, duration = 0 } = req.body;
+      
+      // Get user
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Import voice training script
+      const { voiceTrainingScript } = await import("@shared/voiceTrainingScript");
+      
+      // Update completed prompts if not already included
+      const completedPrompts = user.completedPrompts || [];
+      if (!completedPrompts.includes(promptId)) {
+        completedPrompts.push(promptId);
+      }
+      
+      // Update total recording time
+      const totalRecordingTime = (user.totalRecordingTime || 0) + duration;
+      
+      // Get current stage
+      const currentStage = voiceTrainingScript.find(s => s.stage === user.currentStage);
+      if (!currentStage) {
+        return res.status(400).json({ error: "Invalid stage" });
+      }
+      
+      // Determine next prompt/stage
+      let nextStage = user.currentStage;
+      let nextPromptIndex = user.currentPromptIndex + 1;
+      let stageComplete = false;
+      let stage1Complete = user.stage1Complete || 0;
+      let stage2Complete = user.stage2Complete || 0;
+      let stage3Complete = user.stage3Complete || 0;
+      
+      if (nextPromptIndex >= currentStage.prompts.length) {
+        // Current stage complete
+        stageComplete = true;
+        
+        if (user.currentStage === 1) {
+          stage1Complete = 1;
+          nextStage = 2;
+        } else if (user.currentStage === 2) {
+          stage2Complete = 1;
+          nextStage = 3;
+        } else if (user.currentStage === 3) {
+          stage3Complete = 1;
+        }
+        
+        nextPromptIndex = 0;
+      }
+      
+      // Update user in database
+      await db.update(users)
+        .set({
+          completedPrompts,
+          totalRecordingTime,
+          currentStage: nextStage,
+          currentPromptIndex: nextPromptIndex,
+          stage1Complete,
+          stage2Complete,
+          stage3Complete,
+          lastSaved: new Date(),
+          trainingStartedAt: user.trainingStartedAt || new Date(),
+          trainingCompletedAt: stage3Complete ? new Date() : user.trainingCompletedAt,
+          voiceTrainingComplete: stage3Complete
+        })
+        .where(eq(users.id, userId));
+      
+      res.json({ 
+        success: true, 
+        progress: completedPrompts.length,
+        stageComplete,
+        completedStage: stageComplete ? user.currentStage : null,
+        nextStage: stageComplete ? nextStage : null
+      });
+      
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      res.status(500).json({ error: "Failed to save progress" });
+    }
+  });
+  
+  // Set current stage (for stage selection)
+  app.post("/api/voice/training/set-stage", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const { stage } = req.body;
+      
+      if (!stage || stage < 1 || stage > 3) {
+        return res.status(400).json({ error: "Invalid stage" });
+      }
+      
+      // Update user's current stage and reset prompt index
+      await db.update(users)
+        .set({
+          currentStage: stage,
+          currentPromptIndex: 0
+        })
+        .where(eq(users.id, userId));
+      
+      res.json({ success: true, stage });
+    } catch (error) {
+      console.error("Error setting stage:", error);
+      res.status(500).json({ error: "Failed to set stage" });
+    }
+  });
+  
+  // Get all stage statuses
+  app.get("/api/voice/training/stages", requireAuth, async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      
+      // Get user
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Import voice training script
+      const { voiceTrainingScript } = await import("@shared/voiceTrainingScript");
+      
+      // Build stage status array
+      const stages = voiceTrainingScript.map(stage => {
+        let complete = false;
+        if (stage.stage === 1) complete = user.stage1Complete === 1;
+        if (stage.stage === 2) complete = user.stage2Complete === 1;
+        if (stage.stage === 3) complete = user.stage3Complete === 1;
+        
+        return {
+          stage: stage.stage,
+          title: stage.title,
+          description: stage.description,
+          estimatedTime: stage.estimatedTime,
+          promptCount: stage.prompts.length,
+          complete,
+          locked: stage.stage > user.currentStage,
+          current: stage.stage === user.currentStage
+        };
+      });
+      
+      const completedCount = user.completedPrompts?.length || 0;
+      const overallProgress = Math.round((completedCount / 25) * 100);
+      
+      res.json({
+        stages,
+        overallProgress,
+        completedPrompts: completedCount,
+        totalPrompts: 25
+      });
+      
+    } catch (error) {
+      console.error("Error getting stage statuses:", error);
+      res.status(500).json({ error: "Failed to get stage statuses" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -20,6 +20,19 @@ export const users = pgTable("users", {
   timezone: text("timezone"),
   voiceModelId: varchar("voice_model_id", { length: 100 }), // ElevenLabs voice ID
   voiceTrainingComplete: integer("voice_training_complete").default(0), // 0 = false, 1 = true
+  
+  // Voice training progress tracking
+  currentStage: integer("current_stage").default(1).notNull(),
+  currentPromptIndex: integer("current_prompt_index").default(0).notNull(),
+  completedPrompts: integer("completed_prompts").array().default(sql`ARRAY[]::integer[]`).notNull(),
+  stage1Complete: integer("stage1_complete").default(0).notNull(), // 0 = false, 1 = true
+  stage2Complete: integer("stage2_complete").default(0).notNull(),
+  stage3Complete: integer("stage3_complete").default(0).notNull(),
+  lastSaved: timestamp("last_saved"),
+  trainingStartedAt: timestamp("training_started_at"),
+  trainingCompletedAt: timestamp("training_completed_at"),
+  totalRecordingTime: integer("total_recording_time").default(0).notNull(), // seconds
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
