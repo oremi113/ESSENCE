@@ -97,14 +97,15 @@ function Router() {
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState(0);
   const [recordings, setRecordings] = useState<(Blob | null)[]>(new Array(totalPrompts).fill(null));
   
-  // Load profiles from backend
+  // Load profiles from backend (only when authenticated)
   const { data: profiles = [], isLoading: loadingProfiles, isFetching: fetchingProfiles } = useQuery({
     queryKey: ['/api/profiles'],
     queryFn: async () => {
       const response = await fetch('/api/profiles', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to load profiles');
       return response.json();
-    }
+    },
+    enabled: isAuthenticated
   });
 
   // Set current profile to first profile if available
