@@ -604,6 +604,7 @@ function Router() {
                 phraseText 
               });
             }}
+            onComplete={() => setCurrentView('create')}
           />
         )}
         

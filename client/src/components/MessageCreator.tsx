@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles, Play, Save, Volume2, Heart, MessageSquare } from "lucide-react";
+import { Loader2, Sparkles, Play, Pause, Save, Volume2, Heart, MessageSquare } from "lucide-react";
 
 interface MessageCreatorProps {
   voiceModelStatus: 'not_submitted' | 'training' | 'ready';
@@ -24,6 +24,7 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
   const [audioDuration, setAudioDuration] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string>("other");
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const relationships = ["Spouse", "Daughter", "Son", "Parent", "Friend"];
 
@@ -152,28 +153,45 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
     }
   };
 
-  const handlePlay = async () => {
+  const togglePlayPause = async () => {
     if (!generatedAudio) return;
     
-    setIsPlaying(true);
-    
-    try {
-      const audio = new Audio(generatedAudio);
-      
-      audio.onended = () => {
-        setIsPlaying(false);
-      };
-      
-      audio.onerror = () => {
-        console.error('Error playing generated audio');
-        setIsPlaying(false);
-      };
-      
-      await audio.play();
-      
-    } catch (error) {
-      console.error('Error playing preview audio:', error);
+    if (isPlaying && audioRef.current) {
+      // Pause the audio
+      audioRef.current.pause();
       setIsPlaying(false);
+    } else if (audioRef.current && audioRef.current.paused && !audioRef.current.ended) {
+      // Resume paused audio
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Error resuming audio:', error);
+        setIsPlaying(false);
+      }
+    } else {
+      // Play the audio for the first time
+      setIsPlaying(true);
+      
+      try {
+        const audio = new Audio(generatedAudio);
+        audioRef.current = audio;
+        
+        audio.onended = () => {
+          setIsPlaying(false);
+        };
+        
+        audio.onerror = () => {
+          console.error('Error playing generated audio');
+          setIsPlaying(false);
+        };
+        
+        await audio.play();
+        
+      } catch (error) {
+        console.error('Error playing preview audio:', error);
+        setIsPlaying(false);
+      }
     }
   };
 
@@ -325,15 +343,14 @@ export default function MessageCreator({ voiceModelStatus, currentProfileId, onC
                         </div>
                       </div>
                       <Button
-                        onClick={handlePlay}
+                        onClick={togglePlayPause}
                         variant="outline"
                         size="sm"
-                        disabled={isPlaying}
                         className="border-green-200 dark:border-green-800"
                         data-testid="button-preview-audio"
                       >
-                        {isPlaying ? <Volume2 className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        {isPlaying ? 'Playing' : 'Preview'}
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        {isPlaying ? 'Pause' : 'Preview'}
                       </Button>
                     </div>
                   </CardContent>

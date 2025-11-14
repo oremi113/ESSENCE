@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -33,11 +32,11 @@ interface VoiceTrainingFlowProps {
   currentUser: User;
   currentProfile: any;
   onSaveRecording: (audioBlob: Blob, phraseIndex: number, phraseText: string) => Promise<void>;
+  onComplete?: () => void;
 }
 
-export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveRecording }: VoiceTrainingFlowProps) {
+export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveRecording, onComplete }: VoiceTrainingFlowProps) {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
   const [currentView, setCurrentView] = useState<'stages' | 'recording' | 'celebration'>('stages');
   const [showCelebration, setShowCelebration] = useState(false);
   const [completedStage, setCompletedStage] = useState<number | null>(null);
@@ -104,8 +103,10 @@ export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveR
         setShowCelebration(true);
         setCurrentView('stages');
       } else if (data.complete) {
-        // All stages complete - redirect to message creation
-        setLocation('/create');
+        // All stages complete - switch to message creation
+        if (onComplete) {
+          onComplete();
+        }
       } else {
         // Move to next prompt
         refetchCurrentPrompt();
@@ -128,10 +129,12 @@ export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveR
         setShowCelebration(true);
         setCurrentView('stages');
       } else if (currentPromptData.complete) {
-        setLocation('/create');
+        if (onComplete) {
+          onComplete();
+        }
       }
     }
-  }, [currentView, currentPromptData, loadingPrompt, setLocation]);
+  }, [currentView, currentPromptData, loadingPrompt, onComplete]);
 
   const handleSelectStage = async (stageNumber: number) => {
     try {
@@ -242,8 +245,10 @@ export default function VoiceTrainingFlow({ currentUser, currentProfile, onSaveR
     setShowCelebration(false);
     
     if (completedStage === 3) {
-      // All done - redirect to message creation
-      setLocation('/create');
+      // All done - switch to message creation
+      if (onComplete) {
+        onComplete();
+      }
     } else {
       // Back to stage selector
       setCurrentView('stages');

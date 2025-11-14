@@ -206,8 +206,12 @@ export default function VoiceRecorder({
       // Pause the audio
       audioRef.current.pause();
       setIsPlaying(false);
+    } else if (audioRef.current && audioRef.current.paused) {
+      // Resume paused audio
+      audioRef.current.play();
+      setIsPlaying(true);
     } else {
-      // Play the audio
+      // Play the audio for the first time
       const recordingToPlay = currentRecording || recordings[currentPromptIndex];
       if (recordingToPlay) {
         const url = URL.createObjectURL(recordingToPlay);
