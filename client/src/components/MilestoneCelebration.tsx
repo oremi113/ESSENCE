@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PartyPopper, Sparkles, Trophy } from "lucide-react";
 
@@ -114,14 +114,14 @@ export default function MilestoneCelebration({ stage, open, onClose }: Milestone
           </div>
 
           {/* Title */}
-          <h2 className="text-3xl font-bold" data-testid={`milestone-title-stage-${stage}`}>
+          <DialogTitle className="text-3xl font-bold" data-testid={`milestone-title-stage-${stage}`}>
             {milestone.title}
-          </h2>
+          </DialogTitle>
 
           {/* Message */}
-          <p className="text-lg text-muted-foreground" data-testid={`milestone-message-stage-${stage}`}>
+          <DialogDescription className="text-lg text-muted-foreground" data-testid={`milestone-message-stage-${stage}`}>
             {milestone.message}
-          </p>
+          </DialogDescription>
 
           {/* Progress Circle */}
           <div className="flex justify-center py-4">
