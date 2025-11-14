@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Square, Play, RotateCcw, Check, Volume2 } from "lucide-react";
+import { Mic, Square, Play, Pause, RotateCcw, Check, Volume2 } from "lucide-react";
 import { voiceTrainingScript } from "@shared/voiceTrainingScript";
 import { getPersonalizedLine, getTimeOfDay, getGeneration, getTotalPrompts, type UserContext } from "@shared/personalizationHelper";
 import type { User, Profile } from "@shared/schema";
@@ -201,18 +201,25 @@ export default function VoiceRecorder({
     }
   };
 
-  const playRecording = () => {
-    const recordingToPlay = currentRecording || recordings[currentPromptIndex];
-    if (recordingToPlay) {
-      const url = URL.createObjectURL(recordingToPlay);
-      audioRef.current = new Audio(url);
-      audioRef.current.play();
-      setIsPlaying(true);
-      
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        URL.revokeObjectURL(url);
-      };
+  const togglePlayPause = () => {
+    if (isPlaying && audioRef.current) {
+      // Pause the audio
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      // Play the audio
+      const recordingToPlay = currentRecording || recordings[currentPromptIndex];
+      if (recordingToPlay) {
+        const url = URL.createObjectURL(recordingToPlay);
+        audioRef.current = new Audio(url);
+        audioRef.current.play();
+        setIsPlaying(true);
+        
+        audioRef.current.onended = () => {
+          setIsPlaying(false);
+          URL.revokeObjectURL(url);
+        };
+      }
     }
   };
 
@@ -329,14 +336,13 @@ export default function VoiceRecorder({
                   {hasRecording && (
                     <>
                       <Button
-                        onClick={playRecording}
+                        onClick={togglePlayPause}
                         variant="outline"
                         size="lg"
-                        disabled={isPlaying}
                         data-testid="button-play-recording"
                       >
-                        {isPlaying ? <Volume2 className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        {isPlaying ? 'Playing' : 'Play'}
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        {isPlaying ? 'Pause' : 'Play'}
                       </Button>
                       
                       <Button
