@@ -745,10 +745,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ complete: true, stage: user.currentStage });
       }
       
-      // Get current prompt
-      const currentPrompt = currentStage.prompts[user.currentPromptIndex];
+      // Calculate progress
+      const completedCount = user.completedPrompts?.length || 0;
+      const progressPercentage = Math.round((completedCount / 25) * 100);
       
-      if (!currentPrompt) {
+      // Derive the correct prompt index from completed count (don't trust current_prompt_index which may drift)
+      // Within the current stage, find which prompts have been completed
+      const stageStartId = currentStage.prompts[0].id;
+      const stageEndId = currentStage.prompts[currentStage.prompts.length - 1].id;
+      const completedInStage = user.completedPrompts?.filter((id: number) => id >= stageStartId && id <= stageEndId).length || 0;
+      const nextPromptIndex = Math.min(completedInStage, currentStage.prompts.length - 1);
+      
+      // Resync current_prompt_index if it has drifted
+      if (nextPromptIndex !== user.currentPromptIndex) {
+        await db.update(users)
+          .set({ currentPromptIndex: nextPromptIndex })
+          .where(eq(users.id, userId));
+      }
+      
+      // Get current prompt using the corrected index
+      const currentPrompt = currentStage.prompts[nextPromptIndex];
+      
+      if (!currentPrompt || completedInStage >= currentStage.prompts.length) {
         // Stage complete
         return res.json({ 
           stageComplete: true, 
@@ -770,10 +788,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get personalized line
       const displayLine = getPersonalizedLine(currentPrompt, userContext);
-      
-      // Calculate progress
-      const completedCount = user.completedPrompts?.length || 0;
-      const progressPercentage = Math.round((completedCount / 25) * 100);
       
       res.json({
         stage: currentStage.stage,
