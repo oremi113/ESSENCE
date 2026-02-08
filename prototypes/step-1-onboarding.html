@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE Onboarding Flow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ============================================
+       IPHONE FRAME
+       ============================================ */
+    .iphone-frame {
+      position: relative;
+      width: 393px;
+      height: 852px;
+      background: #1a1a1a;
+      border-radius: 55px;
+      padding: 12px;
+      box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.1),
+        0 20px 60px rgba(0,0,0,0.5),
+        0 0 0 12px #1a1a1a,
+        0 0 0 13px rgba(255,255,255,0.05),
+        inset 0 0 2px rgba(255,255,255,0.1);
+    }
+
+    /* Side buttons */
+    .iphone-frame::before {
+      content: '';
+      position: absolute;
+      right: -3px;
+      top: 180px;
+      width: 4px;
+      height: 100px;
+      background: linear-gradient(180deg, #2a2a2a, #1a1a1a, #2a2a2a);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .iphone-frame::after {
+      content: '';
+      position: absolute;
+      left: -3px;
+      top: 150px;
+      width: 4px;
+      height: 35px;
+      background: linear-gradient(180deg, #2a2a2a, #1a1a1a, #2a2a2a);
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 55px 0 #222, 0 95px 0 #222;
+    }
+
+    /* Screen container */
+    .iphone-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #FBF8F4;
+      border-radius: 44px;
+      overflow: hidden;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 37px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 1000;
+    }
+
+    /* Status bar */
+    .status-bar {
+      position: absolute;
+      top: 12px;
+      left: 0;
+      right: 0;
+      height: 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 28px;
+      z-index: 999;
+    }
+
+    .status-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1C1A18;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-icons svg {
+      height: 12px;
+      fill: #1C1A18;
+    }
+
+    /* Home indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: #1C1A18;
+      border-radius: 3px;
+      opacity: 0.2;
+      z-index: 1000;
+    }
+
+    /* ============================================
+       PROTOTYPE STYLES
+       ============================================ */
+    :root {
+      /* Color Ramp */
+      --bg-neutral: #FBF8F4;
+      --bg-warm-1: #FAF6F1;
+      --bg-warm-2: #F9F4EE;
+      --bg-warm-3: #F7F1E9;
+      --bg-gold: #F5EEE4;
+      --bg-rich: #F3EBE0;
+
+      /* Core Colors */
+      --card: #F5F0EA;
+      --surface-warm: #EBE4DC;
+      --surface-honey: #E8DCC8;
+      --primary: #7A8088;
+      --primary-dark: #656B73;
+      --text-primary: #1C1A18;
+      --text-secondary: #6B6B6B;
+      --text-tertiary: #ADA9A5;
+      --sage: #7A9684;
+
+      /* Typography */
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+
+      /* Easing */
+      --ease-primary: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-breath: cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    /* App container */
+    .app {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-neutral);
+      transition: background-color 800ms var(--ease-breath);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Screen Container */
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 70px 24px 40px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(30px);
+      transition: opacity 350ms var(--ease-primary), 
+                  transform 350ms var(--ease-primary),
+                  visibility 0ms 350ms;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      transition: opacity 350ms var(--ease-primary), 
+                  transform 350ms var(--ease-primary),
+                  visibility 0ms;
+    }
+
+    .screen.exiting {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .screen.entering-back {
+      transform: translateX(-30px);
+    }
+
+    .screen.exiting-back {
+      transform: translateX(30px);
+    }
+
+    /* Back Button */
+    .back-button {
+      position: absolute;
+      top: 60px;
+      left: 16px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 300ms ease, background-color 180ms ease;
+      touch-action: manipulation;
+    }
+
+    .back-button.visible {
+      opacity: 1;
+    }
+
+    .back-button:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .back-button svg {
+      width: 24px;
+      height: 24px;
+      color: var(--text-secondary);
+    }
+
+    /* Progress Indicator */
+    .progress-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-shrink: 0;
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--surface-warm);
+      opacity: 0.3;
+      transition: background-color 220ms var(--ease-primary), opacity 220ms var(--ease-primary);
+    }
+
+    .progress-dot.active,
+    .progress-dot.completed {
+      background: var(--primary);
+      opacity: 1;
+    }
+
+    /* Breath Stone */
+    .stone-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      height: 220px;
+      margin-bottom: 8px;
+      margin-top: 8px;
+      padding-top: 20px;
+    }
+
+    /* Soft aura field behind stone - creates cinematic illumination */
+    .stone-container::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle, 
+        rgba(245, 238, 221, 0.28) 0%, 
+        rgba(245, 238, 221, 0.12) 40%, 
+        rgba(245, 238, 221, 0.04) 60%,
+        transparent 80%
+      );
+      filter: blur(28px);
+      opacity: 0;
+      transition: opacity 1.4s var(--ease-breath);
+      pointer-events: none;
+    }
+
+    .stone-container.aura-visible::before {
+      opacity: 0.75;
+    }
+
+    .breath-stone {
+      position: relative;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 35% 35%,
+        #F8F0DC 0%,
+        #E5D8C0 35%,
+        #C4B8A0 60%,
+        #9A9590 85%,
+        #7D827E 100%
+      );
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        inset -15px -15px 30px rgba(28, 26, 24, 0.12),
+        inset 15px 15px 30px rgba(251, 248, 244, 0.35);
+      transition: width 400ms var(--ease-breath), 
+                  height 400ms var(--ease-breath);
+    }
+
+    .breath-stone::before {
+      content: '';
+      position: absolute;
+      inset: -50px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(232, 220, 200, var(--glow-opacity, 0.08)),
+        transparent 70%
+      );
+      animation: breathe-glow var(--cycle-time, 6000ms) var(--ease-breath) infinite;
+    }
+
+    .breath-stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: inherit;
+      animation: breathe-stone var(--cycle-time, 6000ms) var(--ease-breath) infinite;
+    }
+
+    /* Stone States - Cinematic Sizes */
+    .breath-stone.idle {
+      width: 120px;
+      height: 120px;
+      --glow-opacity: 0.10;
+      --cycle-time: 7200ms;
+    }
+
+    .breath-stone.idle-warm {
+      width: 125px;
+      height: 125px;
+      --glow-opacity: 0.14;
+      --cycle-time: 6800ms;
+    }
+
+    .breath-stone.ready {
+      width: 135px;
+      height: 135px;
+      --glow-opacity: 0.18;
+      --cycle-time: 5400ms;
+    }
+
+    .breath-stone.ready-bright {
+      width: 135px;
+      height: 135px;
+      --glow-opacity: 0.22;
+      --cycle-time: 5000ms;
+    }
+
+    .breath-stone.ceremonial {
+      width: 150px;
+      height: 150px;
+      --glow-opacity: 0.26;
+      --cycle-time: 6200ms;
+      --breath-amplitude: 1.045; /* deeper amplitude for ceremonial */
+    }
+
+    @keyframes breathe-glow {
+      0% {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+      35% {
+        opacity: 0.9;
+        transform: scale(1.01);
+      }
+      45% {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+      70% {
+        opacity: 0.75;
+        transform: scale(0.98);
+      }
+      100% {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+    }
+
+    /* Organic breathing with micro-easing wobble - feels alive, not robotic */
+    @keyframes breathe-stone {
+      0% {
+        transform: scale(1);
+      }
+      35% {
+        transform: scale(1.035);
+      }
+      45% {
+        transform: scale(1.037); /* tiny overshoot - the living pulse */
+      }
+      70% {
+        transform: scale(1.02); /* settling back */
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Ceremonial breathing - deeper amplitude for emotional moments */
+    @keyframes breathe-stone-deep {
+      0% {
+        transform: scale(1);
+      }
+      35% {
+        transform: scale(1.042);
+      }
+      45% {
+        transform: scale(1.045); /* deeper overshoot for ceremonial */
+      }
+      70% {
+        transform: scale(1.025); /* settling */
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Apply deep breathing to ceremonial state */
+    .breath-stone.ceremonial {
+      animation: breathe-stone-deep var(--cycle-time, 6200ms) var(--ease-breath) infinite;
+    }
+
+    /* Static grain texture overlay for tactile, earthly feel - NO animation */
+    .breath-stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: 
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-blend-mode: soft-light;
+      opacity: 0.10;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    /* Light shift gradients for different states - applied to main stone */
+    .breath-stone.idle {
+      background: radial-gradient(
+        circle at 35% 35%,
+        #F5EDE0 0%,
+        #E2D5BD 35%,
+        #C0B49C 60%,
+        #979390 85%,
+        #7A7F7B 100%
+      );
+    }
+
+    .breath-stone.idle-warm,
+    .breath-stone.ready {
+      background: radial-gradient(
+        circle at 32% 32%,
+        #FAF2E2 0%,
+        #EBDCC4 30%,
+        #CCBDA0 55%,
+        #A09890 80%,
+        #808580 100%
+      );
+    }
+
+    .breath-stone.ceremonial,
+    .breath-stone.ready-bright {
+      background: radial-gradient(
+        circle at 30% 30%,
+        #FDF5E6 0%,
+        #F0E0C4 25%,
+        #D4C4A0 50%,
+        #B0A590 75%,
+        #8A8A82 100%
+      );
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Typography */
+    .screen-label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fade-up 500ms var(--ease-breath) forwards;
+      animation-delay: 50ms;
+    }
+
+    .screen-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(4px);
+      animation: fade-up-blur 500ms var(--ease-breath) forwards;
+      animation-delay: 100ms;
+    }
+
+    .screen-body {
+      font-family: var(--font-sans);
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text-primary);
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(4px);
+      animation: fade-up-blur 500ms var(--ease-breath) forwards;
+      animation-delay: 200ms;
+    }
+
+    .screen-body p {
+      margin-bottom: 16px;
+    }
+
+    .screen-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .screen-body .emphasis {
+      font-weight: 500;
+    }
+
+    .screen-body .muted {
+      color: var(--text-secondary);
+    }
+
+    /* Slightly darker text on warm backgrounds for better contrast */
+    .screen[data-bg="warm-1"] .screen-body,
+    .screen[data-bg="warm-2"] .screen-body,
+    .screen[data-bg="gold"] .screen-body,
+    .screen[data-bg="rich"] .screen-body {
+      color: #1A1816;
+    }
+
+    /* Soften headline on warm backgrounds so stone remains focal */
+    .screen[data-bg="gold"] .screen-title,
+    .screen[data-bg="rich"] .screen-title {
+      color: #2C2926;
+    }
+
+    /* Journey Steps */
+    .journey-steps {
+      margin: 8px 0 14px;
+    }
+
+    .journey-step {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .step-number {
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .step-text {
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .step-time {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Time Badge */
+    .time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 20px;
+      background: var(--card);
+      margin-top: 16px;
+      opacity: 0;
+      animation: fade-up 400ms var(--ease-breath) forwards;
+      animation-delay: 400ms;
+    }
+
+    .time-badge svg {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .time-badge span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    /* Input Field */
+    .input-group {
+      margin: 28px 0;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 52px;
+      padding: 0 18px;
+      border: 1px solid var(--surface-warm);
+      border-radius: 12px;
+      background: white;
+      font-family: var(--font-sans);
+      font-size: 17px;
+      color: var(--text-primary);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+      touch-action: manipulation;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(122, 128, 136, 0.15);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .input-helper {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* Photo Upload */
+    .photo-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 28px 0;
+    }
+
+    .photo-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 2px dashed var(--surface-warm);
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color 180ms ease, background-color 180ms ease;
+      touch-action: manipulation;
+    }
+
+    .photo-circle:hover {
+      border-color: var(--primary);
+      background: var(--surface-warm);
+    }
+
+    .photo-circle.has-photo {
+      border: none;
+      background: linear-gradient(135deg, #E8DCC8, #C4B8A0);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .photo-circle svg {
+      width: 28px;
+      height: 28px;
+      color: var(--primary);
+    }
+
+    .photo-circle span {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .photo-confirmation {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--sage);
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    .photo-confirmation.visible {
+      opacity: 1;
+    }
+
+    /* Buttons */
+    .button-group {
+      margin-top: auto;
+      padding-top: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: button-rise 400ms var(--ease-breath) forwards;
+      animation-delay: 350ms;
+    }
+
+    .btn-primary {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: background-color 180ms ease, 
+                  transform 180ms ease, 
+                  box-shadow 180ms ease,
+                  opacity 180ms ease;
+      touch-action: manipulation;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary:disabled:hover {
+      background: var(--primary);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: none;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--primary);
+      cursor: pointer;
+      text-align: center;
+      transition: color 180ms ease;
+      touch-action: manipulation;
+    }
+
+    .btn-secondary:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Animations */
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade-up-blur {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes button-rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================
+       SCREEN 1: CINEMATIC INTRO SEQUENCE
+       ============================================ */
+    
+    /* Initial state - stone hidden */
+    .screen-1 .breath-stone {
+      opacity: 0;
+      filter: blur(12px);
+      transform: scale(0.8);
+      animation: none !important;
+    }
+
+    .screen-1 .breath-stone::before,
+    .screen-1 .breath-stone::after {
+      animation: none !important;
+    }
+
+    /* Stone reveal animation - then breathing starts */
+    .screen-1.intro-complete .breath-stone {
+      animation: stone-reveal 1500ms var(--ease-breath) forwards;
+    }
+
+    /* After intro, start breathing (added via JS) */
+    .screen-1.breathing .breath-stone {
+      animation: breathe-stone var(--cycle-time, 7200ms) var(--ease-breath) infinite;
+    }
+
+    .screen-1.intro-complete .breath-stone::before {
+      animation: glow-intro 1500ms var(--ease-breath) forwards;
+    }
+
+    .screen-1.breathing .breath-stone::before {
+      animation: breathe-glow var(--cycle-time, 7200ms) var(--ease-breath) infinite;
+    }
+
+    @keyframes glow-intro {
+      0% {
+        opacity: 0;
+        transform: scale(0.75);
+      }
+      25% { /* ~300ms - glow begins faintly */
+        opacity: 0.15;
+        transform: scale(0.8);
+      }
+      60% { /* ~750ms - glow ramps up */
+        opacity: 0.5;
+        transform: scale(0.92);
+      }
+      100% {
+        opacity: var(--glow-opacity, 0.1);
+        transform: scale(1);
+      }
+    }
+
+    @keyframes stone-reveal {
+      0% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: scale(0.8);
+      }
+      20% { /* ~300ms - glow begins, stone still dim */
+        opacity: 0.3;
+        filter: blur(10px);
+        transform: scale(0.82);
+      }
+      50% { /* ~750ms - stone sharpens */
+        opacity: 0.7;
+        filter: blur(3px);
+        transform: scale(0.92);
+      }
+      80% { /* ~1200ms - expands to full with overshoot */
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1.035);
+      }
+      100% { /* settles at full size */
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+      }
+    }
+
+    /* Glow pulse - "breath of life" moment - the stone welcomes the user */
+    @keyframes glow-pulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      40% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      70% {
+        opacity: 0.85;
+        transform: scale(1.08);
+      }
+      100% {
+        opacity: 0.75;
+        transform: scale(1);
+      }
+    }
+
+    .screen-1 .stone-container::before {
+      opacity: 0;
+    }
+
+    .screen-1.intro-complete .stone-container::before {
+      animation: glow-pulse 1000ms var(--ease-breath) 1100ms forwards;
+    }
+
+    /* Progress dots - very dim initially on Screen 1, all attention on stone */
+    .screen-1 .progress-indicator {
+      opacity: 0.2;
+      transition: opacity 800ms var(--ease-breath);
+    }
+
+    .screen-1.intro-complete .progress-indicator {
+      opacity: 1;
+      transition-delay: 2200ms; /* fade in well after stone reveal */
+    }
+
+    .screen-1 .progress-dot:not(.active):not(.completed) {
+      opacity: 0.2;
+    }
+
+    .screen-1.intro-complete .progress-dot:not(.active):not(.completed) {
+      opacity: 0.25;
+    }
+
+    /* Content fades in AFTER stone reveal and breath of life pulse */
+    .screen-1 .content {
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(2px);
+    }
+
+    .screen-1.intro-complete .content {
+      animation: content-reveal 800ms var(--ease-breath) 2000ms forwards;
+    }
+
+    @keyframes content-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(2px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    /* Button group fades in last */
+    .screen-1 .button-group {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .screen-1.intro-complete .button-group {
+      animation: button-rise 600ms var(--ease-breath) 2400ms forwards;
+    }
+
+    /* Override default animations for Screen 1 */
+    .screen-1 .screen-label,
+    .screen-1 .screen-title,
+    .screen-1 .screen-body {
+      animation: none;
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+
+    /* ============================================
+       END CINEMATIC INTRO
+       ============================================ */
+
+    /* Screen 10 Special Ceremony */
+    .screen-10 .screen-title,
+    .screen-10 .screen-body,
+    .screen-10 .button-group {
+      animation: none;
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(4px);
+    }
+
+    /* Slower animation timing for emotional/deep screens */
+    .screen-2 .screen-title,
+    .screen-3 .screen-title,
+    .screen-4 .screen-title,
+    .screen-5 .screen-title {
+      animation-delay: 150ms;
+    }
+
+    .screen-2 .screen-body,
+    .screen-3 .screen-body,
+    .screen-4 .screen-body,
+    .screen-5 .screen-body {
+      animation-delay: 300ms;
+    }
+
+    .screen-2 .button-group,
+    .screen-3 .button-group,
+    .screen-4 .button-group,
+    .screen-5 .button-group {
+      animation-delay: 450ms;
+    }
+
+    .screen-10.active .screen-title {
+      animation: fade-up-blur 600ms var(--ease-breath) forwards;
+      animation-delay: 1000ms;
+    }
+
+    .screen-10.active .screen-body {
+      animation: fade-up-blur 600ms var(--ease-breath) forwards;
+      animation-delay: 1500ms;
+    }
+
+    .screen-10.active .button-group {
+      animation: button-rise 400ms var(--ease-breath) forwards;
+      animation-delay: 3500ms;
+      filter: blur(0);
+    }
+
+    .screen-10 .btn-primary {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .screen-10.active .btn-primary {
+      animation: button-unlock 400ms var(--ease-breath) forwards;
+      animation-delay: 3500ms;
+    }
+
+    .screen-10 .btn-primary.unlocked {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @keyframes button-unlock {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    .breath-hint {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      text-align: center;
+      margin-top: 14px;
+      opacity: 0;
+    }
+
+    .screen-10.active .breath-hint {
+      animation: fade-up 400ms var(--ease-breath) forwards;
+      animation-delay: 2500ms;
+    }
+
+    /* Save Confirmation */
+    .save-confirmation {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: rgba(122, 150, 132, 0.1);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--sage);
+      margin-top: 10px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 300ms ease, transform 300ms ease;
+    }
+
+    .save-confirmation.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Responsive scaling for smaller viewports */
+    @media (max-height: 900px) {
+      .iphone-frame {
+        transform: scale(0.85);
+        transform-origin: center center;
+      }
+    }
+
+    @media (max-height: 750px) {
+      .iphone-frame {
+        transform: scale(0.7);
+      }
+    }
+
+    @media (max-width: 450px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+      .iphone-frame {
+        transform: scale(0.82);
+        transform-origin: top center;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .iphone-frame {
+        transform: scale(0.72);
+        transform-origin: top center;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .iphone-frame {
+        transform: scale(0.65);
+        transform-origin: top center;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .iphone-frame {
+        transform: scale(0.58);
+        transform-origin: top center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- iPhone Frame -->
+  <div class="iphone-frame">
+    <div class="iphone-screen">
+      <!-- Dynamic Island -->
+      <div class="dynamic-island"></div>
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 18 12"><path d="M1 4.5C1 3.67 1.67 3 2.5 3h2C5.33 3 6 3.67 6 4.5v3C6 8.33 5.33 9 4.5 9h-2C1.67 9 1 8.33 1 7.5v-3zM7 3.5C7 2.67 7.67 2 8.5 2h2c.83 0 1.5.67 1.5 1.5v4c0 .83-.67 1.5-1.5 1.5h-2C7.67 9 7 8.33 7 7.5v-4zM13 2.5c0-.83.67-1.5 1.5-1.5h2c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-2c-.83 0-1.5-.67-1.5-1.5v-5z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2C4.69 2 1.88 4.01.35 6.9c-.12.23-.12.5 0 .73C1.88 10.49 4.69 12.5 8 12.5s6.12-2.01 7.65-4.87c.12-.23.12-.5 0-.73C14.12 4.01 11.31 2 8 2zm0 8.75c-2.34 0-4.24-1.79-4.24-4s1.9-4 4.24-4 4.24 1.79 4.24 4-1.9 4-4.24 4z"/></svg>
+          <svg viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="2.5" stroke="currentColor" stroke-width="1" fill="none"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor"/><rect x="2" y="3" width="18" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <!-- Home Indicator -->
+      <div class="home-indicator"></div>
+
+      <!-- App Content -->
+      <div class="app" id="app">
+        <!-- Back Button -->
+        <button class="back-button" id="backBtn" onclick="goBack()" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- Screen 1: Welcome -->
+        <div class="screen screen-1 active" data-screen="1" data-bg="neutral">
+          <div class="progress-indicator">
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle"></div>
+          </div>
+          <div class="content">
+            <div class="screen-label">Welcome to ESSENCE</div>
+            <h1 class="screen-title">Your voice is yours alone.</h1>
+            <div class="screen-body">
+              <p>We help you keep it safe for the people who matter most.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(2)">Continue</button>
+            <button class="btn-secondary">Learn more</button>
+          </div>
+        </div>
+
+        <!-- Screen 2: Purpose -->
+        <div class="screen screen-2" data-screen="2" data-bg="warm-1">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Here's what ESSENCE does.</h1>
+            <div class="screen-body">
+              <p>You record a few minutes of natural speech.</p>
+              <p>We create a voice that sounds like you.</p>
+              <p>Then you use it to leave messages for the future.</p>
+              <p class="muted">Birthday wishes. Life advice. Love notes.<br>Your voice. Their timeline.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(3)">Continue</button>
+          </div>
+        </div>
+
+        <!-- Screen 3: Who This Is For -->
+        <div class="screen screen-3" data-screen="3" data-bg="warm-2">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle-warm"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">This is for people who plan ahead.</h1>
+            <div class="screen-body">
+              <p>Parents who want their grandchildren to hear their voice.</p>
+              <p>Partners who want to leave love notes for special days.</p>
+              <p class="emphasis">You don't need to be sick.<br>You just need to care.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(4)">That sounds like me</button>
+            <button class="btn-secondary">Not sure yet</button>
+          </div>
+        </div>
+
+        <!-- Screen 4: Safety & Trust -->
+        <div class="screen screen-4" data-screen="4" data-bg="warm-2">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Your voice stays private. Always.</h1>
+            <div class="screen-body">
+              <p>We <span class="emphasis">never</span> sell your recordings.</p>
+              <p>We <span class="emphasis">never</span> use them to train other products.</p>
+              <p>We <span class="emphasis">never</span> share them without your permission.</p>
+              <p class="muted">Protected with end-to-end encryption.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(5)">I understand</button>
+            <button class="btn-secondary">Read our privacy promise</button>
+          </div>
+        </div>
+
+        <!-- Screen 5: Why Your Voice Matters -->
+        <div class="screen screen-5" data-screen="5" data-bg="gold">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone ready"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">No one else sounds like you.</h1>
+            <div class="screen-body">
+              <p>The way you say someone's name.</p>
+              <p>The rhythm of how you tell a story.</p>
+              <p>The warmth in your laugh.</p>
+              <p class="emphasis">These things can't be written down.<br>But they can be preserved.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(6)">Continue</button>
+          </div>
+        </div>
+
+        <!-- Screen 6: Start Your Journey -->
+        <div class="screen screen-6" data-screen="6" data-bg="warm-1">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone ready"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Here's how this works.</h1>
+            <div class="screen-body">
+              <div class="journey-steps">
+                <div class="journey-step">
+                  <span class="step-number">①</span>
+                  <div>
+                    <span class="step-text">Tell us about yourself</span><br>
+                    <span class="step-time">(2 minutes)</span>
+                  </div>
+                </div>
+                <div class="journey-step">
+                  <span class="step-number">②</span>
+                  <div>
+                    <span class="step-text">Record your voice</span><br>
+                    <span class="step-time">(10-13 minutes)</span>
+                  </div>
+                </div>
+                <div class="journey-step">
+                  <span class="step-number">③</span>
+                  <div>
+                    <span class="step-text">Create your first message</span>
+                  </div>
+                </div>
+              </div>
+              <p class="muted">You can pause anytime and pick up where you left off.</p>
+              <p class="muted">We'll guide you through every step. There's no wrong way to do this.</p>
+              <div class="time-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>About 15 minutes total</span>
+              </div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(7)">Let's begin</button>
+          </div>
+        </div>
+
+        <!-- Screen 7: Identity Setup Intro -->
+        <div class="screen screen-7" data-screen="7" data-bg="neutral">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">First, tell us a little about you.</h1>
+            <div class="screen-body">
+              <p>This helps us personalize your experience.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(8)">Enter your name</button>
+          </div>
+        </div>
+
+        <!-- Screen 8: Name Input -->
+        <div class="screen screen-8" data-screen="8" data-bg="neutral">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">What should we call you?</h1>
+            <div class="screen-body">
+              <p>Your name helps make your messages feel personal.</p>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Your first name</label>
+              <input type="text" class="input-field" id="nameInput" placeholder="Enter your name" oninput="validateName()">
+              <div class="input-helper">This is how we'll greet you.</div>
+              <div class="save-confirmation" id="nameConfirm">✓ Saved</div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" id="nameBtn" onclick="saveName()" disabled>Save name</button>
+          </div>
+        </div>
+
+        <!-- Screen 9: Photo Upload -->
+        <div class="screen screen-9" data-screen="9" data-bg="warm-1">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone idle-warm"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Add a photo if you'd like.</h1>
+            <div class="screen-body">
+              <p>It helps your messages feel more personal. Completely optional.</p>
+            </div>
+            <div class="photo-upload">
+              <div class="photo-circle" id="photoCircle" onclick="togglePhoto()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="cameraIcon">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <span id="photoText">Tap to add</span>
+              </div>
+              <div class="photo-confirmation" id="photoConfirm">Looking good ✓</div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" id="photoBtn" onclick="goToScreen(10)">Continue without photo</button>
+            <button class="btn-secondary" onclick="goToScreen(10)" style="display: none;" id="skipPhotoBtn">Continue without photo</button>
+          </div>
+        </div>
+
+        <!-- Screen 10: Priming Moment -->
+        <div class="screen screen-10" data-screen="10" data-bg="rich">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone ceremonial"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Take a breath.</h1>
+            <div class="screen-body">
+              <p>In a moment, you'll start recording your voice.</p>
+              <p>There's no script. No performance.<br>Just you, speaking naturally.</p>
+              <p>Think of it like leaving a voicemail for someone you love.</p>
+            </div>
+            <div class="breath-hint">Breathe with the stone for a moment.</div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="goToScreen(11)">Begin setup</button>
+          </div>
+        </div>
+
+        <!-- Screen 11: Ready to Begin -->
+        <div class="screen screen-11" data-screen="11" data-bg="neutral">
+          <div class="progress-indicator">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+          </div>
+          <div class="stone-container">
+            <div class="breath-stone ready-bright"></div>
+          </div>
+          <div class="content">
+            <h1 class="screen-title">Ready to begin recording?</h1>
+            <div class="screen-body">
+              <p>You'll need about 10-13 minutes in a quiet space.</p>
+              <p>We'll guide you through 25 short prompts.</p>
+              <p>Your microphone will need to be enabled.</p>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-primary" onclick="completeOnboarding()">Begin recording</button>
+            <button class="btn-secondary">I need more time</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentScreen = 1;
+    let userName = '';
+    let hasPhoto = false;
+
+    // Background color map (strengthened contrast)
+    const bgColors = {
+      'neutral': '#FBF8F4',
+      'warm-1': '#F9F4ED',
+      'warm-2': '#F6F0E5',
+      'warm-3': '#F4EBDD',
+      'gold': '#F2E8D6',
+      'rich': '#EDE3D0'
+    };
+
+    // Navigation
+    function goToScreen(screenNum) {
+      const currentEl = document.querySelector(`.screen-${currentScreen}`);
+      const nextEl = document.querySelector(`.screen-${screenNum}`);
+      
+      if (!currentEl || !nextEl) return;
+
+      const isForward = screenNum > currentScreen;
+
+      currentEl.classList.remove('active');
+      currentEl.classList.add(isForward ? 'exiting' : 'exiting-back');
+
+      if (!isForward) {
+        nextEl.classList.add('entering-back');
+      }
+      
+      setTimeout(() => {
+        currentEl.classList.remove('exiting', 'exiting-back');
+        nextEl.classList.remove('entering-back');
+        nextEl.classList.add('active');
+        
+        // Update app background
+        const bgType = nextEl.dataset.bg;
+        document.getElementById('app').style.backgroundColor = bgColors[bgType];
+
+        // Update back button
+        const backBtn = document.getElementById('backBtn');
+        if (screenNum > 1) {
+          backBtn.classList.add('visible');
+        } else {
+          backBtn.classList.remove('visible');
+        }
+
+        currentScreen = screenNum;
+        resetAnimations(nextEl);
+
+        // Screen 10 ceremony
+        if (screenNum === 10) {
+          const screen10Btn = nextEl.querySelector('.btn-primary');
+          screen10Btn.classList.remove('unlocked');
+          setTimeout(() => {
+            screen10Btn.classList.add('unlocked');
+          }, 3900);
+        }
+
+        // Auto-focus name input
+        if (screenNum === 8) {
+          setTimeout(() => {
+            const nameInput = document.getElementById('nameInput');
+            if (nameInput) nameInput.focus();
+          }, 400);
+        }
+
+        // Handle Screen 1 intro if returning
+        if (screenNum === 1) {
+          const screen1 = document.querySelector('.screen-1');
+          screen1.classList.remove('intro-complete', 'breathing');
+          setTimeout(() => {
+            screen1.classList.add('intro-complete');
+            setTimeout(() => {
+              screen1.classList.add('breathing');
+            }, 1500);
+          }, 100);
+        }
+      }, 50);
+    }
+
+    function goBack() {
+      if (currentScreen > 1) {
+        goToScreen(currentScreen - 1);
+      }
+    }
+
+    function resetAnimations(screenEl) {
+      const animatedEls = screenEl.querySelectorAll('.screen-label, .screen-title, .screen-body, .button-group');
+      animatedEls.forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = null;
+      });
+    }
+
+    // Name validation
+    function validateName() {
+      const input = document.getElementById('nameInput');
+      const btn = document.getElementById('nameBtn');
+      btn.disabled = input.value.trim().length < 2;
+    }
+
+    function saveName() {
+      const input = document.getElementById('nameInput');
+      userName = input.value.trim();
+      
+      const confirm = document.getElementById('nameConfirm');
+      confirm.classList.add('visible');
+      
+      setTimeout(() => {
+        goToScreen(9);
+        confirm.classList.remove('visible');
+      }, 800);
+    }
+
+    // Photo toggle
+    function togglePhoto() {
+      const circle = document.getElementById('photoCircle');
+      const icon = document.getElementById('cameraIcon');
+      const text = document.getElementById('photoText');
+      const confirm = document.getElementById('photoConfirm');
+      const btn = document.getElementById('photoBtn');
+      const skipBtn = document.getElementById('skipPhotoBtn');
+
+      hasPhoto = !hasPhoto;
+
+      if (hasPhoto) {
+        circle.classList.add('has-photo');
+        icon.style.display = 'none';
+        text.textContent = '';
+        confirm.classList.add('visible');
+        btn.textContent = 'Save photo';
+        skipBtn.style.display = 'block';
+      } else {
+        circle.classList.remove('has-photo');
+        icon.style.display = 'block';
+        text.textContent = 'Tap to add';
+        confirm.classList.remove('visible');
+        btn.textContent = 'Continue without photo';
+        skipBtn.style.display = 'none';
+      }
+    }
+
+    // Complete
+    function completeOnboarding() {
+      alert('🎉 Onboarding complete!\n\nIn the full app, this would transition to voice training.\n\nUser: ' + (userName || 'Anonymous') + '\nPhoto: ' + (hasPhoto ? 'Yes' : 'No'));
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('app').style.backgroundColor = bgColors['neutral'];
+      document.getElementById('backBtn').classList.remove('visible');
+      
+      // Enable aura for all stone containers (except Screen 1 which animates in)
+      document.querySelectorAll('.stone-container').forEach(container => {
+        if (!container.closest('.screen-1')) {
+          container.classList.add('aura-visible');
+        }
+      });
+
+      // Trigger Screen 1 cinematic intro sequence
+      // Timeline: 0ms start → 1500ms reveal complete → breathing begins
+      setTimeout(() => {
+        document.querySelector('.screen-1').classList.add('intro-complete');
+        
+        // Aura pulses in during reveal
+        document.querySelector('.screen-1 .stone-container').classList.add('aura-visible');
+        
+        // Start breathing after reveal animation completes (~1500ms)
+        setTimeout(() => {
+          document.querySelector('.screen-1').classList.add('breathing');
+        }, 1600);
+      }, 100);
+    });
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') {
+        if (e.key === 'Enter' && currentScreen === 8) {
+          const btn = document.getElementById('nameBtn');
+          if (!btn.disabled) saveName();
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (currentScreen < 11) {
+          if (currentScreen === 8) {
+            const btn = document.getElementById('nameBtn');
+            if (!btn.disabled) saveName();
+          } else {
+            goToScreen(currentScreen + 1);
+          }
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        goBack();
+      }
+    });
+  </script>
+</body>
+</html>
