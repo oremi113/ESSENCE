@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<!--
+  ESSENCE Message Creation Module - Phase 2 Complete
+  Screens: MC-1, MC-2, MC-3, MC-4 (Toast) → Home B
+  Built: November 26, 2025
+  
+  PHASE 2 COMPLETE:
+  - Staggered reveals with precise timing & pause beats
+  - Overflow text handling (600 char with fade)
+  - Full expander logic with character counter
+  - Button crossfades on playback end
+  - Tooltip on "Try a different version"
+  - Message card settle animation on Home B
+  - Group spacing refinements
+  - Micro-affirmation glow on play
+  - Polish pass complete
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE - Message Creation Module</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* MINERAL & WARMTH Palette */
+      --cream: #FBF8F4;
+      --oat: #F5F0EA;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      --ash: #ADA9A5;
+      
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      
+      --border: rgba(0, 0, 0, 0.06);
+      
+      /* Typography */
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'SF Mono', Monaco, monospace;
+      
+      /* Easing */
+      --ease-drift: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-breath: cubic-bezier(0.4, 0.0, 0.2, 1);
+      --ease-out-soft: cubic-bezier(0.0, 0.0, 0.2, 1);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #1A1715;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* ========================================
+       PHONE FRAME
+       ======================================== */
+    .prototype-wrapper {
+      max-width: 390px;
+      width: 100%;
+      background: var(--oat);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 12px #1A1715, 
+        0 0 0 14px var(--mineral), 
+        0 40px 80px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .phone-frame {
+      width: 100%;
+      aspect-ratio: 390 / 844;
+      background: var(--cream);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 36px;
+      background: #1C1A18;
+      border-radius: 20px;
+      z-index: 1000;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 54px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
+      background: var(--cream);
+      z-index: 100;
+    }
+
+    .status-time {
+      font-weight: 600;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    /* Home Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: var(--charcoal);
+      border-radius: 3px;
+      opacity: 0.2;
+      z-index: 1000;
+    }
+
+    /* ========================================
+       SCREENS
+       ======================================== */
+    .screen {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      background: var(--cream);
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      transition: opacity 0.4s var(--ease-drift);
+    }
+
+    .screen.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .screen.fade-out {
+      opacity: 0;
+    }
+
+    /* ========================================
+       HEADER
+       ======================================== */
+    .screen-header {
+      padding: 16px 32px 12px;
+      text-align: center;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--graphite);
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s var(--ease-out-soft) forwards;
+    }
+
+    .screen-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s var(--ease-out-soft) 0.1s forwards;
+    }
+
+    .screen-subtitle {
+      font-size: 15px;
+      color: var(--graphite);
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s var(--ease-out-soft) 0.15s forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ========================================
+       BREATH STONE
+       ======================================== */
+    .breath-stone-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 24px 20px;
+      min-height: 140px;
+    }
+
+    .breath-stone {
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%, 
+        #FCF4E4,
+        #F5ECD8 10%,
+        #EFE6D0 22%,
+        #E5D8C0 38%,
+        #D8CAB0 52%,
+        #C4B8A0 68%,
+        #AEA090 82%,
+        #7D827E
+      );
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        inset -20px -20px 40px rgba(28, 26, 24, 0.12),
+        inset 20px 20px 40px rgba(251, 248, 244, 0.5);
+      position: relative;
+      transition: all 0.6s var(--ease-breath);
+    }
+
+    /* Stone glow */
+    .breath-stone::before {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle, 
+        rgba(238, 212, 182, var(--glow-intensity, 0.15)), 
+        transparent 70%
+      );
+      animation: stoneBreathe var(--breath-speed, 7s) var(--ease-breath) infinite;
+      transition: all 0.6s var(--ease-breath);
+    }
+
+    /* Stone shimmer overlay */
+    .breath-stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 50%,
+        transparent 100%
+      );
+      opacity: 0.6;
+    }
+
+    @keyframes stoneBreathe {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.4;
+      }
+      40% {
+        transform: scale(1.03);
+        opacity: 0.7;
+      }
+      45% {
+        transform: scale(1.03);
+        opacity: 0.7;
+      }
+    }
+
+    /* Stone States */
+    .breath-stone.ready {
+      width: 90px;
+      height: 90px;
+      --breath-speed: 6s;
+      --glow-intensity: 0.15;
+    }
+
+    .breath-stone.focus {
+      width: 95px;
+      height: 95px;
+      --breath-speed: 7s;
+      --glow-intensity: 0.2;
+    }
+
+    .breath-stone.ready-bright {
+      width: 100px;
+      height: 100px;
+      --breath-speed: 5.5s;
+      --glow-intensity: 0.28;
+    }
+
+    .breath-stone.working {
+      width: 105px;
+      height: 105px;
+      --breath-speed: 3.25s;
+      --glow-intensity: 0.3;
+      animation: workingPulse 1.08s var(--ease-breath) infinite;
+    }
+
+    @keyframes workingPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.04);
+      }
+    }
+
+    .breath-stone.playback-ready {
+      width: 110px;
+      height: 110px;
+      --breath-speed: 6s;
+      --glow-intensity: 0.22;
+    }
+
+    .breath-stone.playback {
+      width: 115px;
+      height: 115px;
+      --breath-speed: 4s;
+      --glow-intensity: 0.32;
+      animation: playbackSync 2s var(--ease-breath) infinite;
+    }
+
+    @keyframes playbackSync {
+      0%, 100% {
+        transform: scale(1);
+        --glow-intensity: 0.25;
+      }
+      30% {
+        transform: scale(1.03);
+        --glow-intensity: 0.35;
+      }
+      60% {
+        transform: scale(1.01);
+        --glow-intensity: 0.28;
+      }
+    }
+
+    .breath-stone.calm-ready {
+      width: 108px;
+      height: 108px;
+      --breath-speed: 7s;
+      --glow-intensity: 0.18;
+    }
+
+    .breath-stone.shimmer {
+      width: 110px;
+      height: 110px;
+      --breath-speed: 6s;
+      --glow-intensity: 0.25;
+      animation: shimmerPulse 0.6s var(--ease-breath) forwards;
+    }
+
+    @keyframes shimmerPulse {
+      0% {
+        transform: scale(1);
+        --glow-intensity: 0.2;
+      }
+      50% {
+        transform: scale(1.06);
+        --glow-intensity: 0.4;
+      }
+      100% {
+        transform: scale(1);
+        --glow-intensity: 0.2;
+      }
+    }
+
+    .breath-stone.infused {
+      width: 100px;
+      height: 100px;
+      --breath-speed: 8s;
+      --glow-intensity: 0.2;
+    }
+
+    /* ========================================
+       CONTENT AREA
+       ======================================== */
+    .content-area {
+      flex: 1;
+      padding: 0 28px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========================================
+       MC-1: RECIPIENT + MESSAGE TYPE CARDS
+       ======================================== */
+    .recipient-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .recipient-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.18s var(--ease-drift);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--charcoal);
+      position: relative;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .recipient-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .recipient-card:hover {
+      border-color: var(--mineral);
+      background: var(--oat);
+    }
+
+    .recipient-card.selected {
+      background: var(--oat);
+      border: 2px solid var(--mineral);
+      transform: translateY(-2px);
+    }
+
+    .recipient-card.selected::after {
+      content: '✓';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--mineral);
+      font-weight: 600;
+    }
+
+    /* Collapse unselected cards */
+    .recipient-cards.has-selection .recipient-card:not(.selected) {
+      max-height: 0;
+      padding: 0;
+      margin: 0;
+      opacity: 0;
+      border: none;
+      overflow: hidden;
+    }
+
+    .recipient-card {
+      max-height: 60px;
+      transition: all 0.3s var(--ease-drift), opacity 0.25s var(--ease-out-soft), transform 0.25s var(--ease-out-soft);
+    }
+
+    /* Change selection hint */
+    .recipient-cards.has-selection .recipient-card.selected::before {
+      content: 'Tap to change';
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--ash);
+      font-weight: 400;
+    }
+
+    /* Other input expansion */
+    .other-input-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s var(--ease-drift), padding 0.3s var(--ease-drift);
+      padding: 0 20px;
+    }
+
+    .other-input-container.expanded {
+      max-height: 80px;
+      padding: 12px 20px;
+    }
+
+    .other-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--charcoal);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.2s var(--ease-drift);
+    }
+
+    .other-input:focus {
+      border-color: var(--mineral);
+    }
+
+    .other-input::placeholder {
+      color: var(--ash);
+    }
+
+    /* Message Type Section */
+    .message-type-section {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s var(--ease-drift), opacity 0.3s var(--ease-drift);
+    }
+
+    .message-type-section.visible {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    .section-label {
+      font-size: 14px;
+      color: var(--charcoal);
+      text-align: center;
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+
+    .message-type-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message-type-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.18s var(--ease-drift);
+      position: relative;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .message-type-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .message-type-card:hover {
+      border-color: var(--mineral);
+      background: var(--oat);
+    }
+
+    .message-type-card.selected {
+      background: var(--oat);
+      border: 2px solid var(--mineral);
+    }
+
+    .message-type-card.selected::after {
+      content: '✓';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--mineral);
+      font-weight: 600;
+    }
+
+    .message-type-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 3px;
+    }
+
+    .message-type-preview {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      color: var(--graphite);
+      line-height: 1.4;
+    }
+
+    /* ========================================
+       FOOTER / CTA
+       ======================================== */
+    .footer {
+      padding: 16px 28px 20px;
+      background: var(--cream);
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-drift);
+      border-radius: 12px;
+      padding: 16px 28px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--mineral);
+      color: var(--cream);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--mineral-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary:disabled {
+      background: var(--sand);
+      color: var(--ash);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--graphite);
+      padding: 12px 28px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      color: var(--charcoal);
+    }
+
+    /* ========================================
+       MC-2: GENERATING SCREEN
+       ======================================== */
+    .generating-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 32px;
+    }
+
+    .generating-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--charcoal);
+      margin-top: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.3s var(--ease-out-soft) 0.3s forwards;
+    }
+
+    /* ========================================
+       MC-3: PLAYBACK SCREEN
+       ======================================== */
+    
+    /* Group spacing */
+    .playback-group {
+      margin-bottom: 24px;
+    }
+
+    .message-group {
+      margin-bottom: 20px;
+    }
+
+    .action-group {
+      margin-top: auto;
+    }
+
+    /* Playback Card */
+    .playback-card {
+      background: var(--oat);
+      border: 2px solid var(--sand);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .playback-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .play-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--mineral);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s var(--ease-drift);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .play-button:hover {
+      background: var(--mineral-dark);
+      transform: scale(1.05);
+    }
+
+    .play-button .play-icon,
+    .play-button .pause-icon {
+      position: absolute;
+      transition: opacity 0.25s var(--ease-drift);
+    }
+
+    .play-button .play-icon {
+      width: 0;
+      height: 0;
+      border-left: 14px solid var(--cream);
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      margin-left: 3px;
+    }
+
+    .play-button .pause-icon {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+    }
+
+    .play-button .pause-icon span {
+      width: 4px;
+      height: 16px;
+      background: var(--cream);
+      border-radius: 2px;
+    }
+
+    .play-button.playing .play-icon {
+      opacity: 0;
+    }
+
+    .play-button.playing .pause-icon {
+      opacity: 1;
+    }
+
+    /* Waveform */
+    .waveform-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 32px;
+    }
+
+    .waveform-bar {
+      width: 3px;
+      height: 8px;
+      background: var(--mineral);
+      border-radius: 2px;
+      opacity: 0.4;
+      transition: height 0.15s var(--ease-drift), opacity 0.15s var(--ease-drift);
+    }
+
+    .waveform.active .waveform-bar {
+      animation: waveAnimation 1s ease-in-out infinite;
+    }
+
+    @keyframes waveAnimation {
+      0%, 100% { 
+        height: 8px;
+        opacity: 0.4;
+      }
+      50% { 
+        height: 24px;
+        opacity: 0.8;
+      }
+    }
+
+    .waveform-bar:nth-child(1) { animation-delay: 0s; }
+    .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+    .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+    .waveform-bar:nth-child(4) { animation-delay: 0.15s; }
+    .waveform-bar:nth-child(5) { animation-delay: 0.25s; }
+    .waveform-bar:nth-child(6) { animation-delay: 0.1s; }
+    .waveform-bar:nth-child(7) { animation-delay: 0.2s; }
+    .waveform-bar:nth-child(8) { animation-delay: 0.05s; }
+    .waveform-bar:nth-child(9) { animation-delay: 0.15s; }
+    .waveform-bar:nth-child(10) { animation-delay: 0.25s; }
+    .waveform-bar:nth-child(11) { animation-delay: 0.1s; }
+    .waveform-bar:nth-child(12) { animation-delay: 0.2s; }
+    .waveform-bar:nth-child(13) { animation-delay: 0.15s; }
+    .waveform-bar:nth-child(14) { animation-delay: 0.05s; }
+    .waveform-bar:nth-child(15) { animation-delay: 0.2s; }
+
+    .playback-time {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--graphite);
+      text-align: right;
+    }
+
+    /* Replay encouragement */
+    /* Replay encouragement - softened, margin space */
+    .replay-text {
+      font-size: 11px;
+      color: var(--ash);
+      text-align: right;
+      margin-top: 6px;
+      margin-right: 4px;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    /* Separator */
+    .separator {
+      width: 40%;
+      height: 1px;
+      background: var(--sand);
+      margin: 0 auto;
+    }
+
+    /* Message Card */
+    .message-label {
+      font-size: 13px;
+      color: var(--graphite);
+      margin-bottom: 10px;
+    }
+
+    .message-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 20px 22px;
+      max-width: 520px;
+    }
+
+    .message-text {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--charcoal);
+    }
+
+    /* Expander */
+    .expander {
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .expander-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: background 0.2s var(--ease-drift);
+    }
+
+    .expander-header:hover {
+      background: var(--oat);
+    }
+
+    .expander-label {
+      font-size: 14px;
+      color: var(--graphite);
+    }
+
+    .expander-optional {
+      font-size: 12px;
+      color: var(--ash);
+      margin-left: auto;
+      margin-right: 10px;
+    }
+
+    .expander-chevron {
+      color: var(--ash);
+      font-size: 12px;
+      transition: transform 0.2s var(--ease-drift);
+    }
+
+    .expander.open .expander-chevron {
+      transform: rotate(180deg);
+    }
+
+    .expander-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s var(--ease-drift);
+    }
+
+    .expander.open .expander-content {
+      max-height: 300px;
+    }
+
+    .expander-inner {
+      padding: 0 16px 16px;
+    }
+
+    .personal-input {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px 14px;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--charcoal);
+      background: var(--cream);
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s var(--ease-drift);
+    }
+
+    .personal-input:focus {
+      border-color: var(--mineral);
+    }
+
+    .personal-input::placeholder {
+      color: var(--ash);
+    }
+
+    .expander-examples {
+      font-size: 13px;
+      color: var(--ash);
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .expander-btn {
+      margin-top: 12px;
+      padding: 12px 20px;
+      background: transparent;
+      border: 1px solid var(--charcoal);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--charcoal);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-drift);
+      display: none;
+    }
+
+    .expander-btn.visible {
+      display: block;
+    }
+
+    .expander-btn:hover {
+      background: var(--oat);
+    }
+
+    /* Character counter */
+    .char-counter {
+      font-size: 12px;
+      color: var(--graphite);
+      text-align: right;
+      margin-top: 6px;
+      opacity: 0;
+      transition: opacity 0.2s var(--ease-drift);
+    }
+
+    .char-counter.visible {
+      opacity: 1;
+    }
+
+    /* ========================================
+       PHASE 2: OVERFLOW TEXT HANDLING
+       ======================================== */
+    .personal-input-wrapper {
+      position: relative;
+    }
+
+    .personal-input {
+      width: 100%;
+      min-height: 80px;
+      max-height: 140px;
+      padding: 12px 14px;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--charcoal);
+      background: var(--cream);
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s var(--ease-drift);
+      overflow-y: auto;
+    }
+
+    /* Overflow text fade effect - applied via JS */
+    .personal-input.has-overflow {
+      background: linear-gradient(
+        to bottom,
+        var(--cream) 0%,
+        var(--cream) 70%,
+        rgba(251, 248, 244, 0.5) 100%
+      );
+    }
+
+    .overflow-helper {
+      font-size: 13px;
+      color: var(--graphite);
+      margin-top: 8px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.2s var(--ease-drift), max-height 0.2s var(--ease-drift);
+    }
+
+    .overflow-helper.visible {
+      opacity: 1;
+      max-height: 40px;
+    }
+
+    /* ========================================
+       PHASE 2: TOOLTIP
+       ======================================== */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--charcoal);
+      color: var(--cream);
+      font-size: 13px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s var(--ease-drift), transform 0.2s var(--ease-drift);
+      z-index: 100;
+    }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: var(--charcoal);
+    }
+
+    .tooltip-container:hover .tooltip,
+    .tooltip-container.show-tooltip .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* ========================================
+       PHASE 2: MICRO-AFFIRMATION GLOW
+       ======================================== */
+    .breath-stone.micro-affirm {
+      animation: microAffirm 0.3s var(--ease-breath) forwards;
+    }
+
+    @keyframes microAffirm {
+      0% {
+        --glow-intensity: 0.22;
+      }
+      50% {
+        --glow-intensity: 0.45;
+      }
+      100% {
+        --glow-intensity: 0.32;
+      }
+    }
+
+    /* ========================================
+       PHASE 2: MC-3 STAGGERED ENTRY
+       ======================================== */
+    .mc3-stagger .screen-header .label {
+      opacity: 0;
+      animation: fadeInUp 0.25s var(--ease-out-soft) 0.1s forwards;
+    }
+
+    .mc3-stagger .screen-header .screen-title {
+      opacity: 0;
+      animation: fadeInUp 0.3s var(--ease-out-soft) 0.25s forwards;
+    }
+
+    .mc3-stagger .breath-stone-container {
+      opacity: 0;
+      animation: fadeIn 0.35s var(--ease-out-soft) 0.45s forwards;
+    }
+
+    .mc3-stagger .playback-group {
+      opacity: 0;
+      transform: translateY(15px);
+      animation: fadeInUp 0.3s var(--ease-out-soft) 0.7s forwards;
+    }
+
+    .mc3-stagger .replay-text {
+      opacity: 0;
+      animation: fadeIn 0.2s var(--ease-out-soft) 0.9s forwards;
+    }
+
+    .mc3-stagger .separator {
+      opacity: 0;
+      transform: scaleX(0);
+      animation: scaleIn 0.25s var(--ease-out-soft) 1.0s forwards;
+    }
+
+    .mc3-stagger .message-group {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.25s var(--ease-out-soft) 1.15s forwards;
+    }
+
+    .mc3-stagger .action-group {
+      opacity: 0;
+      animation: fadeIn 0.2s var(--ease-out-soft) 1.35s forwards;
+    }
+
+    .mc3-stagger .footer {
+      opacity: 0;
+      animation: fadeIn 0.2s var(--ease-out-soft) 1.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes scaleIn {
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
+    /* ========================================
+       PHASE 2: HOME B SETTLE ANIMATION
+       ======================================== */
+    .first-message-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s var(--ease-out-soft);
+    }
+
+    .first-message-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .first-message-card.settle {
+      animation: settleCard 0.5s var(--ease-out-soft) forwards;
+    }
+
+    @keyframes settleCard {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Play icon pulse on settle */
+    .first-message-card.settle .first-message-play {
+      animation: playPulse 0.3s var(--ease-breath) 0.5s forwards;
+    }
+
+    @keyframes playPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    /* ========================================
+       PHASE 2: BUTTON SHIMMER ON SAVE
+       ======================================== */
+    .btn-primary.saving {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary.saving::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      animation: shimmerBtn 0.4s var(--ease-drift) forwards;
+    }
+
+    @keyframes shimmerBtn {
+      to {
+        left: 100%;
+      }
+    }
+
+    /* ========================================
+       PHASE 2: SECONDARY CTA REFINEMENTS
+       ======================================== */
+    .btn-secondary {
+      background: transparent;
+      color: var(--graphite);
+      padding: 12px 28px;
+      font-size: 13px;
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .btn-secondary:hover {
+      color: var(--charcoal);
+    }
+
+    /* Message crossfade for regeneration */
+    .message-card.regenerating {
+      opacity: 0.5;
+      transition: opacity 0.3s var(--ease-drift);
+    }
+
+    .message-card.crossfade-in {
+      animation: crossfadeIn 0.3s var(--ease-drift) forwards;
+    }
+
+    @keyframes crossfadeIn {
+      from {
+        opacity: 0.5;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ========================================
+       MC-4: TOAST
+       ======================================== */
+    .toast-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 80px; /* Slight offset above true center for visual balance */
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s var(--ease-out-soft);
+    }
+
+    .toast-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast {
+      background: var(--cream);
+      width: 80%;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .toast-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+
+    .toast-subtitle {
+      font-size: 14px;
+      color: var(--graphite);
+    }
+
+    /* ========================================
+       HOME B PREVIEW
+       ======================================== */
+    .home-b-content {
+      flex: 1;
+      padding: 20px 28px;
+      opacity: 0.4;
+      transition: opacity 0.4s var(--ease-drift);
+    }
+
+    .home-b-content.full {
+      opacity: 1;
+    }
+
+    .home-b-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--charcoal);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .first-message-card {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s var(--ease-out-soft);
+    }
+
+    .first-message-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .first-message-badge {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--graphite);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .first-message-badge::before {
+      content: '★';
+      font-size: 10px;
+    }
+
+    .first-message-recipient {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    .first-message-type {
+      font-size: 14px;
+      color: var(--graphite);
+      margin-bottom: 12px;
+    }
+
+    .first-message-preview {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.6;
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+
+    .first-message-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .first-message-play {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--mineral);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .first-message-play:hover {
+      color: var(--mineral-dark);
+    }
+
+    .first-message-timestamp {
+      font-size: 12px;
+      color: var(--ash);
+    }
+
+    /* ========================================
+       NAVIGATION HELPER
+       ======================================== */
+    .nav-helper {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      background: rgba(28, 26, 24, 0.9);
+      padding: 10px 16px;
+      border-radius: 30px;
+      z-index: 2000;
+    }
+
+    .nav-btn {
+      padding: 8px 14px;
+      background: var(--mineral);
+      color: var(--cream);
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s var(--ease-drift);
+    }
+
+    .nav-btn:hover {
+      background: var(--cream);
+      color: var(--charcoal);
+    }
+
+    .nav-btn.active {
+      background: var(--cream);
+      color: var(--charcoal);
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-wrapper">
+    <div class="phone-frame">
+      <div class="dynamic-island"></div>
+      
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <span>📶</span>
+          <span>🔋</span>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           MC-1: RECIPIENT + MESSAGE TYPE
+           ========================================== -->
+      <div class="screen active" id="screen-mc1">
+        <div class="screen-header">
+          <div class="label">CREATE A MESSAGE</div>
+          <h1 class="screen-title">Who should hear your voice</h1>
+          <p class="screen-subtitle">Choose someone who comes to mind naturally</p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone ready" id="stone-mc1"></div>
+        </div>
+
+        <div class="content-area">
+          <div class="recipient-cards" id="recipient-cards">
+            <div class="recipient-card" data-recipient="Partner">Partner</div>
+            <div class="recipient-card" data-recipient="Child">Child</div>
+            <div class="recipient-card" data-recipient="Grandchild">Grandchild</div>
+            <div class="recipient-card" data-recipient="Sibling">Sibling</div>
+            <div class="recipient-card" data-recipient="Friend">Friend</div>
+            <div class="recipient-card" data-recipient="Other">Other</div>
+          </div>
+
+          <div class="other-input-container" id="other-input-container">
+            <input type="text" class="other-input" id="other-input" placeholder="Type their name">
+          </div>
+
+          <div class="message-type-section" id="message-type-section">
+            <div class="section-label">What kind of moment</div>
+            <div class="message-type-cards" id="message-type-cards">
+              <div class="message-type-card" data-type="A warm hello">
+                <div class="message-type-title">A warm hello</div>
+                <div class="message-type-preview">A gentle greeting that feels familiar</div>
+              </div>
+              <div class="message-type-card" data-type="Words of encouragement">
+                <div class="message-type-title">Words of encouragement</div>
+                <div class="message-type-preview">A steady voice to lift their spirits</div>
+              </div>
+              <div class="message-type-card" data-type="A message of love">
+                <div class="message-type-title">A message of love</div>
+                <div class="message-type-preview">Something heartfelt and sincere</div>
+              </div>
+              <div class="message-type-card" data-type="A memory to share">
+                <div class="message-type-title">A memory to share</div>
+                <div class="message-type-preview">Something meaningful to pass on</div>
+              </div>
+              <div class="message-type-card" data-type="Just because">
+                <div class="message-type-title">Just because</div>
+                <div class="message-type-preview">A simple reminder you're thinking of them</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <button class="btn btn-primary" id="btn-create-message" disabled>Create message</button>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           MC-2: GENERATING
+           ========================================== -->
+      <div class="screen" id="screen-mc2">
+        <div class="screen-header">
+          <div class="label">CREATING</div>
+        </div>
+
+        <div class="generating-content">
+          <div class="breath-stone-container">
+            <div class="breath-stone working" id="stone-mc2"></div>
+          </div>
+          <h2 class="generating-title">Your voice is shaping your words.</h2>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           MC-3: PREVIEW + PLAYBACK
+           ========================================== -->
+      <div class="screen" id="screen-mc3">
+        <div class="screen-header">
+          <div class="label">YOUR FIRST MESSAGE</div>
+          <h1 class="screen-title">This is your voice, speaking to <span id="recipient-display">Sarah</span>.</h1>
+        </div>
+
+        <div class="breath-stone-container" style="min-height: 100px; padding: 16px;">
+          <div class="breath-stone playback-ready" id="stone-mc3"></div>
+        </div>
+
+        <div class="content-area">
+          <!-- Group 1: Playback -->
+          <div class="playback-group">
+            <div class="playback-card">
+              <div class="playback-controls">
+                <button class="play-button" id="play-button">
+                  <span class="play-icon"></span>
+                  <span class="pause-icon"><span></span><span></span></span>
+                </button>
+                <div class="waveform-container">
+                  <div class="waveform" id="waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                  </div>
+                  <div class="playback-time"><span id="current-time">0:00</span> / <span id="total-time">0:18</span></div>
+                </div>
+              </div>
+            </div>
+            <p class="replay-text">You can play this as many times as you like</p>
+          </div>
+
+          <!-- Separator -->
+          <div class="separator"></div>
+
+          <!-- Group 2: Message -->
+          <div class="message-group">
+            <p class="message-label">Message created for <span id="message-recipient">Sarah</span></p>
+            <div class="message-card">
+              <p class="message-text" id="message-text">"Happy birthday, sweetheart. I hope this message finds you feeling loved and celebrated. You bring so much light into the world, and I am so proud of the person you have become. Enjoy your day. I love you."</p>
+            </div>
+          </div>
+
+          <!-- Group 3: Actions -->
+          <div class="action-group">
+            <div class="expander" id="expander">
+              <button class="expander-header" id="expander-header">
+                <span class="expander-label">Add a personal touch</span>
+                <span class="expander-optional">Optional</span>
+                <span class="expander-chevron">▼</span>
+              </button>
+              <div class="expander-content">
+                <div class="expander-inner">
+                  <div class="personal-input-wrapper">
+                    <textarea class="personal-input" id="personal-input" placeholder="Add something meaningful if you would like"></textarea>
+                  </div>
+                  <div class="char-counter" id="char-counter">0 / 600</div>
+                  <div class="overflow-helper" id="overflow-helper">We'll use the first part of what you shared. You can edit it if you would like.</div>
+                  <p class="expander-examples">For example: a cherished memory, or a thought for their future</p>
+                  <button class="expander-btn" id="expander-btn">Create new version with this</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer" id="mc3-footer">
+          <button class="btn btn-primary" id="btn-save-message">Save this message</button>
+          <div class="tooltip-container" id="tooltip-container">
+            <button class="btn btn-secondary" id="btn-different-version">Try a different version</button>
+            <div class="tooltip">Creates another message for you to compare</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           MC-4: HOME B WITH TOAST
+           ========================================== -->
+      <div class="screen" id="screen-mc4">
+        <div class="screen-header" style="padding-top: 24px;">
+          <!-- Empty for Home B -->
+        </div>
+
+        <div class="breath-stone-container" style="min-height: 120px;">
+          <div class="breath-stone infused" id="stone-mc4"></div>
+        </div>
+
+        <div class="home-b-content" id="home-b-content">
+          <h2 class="home-b-title">Your space to save what matters</h2>
+          
+          <div class="first-message-card" id="first-message-card">
+            <div class="first-message-badge">Your first message</div>
+            <div class="first-message-recipient">To <span id="home-recipient">Sarah</span></div>
+            <div class="first-message-type" id="home-message-type">A message of love</div>
+            <p class="first-message-preview" id="home-message-preview">"Happy birthday, sweetheart. I hope this message finds you feeling loved..."</p>
+            <div class="first-message-footer">
+              <span class="first-message-play">▶ Play</span>
+              <span class="first-message-timestamp">Shaped just now</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <button class="btn btn-primary">Create another message</button>
+          <button class="btn btn-secondary">View all messages</button>
+        </div>
+
+        <!-- Toast Overlay -->
+        <div class="toast-overlay" id="toast-overlay">
+          <div class="toast">
+            <h3 class="toast-title">Message saved</h3>
+            <p class="toast-subtitle">Your keepsake is safe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+  <!-- Navigation Helper -->
+  <div class="nav-helper">
+    <button class="nav-btn active" onclick="goToScreen('mc1')">MC-1</button>
+    <button class="nav-btn" onclick="goToScreen('mc2')">MC-2</button>
+    <button class="nav-btn" onclick="goToScreen('mc3')">MC-3</button>
+    <button class="nav-btn" onclick="goToScreen('mc4')">MC-4</button>
+    <button class="nav-btn" onclick="runFullFlow()">▶ Full Flow</button>
+  </div>
+
+  <script>
+    // ==========================================
+    // STATE
+    // ==========================================
+    let selectedRecipient = null;
+    let selectedMessageType = null;
+    let isPlaying = false;
+    let playbackTimer = null;
+    let currentTime = 0;
+    const totalTime = 18;
+
+    // ==========================================
+    // SCREEN NAVIGATION
+    // ==========================================
+    function goToScreen(screenId) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+
+      // Show target screen
+      const targetScreen = document.getElementById(`screen-${screenId}`);
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+      }
+
+      // Update nav buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes(screenId.toUpperCase())) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Reset animations based on screen
+      if (screenId === 'mc1') {
+        initMC1();
+      } else if (screenId === 'mc3') {
+        // Add stagger animation for direct navigation
+        const mc3Screen = document.getElementById('screen-mc3');
+        mc3Screen.classList.add('mc3-stagger');
+        resetPlayback();
+        
+        // Reset expander state
+        document.getElementById('expander').classList.remove('open');
+        document.getElementById('personal-input').value = '';
+        document.getElementById('char-counter').classList.remove('visible');
+        document.getElementById('overflow-helper').classList.remove('visible');
+        document.getElementById('expander-btn').classList.remove('visible');
+        
+        setTimeout(() => {
+          mc3Screen.classList.remove('mc3-stagger');
+        }, 2000);
+      } else if (screenId === 'mc4') {
+        initMC4();
+      }
+    }
+
+    // ==========================================
+    // MC-1: RECIPIENT + MESSAGE TYPE
+    // ==========================================
+    function initMC1() {
+      const recipientCardsContainer = document.getElementById('recipient-cards');
+      
+      // Reset collapse state
+      recipientCardsContainer.classList.remove('has-selection');
+      
+      // Stagger recipient card reveal
+      const recipientCards = document.querySelectorAll('.recipient-card');
+      recipientCards.forEach((card, i) => {
+        card.classList.remove('visible', 'selected');
+        setTimeout(() => {
+          card.style.transition = `all 0.3s var(--ease-drift), opacity 0.25s var(--ease-out-soft), transform 0.25s var(--ease-out-soft)`;
+          card.classList.add('visible');
+        }, 100 + (i * 50));
+      });
+
+      // Reset state
+      selectedRecipient = null;
+      selectedMessageType = null;
+      document.getElementById('btn-create-message').disabled = true;
+      document.getElementById('message-type-section').classList.remove('visible');
+      document.getElementById('other-input-container').classList.remove('expanded');
+      document.getElementById('other-input').value = '';
+
+      // Reset message type cards
+      document.querySelectorAll('.message-type-card').forEach(c => c.classList.remove('selected', 'visible'));
+
+      // Reset stone
+      const stone = document.getElementById('stone-mc1');
+      stone.className = 'breath-stone ready';
+    }
+
+    // Recipient card selection
+    document.querySelectorAll('.recipient-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const recipientCardsContainer = document.getElementById('recipient-cards');
+        const wasSelected = card.classList.contains('selected');
+        const hadSelection = recipientCardsContainer.classList.contains('has-selection');
+
+        // If clicking the already-selected card, expand to show all options again
+        if (wasSelected && hadSelection) {
+          recipientCardsContainer.classList.remove('has-selection');
+          card.classList.remove('selected');
+          selectedRecipient = null;
+          
+          // Hide message type section
+          document.getElementById('message-type-section').classList.remove('visible');
+          document.querySelectorAll('.message-type-card').forEach(c => c.classList.remove('selected'));
+          selectedMessageType = null;
+          
+          // Reset stone
+          const stone = document.getElementById('stone-mc1');
+          stone.className = 'breath-stone ready';
+          
+          // Hide other input if open
+          document.getElementById('other-input-container').classList.remove('expanded');
+          
+          updateCreateButton();
+          return;
+        }
+
+        // Deselect all
+        document.querySelectorAll('.recipient-card').forEach(c => c.classList.remove('selected'));
+        
+        // Select this one
+        card.classList.add('selected');
+        selectedRecipient = card.dataset.recipient;
+
+        // Collapse other cards
+        recipientCardsContainer.classList.add('has-selection');
+
+        // Handle "Other" special case
+        const otherContainer = document.getElementById('other-input-container');
+        if (selectedRecipient === 'Other') {
+          otherContainer.classList.add('expanded');
+          setTimeout(() => document.getElementById('other-input').focus(), 300);
+        } else {
+          otherContainer.classList.remove('expanded');
+        }
+
+        // Update stone state
+        const stone = document.getElementById('stone-mc1');
+        stone.className = 'breath-stone focus';
+
+        // Show message type section
+        setTimeout(() => {
+          const messageTypeSection = document.getElementById('message-type-section');
+          messageTypeSection.classList.add('visible');
+
+          // Phase 2 refinement: Stronger scroll guidance (15% more)
+          const contentArea = document.querySelector('#screen-mc1 .content-area');
+          if (contentArea) {
+            contentArea.scrollTo({
+              top: 120,
+              behavior: 'smooth'
+            });
+          }
+
+          // Stagger message type cards
+          const typeCards = document.querySelectorAll('.message-type-card');
+          typeCards.forEach((tc, i) => {
+            tc.classList.remove('visible', 'selected');
+            setTimeout(() => {
+              tc.classList.add('visible');
+            }, 100 + (i * 50));
+          });
+        }, 300);
+
+        updateCreateButton();
+      });
+    });
+
+    // Other input handling
+    document.getElementById('other-input').addEventListener('input', (e) => {
+      if (e.target.value.length >= 2) {
+        selectedRecipient = e.target.value;
+      } else {
+        selectedRecipient = null;
+      }
+      updateCreateButton();
+    });
+
+    // Message type selection
+    document.querySelectorAll('.message-type-card').forEach(card => {
+      card.addEventListener('click', () => {
+        // Deselect all
+        document.querySelectorAll('.message-type-card').forEach(c => c.classList.remove('selected'));
+        
+        // Select this one
+        card.classList.add('selected');
+        selectedMessageType = card.dataset.type;
+
+        // Update stone state
+        const stone = document.getElementById('stone-mc1');
+        stone.className = 'breath-stone ready-bright';
+
+        updateCreateButton();
+      });
+    });
+
+    function updateCreateButton() {
+      const btn = document.getElementById('btn-create-message');
+      const hasRecipient = selectedRecipient && (selectedRecipient !== 'Other' || document.getElementById('other-input').value.length >= 2);
+      btn.disabled = !(hasRecipient && selectedMessageType);
+    }
+
+    // Create message button
+    document.getElementById('btn-create-message').addEventListener('click', () => {
+      if (selectedRecipient && selectedMessageType) {
+        transitionToMC2();
+      }
+    });
+
+    // ==========================================
+    // TRANSITIONS
+    // ==========================================
+    function transitionToMC2() {
+      const btn = document.getElementById('btn-create-message');
+      btn.classList.add('loading');
+
+      // Get recipient name for display
+      const recipientName = selectedRecipient === 'Other' 
+        ? document.getElementById('other-input').value 
+        : selectedRecipient;
+
+      // Update MC-3 with selections
+      document.getElementById('recipient-display').textContent = recipientName;
+      document.getElementById('message-recipient').textContent = recipientName;
+      document.getElementById('home-recipient').textContent = recipientName;
+      document.getElementById('home-message-type').textContent = selectedMessageType;
+
+      setTimeout(() => {
+        goToScreen('mc2');
+        btn.classList.remove('loading');
+
+        // Auto-advance to MC-3 after generation time
+        setTimeout(() => {
+          transitionToMC3();
+        }, 3250);
+      }, 200);
+    }
+
+    function transitionToMC3() {
+      const mc3Screen = document.getElementById('screen-mc3');
+      
+      // Add stagger class for Phase 2 entry animation
+      mc3Screen.classList.add('mc3-stagger');
+      
+      goToScreen('mc3');
+      
+      // Reset playback state
+      resetPlayback();
+      
+      // Reset expander
+      document.getElementById('expander').classList.remove('open');
+      document.getElementById('personal-input').value = '';
+      document.getElementById('char-counter').classList.remove('visible');
+      document.getElementById('overflow-helper').classList.remove('visible');
+      document.getElementById('expander-btn').classList.remove('visible');
+      
+      // Remove stagger class after animation completes
+      setTimeout(() => {
+        mc3Screen.classList.remove('mc3-stagger');
+      }, 2000);
+    }
+
+    function transitionToMC4() {
+      goToScreen('mc4');
+      initMC4();
+    }
+
+    // ==========================================
+    // MC-3: PLAYBACK
+    // ==========================================
+    function resetPlayback() {
+      isPlaying = false;
+      currentTime = 0;
+      clearInterval(playbackTimer);
+      
+      const playBtn = document.getElementById('play-button');
+      playBtn.classList.remove('playing');
+      
+      const waveform = document.getElementById('waveform');
+      waveform.classList.remove('active');
+      
+      document.getElementById('current-time').textContent = '0:00';
+      
+      const stone = document.getElementById('stone-mc3');
+      stone.className = 'breath-stone playback-ready';
+    }
+
+    document.getElementById('play-button').addEventListener('click', () => {
+      const playBtn = document.getElementById('play-button');
+      const waveform = document.getElementById('waveform');
+      const stone = document.getElementById('stone-mc3');
+
+      if (isPlaying) {
+        // Pause
+        isPlaying = false;
+        playBtn.classList.remove('playing');
+        waveform.classList.remove('active');
+        stone.className = 'breath-stone playback-ready';
+        clearInterval(playbackTimer);
+      } else {
+        // Play
+        isPlaying = true;
+        playBtn.classList.add('playing');
+        waveform.classList.add('active');
+        
+        // Phase 2: Micro-affirmation glow on play initiation
+        stone.className = 'breath-stone playback-ready micro-affirm';
+        setTimeout(() => {
+          stone.classList.remove('micro-affirm');
+          stone.className = 'breath-stone playback';
+        }, 300);
+
+        // Start timer
+        playbackTimer = setInterval(() => {
+          currentTime++;
+          const mins = Math.floor(currentTime / 60);
+          const secs = currentTime % 60;
+          document.getElementById('current-time').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+          if (currentTime >= totalTime) {
+            // Playback ended
+            clearInterval(playbackTimer);
+            
+            // Phase 2: Smooth crossfade button state (250ms)
+            setTimeout(() => {
+              isPlaying = false;
+              playBtn.classList.remove('playing');
+              waveform.classList.remove('active');
+              stone.className = 'breath-stone calm-ready';
+              currentTime = 0;
+              document.getElementById('current-time').textContent = '0:00';
+            }, 250);
+          }
+        }, 1000);
+      }
+    });
+
+    // Expander
+    document.getElementById('expander-header').addEventListener('click', () => {
+      const expander = document.getElementById('expander');
+      expander.classList.toggle('open');
+    });
+
+    // Personal input character counter with Phase 2 overflow handling
+    document.getElementById('personal-input').addEventListener('input', (e) => {
+      const input = e.target;
+      const length = input.value.length;
+      const counter = document.getElementById('char-counter');
+      const btn = document.getElementById('expander-btn');
+      const overflowHelper = document.getElementById('overflow-helper');
+      
+      // Character counter visibility
+      if (length > 500) {
+        counter.textContent = `${length} / 600`;
+        counter.classList.add('visible');
+      } else {
+        counter.classList.remove('visible');
+      }
+      
+      // Phase 2: Overflow handling (600 char limit)
+      if (length > 600) {
+        input.classList.add('has-overflow');
+        overflowHelper.classList.add('visible');
+        
+        // Visual fade effect on overflow text
+        // We'll handle this with CSS gradient, but also add visual indicator
+        counter.style.color = 'var(--graphite)';
+      } else {
+        input.classList.remove('has-overflow');
+        overflowHelper.classList.remove('visible');
+        counter.style.color = '';
+      }
+
+      // Show regenerate button when there's content
+      if (length > 0) {
+        btn.classList.add('visible');
+      } else {
+        btn.classList.remove('visible');
+      }
+    });
+
+    // Save message button with Phase 2 shimmer effect
+    document.getElementById('btn-save-message').addEventListener('click', () => {
+      const btn = document.getElementById('btn-save-message');
+      
+      // Phase 2: Button dims and shimmer
+      btn.classList.add('saving');
+      btn.style.opacity = '0.7';
+
+      setTimeout(() => {
+        transitionToMC4();
+        btn.classList.remove('saving');
+        btn.style.opacity = '1';
+      }, 400);
+    });
+
+    // Try different version with Phase 2 crossfade
+    document.getElementById('btn-different-version').addEventListener('click', () => {
+      const stone = document.getElementById('stone-mc3');
+      const messageCard = document.querySelector('.message-card');
+      
+      // Phase 2: Crossfade animation
+      messageCard.classList.add('regenerating');
+      stone.className = 'breath-stone working';
+
+      setTimeout(() => {
+        // Simulate new message (in real app, would fetch new content)
+        messageCard.classList.remove('regenerating');
+        messageCard.classList.add('crossfade-in');
+        stone.className = 'breath-stone playback-ready';
+        
+        // Reset playback
+        resetPlayback();
+        
+        // Remove animation class
+        setTimeout(() => {
+          messageCard.classList.remove('crossfade-in');
+        }, 300);
+      }, 2000);
+    });
+    
+    // Phase 2: Tooltip long-press for mobile
+    let tooltipTimer = null;
+    const tooltipContainer = document.getElementById('tooltip-container');
+    
+    tooltipContainer.addEventListener('touchstart', () => {
+      tooltipTimer = setTimeout(() => {
+        tooltipContainer.classList.add('show-tooltip');
+      }, 500);
+    });
+    
+    tooltipContainer.addEventListener('touchend', () => {
+      clearTimeout(tooltipTimer);
+      setTimeout(() => {
+        tooltipContainer.classList.remove('show-tooltip');
+      }, 3000);
+    });
+
+    // ==========================================
+    // MC-4: TOAST + HOME B with Phase 2 settle animation
+    // ==========================================
+    function initMC4() {
+      const toast = document.getElementById('toast-overlay');
+      const homeContent = document.getElementById('home-b-content');
+      const messageCard = document.getElementById('first-message-card');
+      const stone = document.getElementById('stone-mc4');
+
+      // Reset states
+      toast.classList.remove('visible');
+      homeContent.classList.remove('full');
+      messageCard.classList.remove('visible', 'settle');
+      stone.className = 'breath-stone shimmer';
+
+      // Show toast
+      setTimeout(() => {
+        toast.classList.add('visible');
+      }, 100);
+
+      // Start revealing Home B beneath
+      setTimeout(() => {
+        homeContent.classList.add('full');
+      }, 300);
+      
+      // Phase 2: Settle animation for message card
+      setTimeout(() => {
+        messageCard.classList.add('settle');
+      }, 500);
+
+      // Hide toast after 2 seconds
+      setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 2300);
+      
+      // Phase 2: Stone transitions from shimmer to infused
+      setTimeout(() => {
+        stone.className = 'breath-stone infused';
+      }, 2500);
+    }
+
+    // ==========================================
+    // FULL FLOW
+    // ==========================================
+    function runFullFlow() {
+      // Reset everything
+      goToScreen('mc1');
+      
+      // Simulate user selections after delay
+      setTimeout(() => {
+        // Select "Child"
+        const childCard = document.querySelector('[data-recipient="Child"]');
+        childCard.click();
+
+        setTimeout(() => {
+          // Select "A message of love"
+          const loveCard = document.querySelector('[data-type="A message of love"]');
+          loveCard.click();
+
+          setTimeout(() => {
+            // Click create
+            document.getElementById('btn-create-message').click();
+          }, 800);
+        }, 600);
+      }, 1000);
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      initMC1();
+    });
+  </script>
+</body>
+</html>

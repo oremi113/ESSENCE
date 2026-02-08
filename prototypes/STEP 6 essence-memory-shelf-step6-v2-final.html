@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE - Memory Shelf V2 (Complete)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ESSENCE Memory Shelf Step 6 V2 - Complete Prototype */
+    /* All Blind Spot Fixes + Functional Improvements Integrated */
+    
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* MINERAL & WARMTH Palette */
+      --cream: #FBF8F4;
+      --oat: #F5F0EA;
+      --oat-cool: #F0EBE5;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      --ash: #ADA9A5;
+      --divider: #D9D6D2;
+      
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      
+      /* Typography */
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'SF Mono', Monaco, monospace;
+      
+      /* Shadows */
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.12);
+      
+      /* Easing */
+      --ease-breath: cubic-bezier(0.4, 0.0, 0.2, 1);
+      
+      /* Special */
+      --glow-unplayed: rgba(232, 220, 200, 0.2);
+      --glow-welcome: rgba(232, 220, 200, 0.2);
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--cream);
+      color: var(--charcoal);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* NOTE: Noise texture and radial gradient removed from artifact
+       (too subtle to render properly in browser preview)
+       Implementation code preserved in design handoff for native app build:
+       - SVG fractal noise overlay at 1-3% opacity
+       - Radial gradient: center lighter (cream) to edges (oat)
+    */
+
+    /* Ensure content stacking */
+    .memory-shelf-container {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* PROTOTYPE CONTROLS */
+    .prototype-controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--charcoal);
+      color: var(--cream);
+      padding: 12px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      font-size: 11px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
+    }
+
+    .prototype-controls button {
+      background: var(--mineral);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .prototype-controls button:hover {
+      background: var(--mineral-dark);
+    }
+
+    .prototype-controls .label {
+      font-weight: 600;
+      margin-right: auto;
+    }
+
+    /* CONTAINER */
+    .memory-shelf-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      /* NOTE: Radial gradient removed (too subtle for artifact)
+         Preserved in design handoff for native implementation */
+    }
+
+    /* CARD SETTLE-IN ANIMATION (Package 1: Intentional Motion) */
+    .message-card,
+    .compact-card {
+      /* Start visible, settle-in on load */
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation state for initial load */
+    .message-card.animating,
+    .compact-card.animating {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .message-card.animating.visible,
+    .compact-card.animating.visible {
+      animation: card-settle-in 600ms var(--ease-breath) forwards;
+    }
+
+    @keyframes card-settle-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Stagger delays for cards */
+    .message-card:nth-child(1).animating { animation-delay: 0ms; }
+    .message-card:nth-child(2).animating { animation-delay: 80ms; }
+    .message-card:nth-child(3).animating { animation-delay: 160ms; }
+    .message-card:nth-child(4).animating { animation-delay: 240ms; }
+    .message-card:nth-child(5).animating { animation-delay: 320ms; }
+    .message-card:nth-child(6).animating { animation-delay: 400ms; }
+    .message-card:nth-child(7).animating { animation-delay: 480ms; }
+
+    /* HEADER - CEREMONIAL CENTERED */
+    .shelf-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 56px;  /* PACKAGE 4: More breathing room (was 48px) */
+      position: relative;
+    }
+
+    .shelf-title-wrapper {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .shelf-title {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--charcoal);
+      letter-spacing: -0.015em;  /* PACKAGE 4: Slightly tighter (was -0.01em) */
+      margin-bottom: 8px;
+    }
+
+    .shelf-tagline {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--graphite);
+      letter-spacing: 0.015em;  /* PACKAGE 4: Slightly looser (was 0.01em) */
+    }
+
+    .view-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* VIEW INDICATORS - Structural, not buttons */
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--ash);  /* Inactive: ash (low contrast) */
+      width: auto;
+      height: auto;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;  /* Icon size */
+      transition: color 200ms var(--ease-breath);
+      /* No borders, no fills, no backgrounds */
+    }
+
+    .toggle-btn:hover {
+      color: var(--graphite);  /* Slight darkening on hover */
+    }
+
+    .toggle-btn.active {
+      color: var(--graphite);  /* Active: darker graphite */
+      /* Optional: subtle underline for active state */
+      position: relative;
+    }
+
+    .toggle-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 2px;
+      background: var(--graphite);
+      border-radius: 1px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .empty-stone {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+    }
+
+    .empty-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .empty-body {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--graphite);
+      max-width: 400px;
+      margin: 0 auto 24px;
+    }
+
+    .empty-promise {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ash);
+      max-width: 360px;
+      margin: 0 auto 32px;
+      font-style: italic;
+    }
+
+    .btn-primary {
+      background: var(--mineral);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .btn-primary:hover {
+      background: var(--mineral-dark);
+      transform: translateY(-1px);
+    }
+
+    /* TIP CARD */
+    .tip-card {
+      background: linear-gradient(135deg, rgba(232, 220, 200, 0.15), rgba(232, 220, 200, 0.05));
+      border: 1px solid rgba(232, 220, 200, 0.3);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      animation: tip-fade-in 600ms var(--ease-breath);
+    }
+
+    @keyframes tip-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tip-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tip-icon {
+      font-size: 20px;
+    }
+
+    .tip-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--graphite);
+    }
+
+    .tip-body {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+    }
+
+    .tip-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--mineral);
+      color: var(--mineral);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(122, 128, 136, 0.1);
+    }
+
+    .btn-tip-primary {
+      background: var(--mineral);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .btn-tip-primary:hover {
+      background: var(--mineral-dark);
+    }
+
+    /* MESSAGE CARDS */
+    .message-card {
+      /* PACKAGE 6: Gradient background (oat → sand, top to bottom) */
+      background: linear-gradient(
+        to bottom,
+        var(--oat) 0%,
+        #F3EDE6 100%
+      );
+      border-radius: 12px;
+      padding: 32px;  /* PACKAGE 4: More generous (was 24px) */
+      margin-bottom: 24px;  /* PACKAGE 4: More space between cards (was 16px) */
+      box-shadow: var(--shadow-card);
+      transition: all 200ms var(--ease-breath);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      /* PACKAGE 6: Inner glow (honey-toned) */
+      box-shadow: 
+        inset 0 1px 2px rgba(232, 220, 200, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .message-card:hover {
+      transform: translateY(-2px);
+      /* PACKAGE 6: Warmer background on hover (shift 3% toward honey) */
+      background: linear-gradient(
+        to bottom,
+        #F2EBE4 0%,
+        #F0E8E0 100%
+      );
+      box-shadow: 
+        inset 0 1px 2px rgba(232, 220, 200, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* UNPLAYED GLOW (Blind Spot Fix #1) */
+    .message-card.unplayed {
+      box-shadow: 0 0 24px rgba(232, 220, 200, 0.6), var(--shadow-card);
+      animation: unplayed-pulse 3000ms var(--ease-breath) infinite;
+    }
+
+    @keyframes unplayed-pulse {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(232, 220, 200, 0.5), var(--shadow-card); 
+      }
+      50% { 
+        box-shadow: 0 0 32px rgba(232, 220, 200, 0.7), var(--shadow-card); 
+      }
+    }
+
+    .message-card.welcome-back {
+      box-shadow: 0 0 16px var(--glow-welcome), var(--shadow-card);
+      animation: welcome-glow 3000ms var(--ease-breath) forwards;
+    }
+
+    @keyframes welcome-glow {
+      0% { box-shadow: 0 0 16px var(--glow-welcome), var(--shadow-card); }
+      100% { box-shadow: var(--shadow-card); }
+    }
+
+    .message-card.unavailable {
+      background: var(--oat-cool);
+      cursor: default;
+    }
+
+    .message-card.unavailable:hover {
+      transform: none;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-recipient {
+      text-align: left;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+
+    .card-excerpt {
+      font-size: 18px;
+      line-height: 1.8;  /* PACKAGE 4: More generous (was 1.6) */
+      color: var(--charcoal);
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      /* PACKAGE 4: Subtle text warmth */
+      text-shadow: 0 0.5px 1px rgba(232, 220, 200, 0.15);
+      /* Asymmetric timing: collapse is faster than expand */
+      transition: max-height 300ms var(--ease-breath), -webkit-line-clamp 300ms var(--ease-breath);
+    }
+
+    .card-excerpt.expanded {
+      -webkit-line-clamp: unset;
+      max-height: 300px;
+      /* Expand is slower (inhale) */
+      transition: max-height 600ms var(--ease-breath), -webkit-line-clamp 600ms var(--ease-breath);
+    }
+
+    /* TEMPORAL METADATA (Blind Spot Fix #2) */
+    .card-metadata {
+      font-size: 14px;
+      color: var(--ash);
+      margin-bottom: 16px;
+      line-height: 1.6;  /* PACKAGE 4: More breathing room (was implicit 1.5) */
+      letter-spacing: 0.01em;  /* PACKAGE 4: Slightly looser */
+    }
+
+    .temporal-meta {
+      color: var(--ash);
+    }
+
+    .frequent-badge {
+      color: var(--ash);
+      font-style: italic;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 48px;
+    }
+
+    .btn-play {
+      background: var(--mineral);
+      border: none;
+      color: white;
+      font-size: 14px;  /* Slightly smaller, more refined */
+      cursor: pointer;
+      padding: 10px 18px;  /* Tighter padding */
+      margin: 0;
+      border-radius: 6px;  /* Subtle rounding */
+      transition: all 180ms var(--ease-breath);
+      display: flex;
+      align-items: center;
+      gap: 6px;  /* Tighter gap */
+      font-family: var(--font-sans);
+      font-weight: 600;
+      position: relative;
+    }
+
+    /* Use thin chevron instead of triangle */
+    .btn-play::before {
+      content: '▷';  /* Thin chevron */
+      font-size: 16px;
+      margin-right: -2px;
+    }
+
+    .btn-play:hover {
+      background: var(--mineral-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* Tap feedback */
+    .btn-play:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: transform 100ms var(--ease-breath);
+    }
+
+    .btn-unavailable {
+      background: transparent;
+      border: none;
+      color: var(--ash);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: default;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unavailable-message {
+      font-size: 13px;
+      color: var(--graphite);
+      line-height: 1.5;
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 6px;
+    }
+
+    .btn-retry {
+      background: var(--mineral);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .btn-retry:hover {
+      background: var(--mineral-dark);
+    }
+
+    /* CONDITIONAL FOOTER (Blind Spot Fix #5) */
+    .shelf-footer {
+      text-align: center;
+      padding: 32px 20px;
+      font-size: 14px;
+      color: var(--ash);
+      opacity: 0;
+      animation: footer-fade-in 600ms var(--ease-breath) forwards;
+    }
+
+    @keyframes footer-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shelf-footer.dismissing {
+      animation: footer-fade-out 400ms var(--ease-breath) forwards;
+    }
+
+    @keyframes footer-fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* REPLAYED VIEW EMPTY STATE */
+    .replayed-empty {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .replayed-empty-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+
+    .replayed-empty-body {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--graphite);
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* PLAYBACK OVERLAY - PACKAGE 3: CEREMONIAL */
+    .playback-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 26, 24, 0.5);  /* Stronger dim: 40% → 50% */
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9000;
+      padding: 20px;
+      backdrop-filter: blur(4px);  /* Blur the background */
+      animation: overlay-fade-in 500ms var(--ease-breath);  /* Slower: 400ms → 500ms */
+    }
+
+    .playback-overlay.active {
+      display: flex;
+    }
+
+    @keyframes overlay-fade-in {
+      from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+      }
+      to {
+        opacity: 1;
+        backdrop-filter: blur(4px);
+      }
+    }
+
+    .playback-modal {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 48px 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-overlay);
+      position: relative;
+      text-align: center;
+      /* Rise from bottom instead of scale from center */
+      animation: modal-rise-in 500ms var(--ease-breath);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modal-rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(40px);  /* Rise from below */
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Close animation is faster (exhale) */
+    .playback-overlay.closing {
+      animation: overlay-fade-out 250ms var(--ease-breath);
+    }
+
+    @keyframes overlay-fade-out {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    .btn-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border: none;
+      color: var(--graphite);
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 180ms var(--ease-breath);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-close:hover {
+      background: rgba(0,0,0,0.05);
+      color: var(--charcoal);
+    }
+
+    .modal-stone {
+      width: 140px;  /* Larger: 130px → 140px */
+      height: 140px;
+      margin: 0 auto 32px;
+      animation: stone-entrance 400ms var(--ease-breath);
+    }
+
+    @keyframes stone-entrance {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-excerpt {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--charcoal);
+      margin-bottom: 32px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      /* Delayed fade-in after stone */
+      opacity: 0;
+      animation: excerpt-fade-in 600ms 300ms var(--ease-breath) forwards;
+    }
+
+    @keyframes excerpt-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      /* Delayed fade-in after excerpt */
+      opacity: 0;
+      animation: controls-fade-in 400ms 500ms var(--ease-breath) forwards;
+    }
+
+    @keyframes controls-fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .btn-modal-primary {
+      background: var(--mineral);
+      color: white;
+      border: none;
+      padding: 16px 48px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+      min-width: 200px;
+    }
+
+    .btn-modal-primary:hover {
+      background: var(--mineral-dark);
+      transform: scale(1.02);
+    }
+
+    .timer {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--graphite);
+      margin-bottom: 16px;
+    }
+
+    .btn-transcript-link {
+      background: transparent;
+      border: none;
+      color: var(--mineral);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px;
+      transition: all 180ms var(--ease-breath);
+      opacity: 0;
+      animation: transcript-fade-in 400ms 800ms var(--ease-breath) forwards;
+    }
+
+    @keyframes transcript-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .btn-transcript-link:hover {
+      color: var(--mineral-dark);
+      text-decoration: underline;
+    }
+
+    .replay-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn-modal-secondary {
+      background: transparent;
+      border: 2px solid var(--mineral);
+      color: var(--mineral);
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+    }
+
+    .btn-modal-secondary:hover {
+      background: rgba(122, 128, 136, 0.1);
+    }
+
+    /* TRANSCRIPT MODAL */
+    .transcript-modal {
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 9500;
+      display: none;
+      flex-direction: column;
+      animation: transcript-slide-in 400ms var(--ease-breath);
+    }
+
+    .transcript-modal.active {
+      display: flex;
+    }
+
+    @keyframes transcript-slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .transcript-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--divider);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .transcript-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ash);
+    }
+
+    .transcript-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .transcript-meta {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--graphite);
+      margin-bottom: 24px;
+    }
+
+    .transcript-body {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--charcoal);
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    /* BREATH STONE */
+    .breath-stone {
+      position: relative;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%,
+        #F8F0DC,
+        #EFE6D0 12%,
+        #E5D8C0 28%,
+        #D8CAB0 45%,
+        #C4B8A0 62%,
+        #AEA090 78%,
+        #7D827E
+      );
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        inset -20px -20px 40px rgba(28, 26, 24, 0.15),
+        inset 20px 20px 40px rgba(251, 248, 244, 0.4);
+    }
+
+    .breath-stone::before {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(238, 212, 182, var(--stone-glow, 0.08)),
+        transparent 70%
+      );
+      animation: stone-breathe var(--stone-cycle, 6000ms) var(--ease-breath) infinite;
+    }
+
+    .breath-stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      animation: stone-pulse var(--stone-cycle, 6000ms) var(--ease-breath) infinite;
+    }
+
+    .breath-stone.idle {
+      --stone-glow: 0.08;
+      --stone-cycle: 6000ms;
+    }
+
+    .breath-stone.ready {
+      --stone-glow: 0.14;
+      --stone-cycle: 5000ms;
+    }
+
+    .breath-stone.playback {
+      --stone-glow: 0.20;
+      --stone-cycle: 4000ms;
+    }
+
+    .breath-stone.pause {
+      --stone-glow: 0.05;
+      --stone-cycle: 7000ms;
+    }
+
+    @keyframes stone-breathe {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(0.98);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes stone-pulse {
+      0%, 100% {
+        transform: scale(0.98);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    /* GROUPED VIEW */
+    .recipient-section {
+      margin-bottom: 24px;
+    }
+
+    .recipient-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--oat);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 180ms var(--ease-breath);
+      margin-bottom: 12px;
+    }
+
+    .recipient-header:hover {
+      background: var(--sand);
+    }
+
+    .recipient-photo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--honey), var(--sand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      flex-shrink: 0;
+    }
+
+    .recipient-info {
+      flex: 1;
+    }
+
+    .recipient-name {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    .recipient-count {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--graphite);
+    }
+
+    .recipient-chevron {
+      font-size: 20px;
+      color: var(--graphite);
+      transition: transform 200ms var(--ease-breath);
+    }
+
+    .recipient-header.expanded .recipient-chevron {
+      transform: rotate(90deg);
+    }
+
+    .recipient-messages {
+      display: none;
+      padding-left: 16px;
+    }
+
+    .recipient-messages.expanded {
+      display: block;
+    }
+
+    .compact-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 180ms var(--ease-breath);
+      cursor: pointer;
+    }
+
+    .compact-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      transform: translateX(4px);
+    }
+
+    .compact-card.unplayed {
+      box-shadow: 0 0 20px rgba(232, 220, 200, 0.6), 0 1px 3px rgba(0,0,0,0.04);
+      animation: unplayed-pulse 3000ms var(--ease-breath) infinite;
+    }
+
+    .compact-info {
+      flex: 1;
+    }
+
+    .compact-excerpt {
+      font-size: 15px;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .compact-meta {
+      font-size: 13px;
+      color: var(--ash);
+    }
+
+    .compact-play {
+      background: var(--mineral);
+      border: none;
+      color: white;
+      font-size: 16px;  /* Just the chevron */
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: all 180ms var(--ease-breath);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compact-play::before {
+      content: '▷';  /* Thin chevron */
+    }
+
+    .compact-play:hover {
+      background: var(--mineral-dark);
+      transform: translateY(-1px);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .memory-shelf-container {
+        padding: 32px 16px 100px;
+      }
+
+      .shelf-title {
+        font-size: 32px;  /* Slightly smaller on mobile: 36px → 32px */
+      }
+
+      .shelf-tagline {
+        font-size: 15px;
+      }
+
+      .modal-excerpt {
+        font-size: 16px;
+      }
+
+      .card-excerpt {
+        font-size: 16px;
+      }
+
+      .transcript-body {
+        font-size: 16px;
+      }
+
+      .view-toggle {
+        top: 4px;  /* Adjust position on mobile */
+        right: 0;
+      }
+    }
+
+    /* UTILITY */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="memory-shelf-container" id="shelfContainer">
+    <!-- HEADER - CEREMONIAL CENTERED -->
+    <div class="shelf-header">
+      <div class="shelf-title-wrapper">
+        <h1 class="shelf-title">Memory Shelf</h1>
+        <p class="shelf-tagline">Your preserved voice messages</p>
+      </div>
+      <div class="view-toggle">
+        <button class="toggle-btn active" data-view="chronological" title="Chronological" aria-label="List view">
+          ☰
+        </button>
+        <button class="toggle-btn" data-view="grouped" title="Grouped by person" aria-label="Grouped view">
+          ⊞
+        </button>
+      </div>
+    </div>
+
+    <!-- TIP CARD -->
+    <div class="tip-card hidden" id="tipCard">
+      <div class="tip-header">
+        <span class="tip-icon">💡</span>
+        <span class="tip-label">Tip</span>
+      </div>
+      <div class="tip-body">
+        You can now group messages by person using the [⊞] button above.
+      </div>
+      <div class="tip-actions">
+        <button class="btn-secondary" id="tipGotIt">Got it</button>
+        <button class="btn-tip-primary" id="tipShowMe">Show me</button>
+      </div>
+    </div>
+
+    <!-- CHRONOLOGICAL VIEW -->
+    <div id="chronologicalView">
+      <!-- Empty State -->
+      <div class="empty-state hidden" id="emptyState">
+        <div class="empty-stone">
+          <div class="breath-stone idle" style="width: 120px; height: 120px;"></div>
+        </div>
+        <h2 class="empty-title">Your Memory Shelf</h2>
+        <p class="empty-body">
+          Your voice messages will gather here.<br>
+          Each one a keepsake that carries your words forward.
+        </p>
+        <p class="empty-promise">
+          These messages are preserved and protected.<br>
+          They're not temporary—they're yours to keep.
+        </p>
+        <button class="btn-primary">Create your first message</button>
+      </div>
+
+      <!-- Message Cards -->
+      <div id="messageCards">
+        <!-- Cards populated by JavaScript -->
+      </div>
+
+      <!-- Conditional Footer -->
+      <div class="shelf-footer hidden" id="shelfFooter">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- GROUPED VIEW -->
+    <div id="groupedView" class="hidden">
+      <!-- Populated by JavaScript -->
+    </div>
+
+    <!-- MOST REPLAYED VIEW -->
+    <div id="replayedView" class="hidden">
+      <!-- Populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- PLAYBACK OVERLAY -->
+  <div class="playback-overlay" id="playbackOverlay">
+    <div class="playback-modal">
+      <button class="btn-close" id="closeOverlay">×</button>
+      
+      <!-- State 2: Pre-Play -->
+      <div id="statePrePlay">
+        <div class="modal-stone">
+          <div class="breath-stone ready" style="width: 110px; height: 110px;"></div>
+        </div>
+        <div class="modal-excerpt" id="modalExcerpt"></div>
+        <div class="modal-controls">
+          <button class="btn-modal-primary" id="btnModalPlay">▶ Play</button>
+        </div>
+      </div>
+
+      <!-- State 3: Playing -->
+      <div id="statePlaying" class="hidden">
+        <div class="modal-stone">
+          <div class="breath-stone playback" style="width: 130px; height: 130px;"></div>
+        </div>
+        <div class="modal-excerpt" id="modalExcerptPlaying"></div>
+        <div class="modal-controls">
+          <div class="timer" id="playbackTimer">0:00 / 2:34</div>
+          <button class="btn-modal-primary" id="btnPause">⏸ Pause</button>
+          <button class="btn-transcript-link" id="btnShowTranscript">View Transcript</button>
+        </div>
+      </div>
+
+      <!-- State 5: Complete (Replay) -->
+      <div id="stateComplete" class="hidden">
+        <div class="modal-stone">
+          <div class="breath-stone pause" style="width: 100px; height: 100px;"></div>
+        </div>
+        <div class="modal-excerpt" id="modalExcerptComplete"></div>
+        <div class="modal-controls">
+          <div class="replay-controls">
+            <button class="btn-modal-primary" id="btnReplay">↻ Replay</button>
+            <button class="btn-modal-secondary" id="btnCloseComplete">Close</button>
+          </div>
+          <button class="btn-transcript-link" id="btnShowTranscriptComplete" style="opacity: 1; animation: none;">View Transcript</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSCRIPT MODAL -->
+  <div class="transcript-modal" id="transcriptModal">
+    <div class="transcript-header">
+      <div class="transcript-label">Transcript</div>
+      <button class="btn-close" id="closeTranscript">×</button>
+    </div>
+    <div class="transcript-content">
+      <div class="transcript-meta" id="transcriptMeta">To Sarah • Feb 7, 2025</div>
+      <div class="transcript-body" id="transcriptBody"></div>
+    </div>
+  </div>
+
+  <!-- PROTOTYPE CONTROLS -->
+  <div class="prototype-controls">
+    <span class="label">Memory Shelf V2 Prototype</span>
+    <button id="toggleEmpty">Empty State</button>
+    <button id="toggleTip">Tip Card</button>
+    <button id="simulateReturn">Simulate Return (7+ days)</button>
+    <button id="simulateFirstVisit">Simulate First Visit</button>
+    <button id="markUnplayed">Mark Card 2 Unplayed</button>
+  </div>
+
+  <script>
+    // ESSENCE Memory Shelf V2 - Complete Interactive Prototype
+    // All Blind Spot Fixes Integrated
+
+    // MOCK DATA
+    const messages = [
+      {
+        id: 7,
+        recipient: 'Alex',
+        recipientInitials: 'A',
+        excerpt: "Just checking in. Hope you're doing well. Call me when you can.",
+        fullText: "Just checking in. Hope you're doing well. Call me when you can.",
+        createdAt: Date.now() - (2 * 24 * 60 * 60 * 1000), // 2 days ago
+        duration: 8, // SHORT MESSAGE FOR TESTING
+        playCount: 1,
+        hasBeenPlayed: true
+      },
+      {
+        id: 1,
+        recipient: 'Sarah',
+        recipientInitials: 'ST',
+        excerpt: "I'm so proud of the person you've become. Watching you graduate today reminded me of that first day of kindergarten when you didn't want to let go of my hand. You were so brave then, and you're even braver now.",
+        fullText: "I'm so proud of the person you've become. Watching you graduate today reminded me of that first day of kindergarten when you didn't want to let go of my hand.\n\nYou were so brave then, and you're even braver now. Keep being exactly who you are.",
+        createdAt: Date.now() - (21 * 24 * 60 * 60 * 1000), // 3 weeks ago
+        duration: 154, // seconds
+        playCount: 8,
+        hasBeenPlayed: true
+      },
+      {
+        id: 2,
+        recipient: 'Mom',
+        recipientInitials: 'M',
+        excerpt: "Thank you for everything you've done for me. I know I don't say it enough, but I think about all those small moments—the way you always knew when I needed to talk, even when I couldn't find the words.",
+        fullText: "Thank you for everything you've done for me. I know I don't say it enough, but I think about all those small moments—the way you always knew when I needed to talk, even when I couldn't find the words.\n\nYou taught me what love looks like, and I carry that with me every day.",
+        createdAt: Date.now() - (28 * 24 * 60 * 60 * 1000), // 4 weeks ago
+        duration: 192,
+        playCount: 3,
+        hasBeenPlayed: true
+      },
+      {
+        id: 3,
+        recipient: 'Jamie',
+        recipientInitials: 'J',
+        excerpt: "You've got this. I know today feels overwhelming, but remember what we talked about—take it one step at a time. You don't have to have all the answers right now. Trust yourself.",
+        fullText: "You've got this. I know today feels overwhelming, but remember what we talked about—take it one step at a time. You don't have to have all the answers right now. Trust yourself.\n\nI believe in you, and I'm here whenever you need me.",
+        createdAt: Date.now() - (63 * 24 * 60 * 60 * 1000), // 9 weeks ago
+        duration: 75,
+        playCount: 2,
+        hasBeenPlayed: true
+      },
+      {
+        id: 4,
+        recipient: 'Sarah',
+        recipientInitials: 'ST',
+        excerpt: "Happy graduation day. This is your moment, and I'm so glad I get to be here to see it.",
+        fullText: "Happy graduation day. This is your moment, and I'm so glad I get to be here to see it.\n\nRemember: the future is yours to write. Make it beautiful.",
+        createdAt: Date.now() - (161 * 24 * 60 * 60 * 1000), // 23 weeks ago
+        duration: 107,
+        playCount: 1,
+        hasBeenPlayed: true,
+        audioUnavailable: true
+      },
+      {
+        id: 5,
+        recipient: 'Sarah',
+        recipientInitials: 'ST',
+        excerpt: "Advice for your first job—just be yourself. They hired you for a reason. Don't try to be someone you're not.",
+        fullText: "Advice for your first job—just be yourself. They hired you for a reason. Don't try to be someone you're not.\n\nAsk questions. Make mistakes. Learn. That's how you grow.",
+        createdAt: Date.now() - (147 * 24 * 60 * 60 * 1000), // 21 weeks ago
+        duration: 52,
+        playCount: 0,
+        hasBeenPlayed: false  // THIS ONE IS UNPLAYED - VISIBLE ON LOAD
+      },
+      {
+        id: 6,
+        recipient: 'Dad',
+        recipientInitials: 'D',
+        excerpt: "I wish I'd said this more often: I'm grateful for you. For the way you showed up, even when things were hard.",
+        fullText: "I wish I'd said this more often: I'm grateful for you. For the way you showed up, even when things were hard.\n\nYou taught me resilience without ever saying the word. Thank you.",
+        createdAt: Date.now() - (189 * 24 * 60 * 60 * 1000), // 27 weeks ago
+        duration: 98,
+        playCount: 12,
+        hasBeenPlayed: true
+      }
+    ];
+
+    // STATE
+    let currentView = 'chronological';
+    let currentPlayingId = null;
+    let playbackTimer = null;
+    let isPlaying = false;
+    let isFirstShelfVisit = !localStorage.getItem('hasVisitedShelf');
+    let lastShelfVisit = parseInt(localStorage.getItem('lastShelfVisit') || '0');
+
+    // ELEMENTS
+    const shelfContainer = document.getElementById('shelfContainer');
+    const chronologicalView = document.getElementById('chronologicalView');
+    const groupedView = document.getElementById('groupedView');
+    const replayedView = document.getElementById('replayedView');
+    const emptyState = document.getElementById('emptyState');
+    const messageCards = document.getElementById('messageCards');
+    const shelfFooter = document.getElementById('shelfFooter');
+    const tipCard = document.getElementById('tipCard');
+    const playbackOverlay = document.getElementById('playbackOverlay');
+    const transcriptModal = document.getElementById('transcriptModal');
+
+    // HAPTIC FEEDBACK (Package 3: Playback Ceremony)
+    function hapticFeedback(style = 'light') {
+      // Check if device supports haptic feedback
+      if (!navigator.vibrate) return;
+      
+      // Vibration patterns (in milliseconds)
+      const patterns = {
+        light: [10],      // Gentle tap on Play
+        medium: [20],     // Medium tap on completion
+        success: [10, 50, 10]  // Double tap for special moments
+      };
+      
+      navigator.vibrate(patterns[style] || patterns.light);
+    }
+
+    // UTILITY FUNCTIONS
+    function getTemporalMetadata(createdAt) {
+      const now = Date.now();
+      const diff = now - createdAt;
+      const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+      const weeks = Math.floor(days / 7);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(days / 365);
+
+      if (days < 7) return `Created ${days} ${days === 1 ? 'day' : 'days'} ago`;
+      if (days < 30) return `Created ${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+      if (days < 365) return `Created ${months} ${months === 1 ? 'month' : 'months'} ago`;
+      return `Created ${years} ${years === 1 ? 'year' : 'years'} ago`;
+    }
+
+    function formatDuration(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // RENDER FUNCTIONS
+    function renderChronologicalView() {
+      messageCards.innerHTML = '';
+      
+      const isInitialLoad = !messageCards.hasAttribute('data-loaded');
+      
+      messages.forEach((msg, index) => {
+        const card = document.createElement('div');
+        card.className = 'message-card';
+        if (isInitialLoad) {
+          card.classList.add('animating'); // Only animate on first load
+        }
+        card.dataset.id = msg.id;
+
+        // Unplayed glow
+        if (!msg.hasBeenPlayed) {
+          card.classList.add('unplayed');
+        }
+
+        // Audio unavailable
+        if (msg.audioUnavailable) {
+          card.classList.add('unavailable');
+        }
+
+        // First card auto-expanded (only on true first visit)
+        const excerptClass = (index === 0 && isFirstShelfVisit) ? 'card-excerpt expanded' : 'card-excerpt';
+
+        // Frequently replayed badge
+        const frequentBadge = msg.playCount >= 5 ? ' • <span class="frequent-badge">Often replayed</span>' : '';
+
+        card.innerHTML = `
+          <div class="card-recipient">${msg.recipient}</div>
+          <div class="${excerptClass}">${msg.excerpt}</div>
+          <div class="card-metadata">
+            <span class="temporal-meta">${getTemporalMetadata(msg.createdAt)}</span> • ${formatDuration(msg.duration)}${frequentBadge}
+          </div>
+          <div class="card-footer">
+            ${msg.audioUnavailable ? `
+              <button class="btn-unavailable">○ Unavailable</button>
+            ` : `
+              <button class="btn-play" data-action="play">
+                <span>Play</span>
+              </button>
+            `}
+          </div>
+          ${msg.audioUnavailable ? `
+            <div class="unavailable-message">
+              This message is safe. It just needs a moment before it can play.
+              <br><button class="btn-retry" data-id="${msg.id}">Try again</button>
+            </div>
+          ` : ''}
+        `;
+
+        messageCards.appendChild(card);
+      });
+
+      attachCardListeners();
+      checkConditionalFooter();
+      
+      // Mark as loaded after first render
+      if (isInitialLoad) {
+        messageCards.setAttribute('data-loaded', 'true');
+      }
+    }
+
+    function renderGroupedView() {
+      groupedView.innerHTML = '';
+      
+      const grouped = {};
+      messages.forEach(msg => {
+        if (!grouped[msg.recipient]) {
+          grouped[msg.recipient] = [];
+        }
+        grouped[msg.recipient].push(msg);
+      });
+
+      // Sort recipients alphabetically
+      const sortedRecipients = Object.keys(grouped).sort();
+
+      sortedRecipients.forEach(recipient => {
+        const msgs = grouped[recipient];
+        const section = document.createElement('div');
+        section.className = 'recipient-section';
+
+        section.innerHTML = `
+          <div class="recipient-header" data-recipient="${recipient}">
+            <div class="recipient-photo">${msgs[0].recipientInitials}</div>
+            <div class="recipient-info">
+              <div class="recipient-name">${recipient}</div>
+              <div class="recipient-count">${msgs.length} ${msgs.length === 1 ? 'message' : 'messages'}</div>
+            </div>
+            <div class="recipient-chevron">▶</div>
+          </div>
+          <div class="recipient-messages" id="${recipient}Messages">
+            ${msgs.map(msg => `
+              <div class="compact-card ${!msg.hasBeenPlayed ? 'unplayed' : ''}" data-id="${msg.id}">
+                <div class="compact-info">
+                  <div class="compact-excerpt">${msg.excerpt.substring(0, 50)}...</div>
+                  <div class="compact-meta">${getTemporalMetadata(msg.createdAt)} • ${formatDuration(msg.duration)}</div>
+                </div>
+                <button class="compact-play"></button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        groupedView.appendChild(section);
+      });
+
+      attachGroupedListeners();
+    }
+
+    function renderReplayedView() {
+      replayedView.innerHTML = '';
+      
+      const replayed = messages.filter(m => m.playCount >= 5).sort((a, b) => b.playCount - a.playCount);
+
+      if (replayed.length === 0) {
+        replayedView.innerHTML = `
+          <div class="replayed-empty">
+            <h2 class="replayed-empty-title">No frequently replayed messages yet</h2>
+            <p class="replayed-empty-body">
+              Messages you listen to 5 or more times will appear here.
+            </p>
+          </div>
+        `;
+      } else {
+        const cardsContainer = document.createElement('div');
+        replayed.forEach(msg => {
+          const card = document.createElement('div');
+          card.className = 'message-card';
+          card.dataset.id = msg.id;
+
+          card.innerHTML = `
+            <div class="card-recipient">${msg.recipient}</div>
+            <div class="card-excerpt">${msg.excerpt}</div>
+            <div class="card-metadata">
+              <span class="temporal-meta">${getTemporalMetadata(msg.createdAt)}</span> • ${formatDuration(msg.duration)} • <span class="frequent-badge">Replayed ${msg.playCount} times</span>
+            </div>
+            <div class="card-footer">
+              <button class="btn-play" data-action="play">
+                ▶ <span>Play</span>
+              </button>
+            </div>
+          `;
+
+          cardsContainer.appendChild(card);
+        });
+
+        replayedView.appendChild(cardsContainer);
+        attachCardListeners(cardsContainer);
+      }
+    }
+
+    function checkConditionalFooter() {
+      const now = Date.now();
+      const daysSince = (now - lastShelfVisit) / (1000 * 60 * 60 * 24);
+      
+      if (daysSince >= 7 && !sessionStorage.getItem('footerShown')) {
+        const count = messages.length;
+        shelfFooter.textContent = `${count} ${count === 1 ? 'message' : 'messages'} safely preserved`;
+        shelfFooter.classList.remove('hidden');
+        sessionStorage.setItem('footerShown', 'true');
+
+        // Dismiss on scroll
+        let scrollDismissed = false;
+        window.addEventListener('scroll', () => {
+          if (!scrollDismissed && window.scrollY > 100) {
+            shelfFooter.classList.add('dismissing');
+            setTimeout(() => shelfFooter.classList.add('hidden'), 400);
+            scrollDismissed = true;
+          }
+        });
+      }
+    }
+
+    // LISTENERS
+    function attachCardListeners(container = messageCards) {
+      container.querySelectorAll('.message-card').forEach(card => {
+        const excerpt = card.querySelector('.card-excerpt');
+        const playBtn = card.querySelector('.btn-play');
+        const retryBtn = card.querySelector('.btn-retry');
+
+        // Tap to expand excerpt
+        if (excerpt) {
+          excerpt.addEventListener('click', (e) => {
+            if (!card.classList.contains('unavailable')) {
+              e.stopPropagation();
+              excerpt.classList.toggle('expanded');
+            }
+          });
+        }
+
+        // Play button
+        if (playBtn) {
+          playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const msgId = parseInt(card.dataset.id);
+            openPlaybackOverlay(msgId);
+          });
+        }
+
+        // Retry button
+        if (retryBtn) {
+          retryBtn.addEventListener('click', () => {
+            const msgId = parseInt(retryBtn.dataset.id);
+            const msg = messages.find(m => m.id === msgId);
+            if (msg) {
+              msg.audioUnavailable = false;
+              renderView(currentView);
+            }
+          });
+        }
+      });
+    }
+
+    function attachGroupedListeners() {
+      // Expand/collapse
+      document.querySelectorAll('.recipient-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const recipient = header.dataset.recipient;
+          const messagesDiv = document.getElementById(`${recipient}Messages`);
+          
+          header.classList.toggle('expanded');
+          messagesDiv.classList.toggle('expanded');
+        });
+      });
+
+      // Compact cards
+      document.querySelectorAll('.compact-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const msgId = parseInt(card.dataset.id);
+          openPlaybackOverlay(msgId);
+        });
+
+        const playBtn = card.querySelector('.compact-play');
+        playBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const msgId = parseInt(card.dataset.id);
+          openPlaybackOverlay(msgId);
+        });
+      });
+    }
+
+    // VIEW SWITCHING
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        switchView(view);
+      });
+    });
+
+    function switchView(view) {
+      currentView = view;
+      
+      document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+
+      chronologicalView.classList.add('hidden');
+      groupedView.classList.add('hidden');
+
+      if (view === 'chronological') {
+        chronologicalView.classList.remove('hidden');
+      } else if (view === 'grouped') {
+        groupedView.classList.remove('hidden');
+      }
+
+      // Re-observe cards in new view
+      observeNewCards();
+    }
+
+    function renderView(view) {
+      if (view === 'chronological') {
+        renderChronologicalView();
+      } else if (view === 'grouped') {
+        renderGroupedView();
+      }
+    }
+
+    // TIP CARD
+    document.getElementById('tipGotIt').addEventListener('click', () => {
+      tipCard.classList.add('hidden');
+    });
+
+    document.getElementById('tipShowMe').addEventListener('click', () => {
+      tipCard.classList.add('hidden');
+      switchView('grouped');
+      renderGroupedView();
+    });
+
+    // PLAYBACK OVERLAY
+    function openPlaybackOverlay(msgId) {
+      const msg = messages.find(m => m.id === msgId);
+      if (!msg) return;
+
+      currentPlayingId = msgId;
+      
+      // Mark as played and remove unplayed glow
+      if (!msg.hasBeenPlayed) {
+        msg.hasBeenPlayed = true;
+        renderView(currentView);
+      }
+
+      // Set modal content
+      document.getElementById('modalExcerpt').textContent = msg.fullText;
+      document.getElementById('modalExcerptPlaying').textContent = msg.fullText;
+      document.getElementById('modalExcerptComplete').textContent = msg.fullText;
+      
+      // Set transcript content
+      document.getElementById('transcriptMeta').textContent = `To ${msg.recipient} • ${new Date(msg.createdAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+      document.getElementById('transcriptBody').textContent = msg.fullText;
+
+      playbackOverlay.classList.add('active');
+      showState('prePlay');
+    }
+
+    function closePlaybackOverlay() {
+      // PACKAGE 3: Ceremonial close (slower than open)
+      playbackOverlay.classList.add('closing');
+      
+      setTimeout(() => {
+        playbackOverlay.classList.remove('active', 'closing');
+        stopPlayback();
+        currentPlayingId = null;
+      }, 250); // Match closing animation duration
+    }
+
+    document.getElementById('closeOverlay').addEventListener('click', closePlaybackOverlay);
+
+    function showState(state) {
+      document.getElementById('statePrePlay').classList.add('hidden');
+      document.getElementById('statePlaying').classList.add('hidden');
+      document.getElementById('stateComplete').classList.add('hidden');
+
+      if (state === 'prePlay') {
+        document.getElementById('statePrePlay').classList.remove('hidden');
+      } else if (state === 'playing') {
+        document.getElementById('statePlaying').classList.remove('hidden');
+      } else if (state === 'complete') {
+        document.getElementById('stateComplete').classList.remove('hidden');
+      }
+    }
+
+    function startPlayback() {
+      const msg = messages.find(m => m.id === currentPlayingId);
+      if (!msg) return;
+
+      // HAPTIC: Gentle tap on play start
+      hapticFeedback('light');
+
+      isPlaying = true;
+      showState('playing');
+      
+      let elapsed = 0;
+      const duration = msg.duration;
+      
+      playbackTimer = setInterval(() => {
+        elapsed++;
+        document.getElementById('playbackTimer').textContent = 
+          `${formatDuration(elapsed)} / ${formatDuration(duration)}`;
+        
+        if (elapsed >= duration) {
+          completePlayback();
+        }
+      }, 1000);
+    }
+
+    function stopPlayback() {
+      isPlaying = false;
+      if (playbackTimer) {
+        clearInterval(playbackTimer);
+        playbackTimer = null;
+      }
+    }
+
+    function completePlayback() {
+      stopPlayback();
+      
+      // HAPTIC: Medium tap on completion
+      hapticFeedback('medium');
+      
+      // Increment play count
+      const msg = messages.find(m => m.id === currentPlayingId);
+      if (msg) {
+        msg.playCount++;
+        
+        // PACKAGE 5: ONE MOMENT OF SURPRISE
+        // First time ANY message is replayed (goes from 1 → 2 plays)
+        // Show subtle warm celebration in the stone
+        if (msg.playCount === 2 && !localStorage.getItem('hasSeenReplayMoment')) {
+          // Mark as seen (only happens once ever)
+          localStorage.setItem('hasSeenReplayMoment', 'true');
+          
+          // Add warm glow to complete state stone for 3 seconds
+          const completeStone = document.querySelector('#stateComplete .breath-stone');
+          if (completeStone) {
+            completeStone.style.filter = 'drop-shadow(0 0 20px rgba(232, 220, 200, 0.6))';
+            setTimeout(() => {
+              completeStone.style.filter = '';
+            }, 3000);
+          }
+        }
+      }
+      
+      showState('complete');
+    }
+
+    document.getElementById('btnModalPlay').addEventListener('click', startPlayback);
+    document.getElementById('btnPause').addEventListener('click', completePlayback);
+    document.getElementById('btnReplay').addEventListener('click', startPlayback);
+    document.getElementById('btnCloseComplete').addEventListener('click', closePlaybackOverlay);
+
+    // TRANSCRIPT
+    document.getElementById('btnShowTranscript').addEventListener('click', () => {
+      transcriptModal.classList.add('active');
+    });
+    document.getElementById('btnShowTranscriptComplete').addEventListener('click', () => {
+      transcriptModal.classList.add('active');
+    });
+    document.getElementById('closeTranscript').addEventListener('click', () => {
+      transcriptModal.classList.remove('active');
+    });
+
+    // PROTOTYPE CONTROLS
+    document.getElementById('toggleEmpty').addEventListener('click', () => {
+      emptyState.classList.toggle('hidden');
+      messageCards.classList.toggle('hidden');
+    });
+
+    document.getElementById('toggleTip').addEventListener('click', () => {
+      tipCard.classList.toggle('hidden');
+    });
+
+    document.getElementById('simulateReturn').addEventListener('click', () => {
+      // Simulate 7+ day absence
+      const eightDaysAgo = Date.now() - (8 * 24 * 60 * 60 * 1000);
+      localStorage.setItem('lastShelfVisit', eightDaysAgo.toString());
+      lastShelfVisit = eightDaysAgo;
+      sessionStorage.removeItem('footerShown');
+      
+      // Show footer immediately and visibly
+      const count = messages.length;
+      shelfFooter.textContent = `${count} ${count === 1 ? 'message' : 'messages'} safely preserved`;
+      shelfFooter.classList.remove('hidden', 'dismissing');
+      shelfFooter.style.opacity = '1';
+      shelfFooter.style.transform = 'translateY(0)';
+      sessionStorage.setItem('footerShown', 'true');
+      
+      // Scroll to bottom to make it visible
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      
+      alert('Footer is now visible at the bottom! Scroll back up to see it fade out after 100px.');
+    });
+
+    document.getElementById('simulateFirstVisit').addEventListener('click', () => {
+      // Clear first visit flag
+      localStorage.removeItem('hasVisitedShelf');
+      isFirstShelfVisit = true;
+      
+      // Force re-render chronological view
+      switchView('chronological');
+      renderChronologicalView();
+      
+      // Scroll to top to see expanded card
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      alert('First card is now AUTO-EXPANDED. Notice the full text is showing (5-6 lines instead of 3). Tap the excerpt to collapse it.');
+    });
+
+    document.getElementById('markUnplayed').addEventListener('click', () => {
+      const msg = messages.find(m => m.id === 2);
+      if (msg) {
+        msg.hasBeenPlayed = false;
+        
+        // Switch to chronological view to see it
+        switchView('chronological');
+        renderView(currentView);
+        
+        // Scroll to card 2
+        setTimeout(() => {
+          const card2 = document.querySelector('[data-id="2"]');
+          if (card2) {
+            card2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+        
+        alert('Card 2 (Mom) now has UNPLAYED GLOW - look for the warm golden glow around the card edges with pulsing animation. It will disappear when you play it.');
+      }
+    });
+
+    // KEYBOARD
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (transcriptModal.classList.contains('active')) {
+          transcriptModal.classList.remove('active');
+        } else if (playbackOverlay.classList.contains('active')) {
+          closePlaybackOverlay();
+        }
+      }
+    });
+
+    // INIT
+    function init() {
+      // Mark first visit
+      if (isFirstShelfVisit) {
+        localStorage.setItem('hasVisitedShelf', 'true');
+      }
+
+      // Update last visit
+      localStorage.setItem('lastShelfVisit', Date.now().toString());
+
+      // Render all views
+      renderChronologicalView();
+      renderGroupedView();
+
+      // PACKAGE 1: INTENTIONAL MOTION - Intersection Observer for card settle-in
+      setupCardAnimations();
+    }
+
+    // Card settle-in animation observer
+    function setupCardAnimations() {
+      const animatingCards = document.querySelectorAll('.message-card.animating, .compact-card.animating');
+      
+      if (animatingCards.length === 0) return; // No cards to animate
+      
+      // Trigger animations immediately on page load
+      setTimeout(() => {
+        animatingCards.forEach(card => {
+          card.classList.add('visible');
+        });
+      }, 100);
+    }
+
+    // Re-observe cards after view switch
+    function observeNewCards() {
+      setTimeout(() => {
+        setupCardAnimations();
+      }, 50);
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

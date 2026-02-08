@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ESSENCE — Settings & Trust</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream: #FBF8F4;
+      --oat: #F5F0EA;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      --ash: #ADA9A5;
+      --border: rgba(0, 0, 0, 0.06);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    body {
+      font-family: var(--font-sans);
+      background: #1C1A18;
+      color: var(--charcoal);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 0;
+    }
+
+    /* ===== PHONE FRAME ===== */
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--cream);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.4);
+    }
+
+    /* ===== STATUS BAR ===== */
+    .status-bar {
+      height: 54px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+      position: relative;
+      z-index: 10;
+    }
+    .status-bar .time { font-size: 15px; font-weight: 600; }
+    .status-icons { display: flex; gap: 5px; align-items: center; }
+    .status-icons svg { width: 16px; height: 16px; fill: var(--charcoal); }
+
+    /* ===== SCREEN CONTAINER ===== */
+    .screen-container {
+      position: relative;
+      height: calc(844px - 54px);
+      overflow: hidden;
+    }
+
+    /* ===== INDIVIDUAL SCREENS ===== */
+    .screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--cream);
+      transform: translateX(100%);
+      transition: transform 0.38s var(--ease), opacity 0.38s var(--ease);
+      opacity: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screen.active {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .screen.slide-out-left {
+      transform: translateX(-30%);
+      opacity: 0.4;
+    }
+    .screen.slide-out-right {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    .screen-inner {
+      padding: 0 24px 80px;
+    }
+
+    /* ===== HEADER (per screen) ===== */
+    .screen-header {
+      padding: 12px 0 28px;
+    }
+    .screen-header .back-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      color: var(--mineral);
+      font-size: 15px;
+      font-weight: 500;
+      transition: color 0.2s;
+      padding: 8px 0;
+      margin-left: -2px;
+    }
+    .screen-header .back-row:hover { color: var(--mineral-dark); }
+    .screen-header .back-row svg { width: 18px; height: 18px; }
+    .screen-header h1 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--charcoal);
+      letter-spacing: -0.01em;
+    }
+    .screen-header .subtitle {
+      font-size: 15px;
+      color: var(--graphite);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ===== SETTINGS MAIN MENU ===== */
+    .settings-menu {
+      display: flex;
+      flex-direction: column;
+      margin-top: 8px;
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: background 0.22s var(--ease);
+    }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-item:hover { background: var(--sand); }
+    .settings-item:active { background: var(--sand); }
+    .settings-item-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .settings-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .settings-icon svg { width: 18px; height: 18px; }
+    .settings-icon.profile { background: rgba(122,128,136,0.1); color: var(--mineral); }
+    .settings-icon.plan { background: rgba(232,220,200,0.5); color: #B8A88A; }
+    .settings-icon.notif { background: rgba(122,150,132,0.12); color: #7A9684; }
+    .settings-icon.security { background: rgba(122,128,136,0.08); color: var(--mineral-dark); }
+    .settings-icon.data { background: rgba(28,26,24,0.06); color: var(--charcoal); }
+    .settings-icon.support { background: rgba(122,128,136,0.06); color: var(--graphite); }
+    .settings-icon svg { fill: currentColor; }
+    .settings-item-text h3 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+    .settings-item-text p {
+      font-size: 13px;
+      color: var(--graphite);
+      margin-top: 1px;
+      line-height: 1.3;
+    }
+    .settings-chevron {
+      color: var(--ash);
+      flex-shrink: 0;
+    }
+    .settings-chevron svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ===== DIVIDERS ===== */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* ===== FORM FIELDS ===== */
+    .field-group { margin-bottom: 20px; }
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--graphite);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .field-input-wrap {
+      position: relative;
+    }
+    .field-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--charcoal);
+      background: var(--oat);
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.22s var(--ease), background 0.22s var(--ease);
+    }
+    .field-input:focus {
+      border-color: var(--mineral);
+      background: white;
+      outline: none;
+    }
+    .field-input:focus-visible {
+      outline: 2px solid var(--mineral);
+      outline-offset: 1px;
+    }
+    .field-input::placeholder { color: var(--ash); }
+
+    .field-select {
+      width: 100%;
+      padding: 14px 40px 14px 16px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--charcoal);
+      background: var(--oat);
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-md);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.22s var(--ease);
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23ADA9A5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+    .field-select:focus { border-color: var(--mineral); }
+
+    .field-helper {
+      font-size: 13px;
+      color: var(--graphite);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* Auto-save confirmation */
+    .save-confirm {
+      font-size: 13px;
+      color: #7A9684;
+      font-weight: 500;
+      margin-top: 6px;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+      min-height: 20px;
+      line-height: 1.5;
+    }
+    .save-confirm.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Pending verification badge */
+    .pending-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #B8943A;
+      background: rgba(184,148,58,0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+    .pending-badge svg { width: 12px; height: 12px; fill: currentColor; }
+
+    /* ===== INFO CARD ===== */
+    .info-card {
+      background: var(--oat);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .info-card p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+    }
+
+    /* ===== BOTTOM SHEET / MODAL ===== */
+    .sheet-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(28, 26, 24, 0.3);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+    }
+    .sheet-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: var(--cream);
+      border-radius: 20px 20px 0 0;
+      padding: 12px 24px 40px;
+      z-index: 101;
+      transform: translateY(100%);
+      transition: transform 0.38s var(--ease);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .sheet-overlay.open .sheet {
+      transform: translateY(0);
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--sand);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .sheet h3 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+    .sheet p {
+      font-size: 15px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: background 0.22s var(--ease), transform 0.12s;
+      text-align: center;
+    }
+    .btn:active { transform: scale(0.985); }
+    .btn-primary {
+      background: var(--mineral);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--mineral-dark); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--graphite);
+      padding: 12px;
+      font-weight: 500;
+    }
+    .btn-secondary:hover { color: var(--charcoal); }
+
+    /* ===== FOOTER TEXT ===== */
+    .screen-footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .screen-footer p {
+      font-size: 13px;
+      color: var(--ash);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ===== PLAN SECTION ===== */
+    .plan-state-switcher {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .plan-state-btn {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--sand);
+      background: transparent;
+      color: var(--graphite);
+      cursor: pointer;
+      transition: all 0.22s var(--ease);
+    }
+    .plan-state-btn.active {
+      background: var(--mineral);
+      border-color: var(--mineral);
+      color: white;
+    }
+    .plan-state-btn:hover:not(.active) {
+      border-color: var(--mineral);
+      color: var(--mineral);
+    }
+
+    .plan-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .plan-card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin-bottom: 4px;
+    }
+    .plan-card-name {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+    .plan-card-billing {
+      font-size: 15px;
+      color: var(--graphite);
+      margin-bottom: 4px;
+    }
+    .plan-card-status {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+    .plan-card-status .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 5px;
+      position: relative;
+      top: -1px;
+    }
+    .status-dot.active { background: #7A9684; }
+    .status-dot.ending { background: #B8943A; }
+    .plan-card-reassurance {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .plan-includes {
+      margin-bottom: 24px;
+    }
+    .plan-includes h4 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin-bottom: 12px;
+    }
+    .plan-includes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .plan-includes-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.4;
+    }
+    .plan-includes-item .check-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(122,150,132,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .plan-includes-item .check-icon svg {
+      width: 10px;
+      height: 10px;
+      stroke: #7A9684;
+      fill: none;
+    }
+
+    .upgrade-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .upgrade-card h3 {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+    .upgrade-card p {
+      font-size: 15px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .upgrade-card .btn { margin-bottom: 4px; }
+
+    .plan-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+    .plan-action-link {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--mineral);
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 12px 0;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.2s;
+    }
+    .plan-action-link:hover { color: var(--mineral-dark); }
+
+    .plan-cancel-area {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .plan-cancel-link {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--ash);
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 8px 0;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.2s;
+    }
+    .plan-cancel-link:hover { color: var(--graphite); }
+
+    .plan-reactivate {
+      margin-top: 16px;
+    }
+    .plan-reactivate p {
+      font-size: 14px;
+      color: var(--graphite);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .plan-profiles-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .plan-profiles-row span {
+      font-size: 14px;
+      color: var(--graphite);
+    }
+    .plan-profiles-bar {
+      width: 120px;
+      height: 4px;
+      background: var(--sand);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .plan-profiles-fill {
+      height: 100%;
+      background: var(--mineral);
+      border-radius: 2px;
+      transition: width 0.4s var(--ease);
+    }
+
+    .persistent-reassurance {
+      background: var(--oat);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      text-align: center;
+    }
+    .persistent-reassurance p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+    }
+
+    /* Plan state views */
+    .plan-state { display: none; }
+    .plan-state.visible { display: block; }
+
+    /* Founding Member badge */
+    .founding-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #8B7A56;
+      background: linear-gradient(135deg, rgba(232,220,200,0.4), rgba(232,220,200,0.2));
+      border: 1px solid rgba(184,148,58,0.15);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .founding-badge svg { width: 12px; height: 12px; }
+
+    /* Price-locked line */
+    .price-locked {
+      font-size: 13px;
+      color: #8B7A56;
+      font-weight: 500;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .price-locked svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* ===== TOGGLE GROUPS (Notifications) ===== */
+    .toggle-group {
+      margin-bottom: 36px;
+    }
+    .toggle-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin-bottom: 12px;
+      display: block;
+      transition: opacity 0.3s var(--ease);
+    }
+    .toggle-group.all-off .toggle-group-label {
+      opacity: 0.5;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info { flex: 1; }
+    .toggle-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--charcoal);
+      line-height: 1.4;
+    }
+    .toggle-desc {
+      font-size: 13px;
+      color: var(--graphite);
+      line-height: 1.5;
+      margin-top: 2px;
+    }
+
+    /* Toggle switch */
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .toggle-track {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--sand);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.25s var(--ease);
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.25s var(--ease);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--mineral);
+    }
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
+    .toggle-switch input:focus-visible + .toggle-track {
+      outline: 2px solid var(--mineral);
+      outline-offset: 2px;
+    }
+
+    /* ===== SECURITY SECTION ===== */
+    .security-card {
+      background: var(--oat);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .security-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .security-card p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .security-card .btn {
+      font-size: 14px;
+      padding: 12px 16px;
+      width: auto;
+      display: inline-block;
+    }
+    .security-card .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--mineral);
+      color: var(--mineral);
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.22s var(--ease), color 0.22s var(--ease);
+    }
+    .security-card .btn-outline:hover {
+      background: var(--mineral);
+      color: white;
+    }
+
+    .security-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin: 36px 0 14px;
+      display: block;
+    }
+
+    /* Password form */
+    .password-form {
+      display: none;
+      margin-top: 12px;
+    }
+    .password-form.visible { display: block; }
+    .password-form .field-group { margin-bottom: 14px; }
+    .password-form .field-label { font-size: 12px; margin-bottom: 6px; }
+    .password-helper {
+      font-size: 12px;
+      color: var(--ash);
+      margin-top: 4px;
+    }
+
+    /* Sign out area */
+    .signout-area {
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .signout-btn {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--mineral);
+      font-weight: 600;
+      background: none;
+      border: none;
+      padding: 12px 0;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.2s;
+      display: block;
+      width: 100%;
+    }
+    .signout-btn:hover { color: var(--mineral-dark); }
+
+    /* ===== STEWARDSHIP PROMISE ===== */
+    .promise-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 36px;
+    }
+    .promise-card h3 {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 14px;
+    }
+    .promise-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .promise-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.5;
+    }
+    .promise-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      color: #7A9684;
+    }
+
+    /* Lifecycle card */
+    .lifecycle-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .lifecycle-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 14px;
+    }
+    .lifecycle-row {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .lifecycle-row:last-child { border-bottom: none; }
+    .lifecycle-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+    .lifecycle-desc {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.5;
+    }
+
+    /* ===== DATA & VOICE STEWARDSHIP ===== */
+    .stewardship-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin: 36px 0 14px;
+      display: block;
+    }
+    .stewardship-section-label:first-of-type { margin-top: 0; }
+
+    .voice-status-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .voice-status-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ash);
+      margin-bottom: 8px;
+    }
+    .voice-status-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .voice-status-line .vs-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .vs-dot.preserved { background: #7A9684; }
+    .vs-dot.in-progress { background: var(--mineral); }
+    .voice-status-desc {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.5;
+    }
+
+    .stewardship-card {
+      background: var(--oat);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .stewardship-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .stewardship-card p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .stewardship-card .btn-outline {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 16px;
+      background: transparent;
+      border: 1.5px solid var(--mineral);
+      color: var(--mineral);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.22s var(--ease), color 0.22s var(--ease);
+      display: inline-block;
+    }
+    .stewardship-card .btn-outline:hover {
+      background: var(--mineral);
+      color: white;
+    }
+
+    /* Danger zone */
+    .danger-zone {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .danger-card {
+      background: var(--oat);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .danger-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .danger-card p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .danger-card .btn-danger {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 16px;
+      background: transparent;
+      border: 1.5px solid #C0756B;
+      color: #C0756B;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.22s var(--ease), color 0.22s var(--ease);
+      display: inline-block;
+    }
+    .danger-card .btn-danger:hover {
+      background: #C0756B;
+      color: white;
+    }
+
+    /* Multi-step flow inside sheet */
+    .sheet-step { display: none; }
+    .sheet-step.active { display: block; }
+    .sheet-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 16px 0;
+      cursor: pointer;
+    }
+    .sheet-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--mineral);
+      flex-shrink: 0;
+    }
+    .sheet-checkbox span {
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.4;
+    }
+    .btn-danger-solid {
+      background: #C0756B;
+      color: white;
+      border: none;
+    }
+    .btn-danger-solid:hover { background: #A8635A; }
+    .btn-danger-solid:disabled {
+      background: var(--sand);
+      color: var(--ash);
+      cursor: not-allowed;
+    }
+
+    /* ===== SUPPORT SECTION ===== */
+    .support-card {
+      background: var(--oat);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .support-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .support-card > p {
+      font-size: 14px;
+      color: var(--graphite);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .support-card .btn-outline {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 20px;
+      background: transparent;
+      border: 1.5px solid var(--mineral);
+      color: var(--mineral);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-block;
+      transition: background 0.22s var(--ease), color 0.22s var(--ease);
+    }
+    .support-card .btn-outline:hover {
+      background: var(--mineral);
+      color: white;
+    }
+    .response-time {
+      font-size: 13px;
+      color: var(--ash);
+      margin-top: 10px;
+    }
+    .help-topics {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 12px;
+    }
+    .help-topic-link {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--mineral);
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 11px 0;
+      cursor: pointer;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .help-topic-link:last-child { border-bottom: none; }
+    .help-topic-link:hover { color: var(--mineral-dark); }
+
+    .legal-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 8px;
+    }
+    .legal-link {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--mineral);
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 11px 0;
+      cursor: pointer;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .legal-link:last-child { border-bottom: none; }
+    .legal-link:hover { color: var(--mineral-dark); }
+
+    .about-section {
+      margin-top: 32px;
+      text-align: center;
+    }
+    .about-version {
+      font-size: 13px;
+      color: var(--ash);
+      margin-bottom: 8px;
+    }
+    .copy-device-link {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--mineral);
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .copy-device-link:hover { color: var(--mineral-dark); }
+    .about-helper {
+      font-size: 12px;
+      color: var(--ash);
+      margin-top: 6px;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    .screen::-webkit-scrollbar { width: 0; }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 16 16"><path d="M1 10.5a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1H2a1 1 0 01-1-1v-3zM6 7.5a1 1 0 011-1h1a1 1 0 011 1v6a1 1 0 01-1 1H7a1 1 0 01-1-1v-6zM11 4a1 1 0 011-1h1a1 1 0 011 1v9.5a1 1 0 01-1 1h-1a1 1 0 01-1-1V4z"/></svg>
+        <svg viewBox="0 0 16 16"><path d="M8 2C5.2 2 2.8 3.3 1.3 5.3a.75.75 0 001.2.9A6.5 6.5 0 018 3.5c2 0 3.9.9 5.2 2.4l.3.3a.75.75 0 001.2-.9C13.2 3.3 10.8 2 8 2zm0 3.5c-1.6 0-3 .7-4 1.8a.75.75 0 001.1 1A3.5 3.5 0 018 7c1.1 0 2.1.5 2.9 1.3a.75.75 0 001.1-1c-1-1.1-2.4-1.8-4-1.8zM8 9a2 2 0 00-1.5.7.75.75 0 001.1 1 .5.5 0 01.8 0 .75.75 0 001.1-1A2 2 0 008 9z"/><circle cx="8" cy="12.5" r="1"/></svg>
+        <svg viewBox="0 0 16 16"><path d="M2 5h10a2 2 0 012 2v4a2 2 0 01-2 2H2a2 2 0 01-2-2V7a2 2 0 012-2zm0 1.5a.5.5 0 00-.5.5v4a.5.5 0 00.5.5h10a.5.5 0 00.5-.5V7a.5.5 0 00-.5-.5H2z"/><path d="M14.5 8v2H15a1 1 0 001-1 1 1 0 00-1-1h-.5z"/></svg>
+      </div>
+    </div>
+
+    <div class="screen-container" id="screenContainer">
+
+      <!-- ==================== MAIN SETTINGS SCREEN ==================== -->
+      <div class="screen active" id="screen-main">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <h1>Settings</h1>
+            <p class="subtitle">Your voice, thoughtfully cared for</p>
+          </div>
+
+          <div class="settings-menu">
+            <!-- 1. Profile -->
+            <button class="settings-item" onclick="navigateTo('screen-profile')">
+              <div class="settings-item-left">
+                <div class="settings-icon profile">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Profile</h3>
+                  <p>Name, email, preferences</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+
+            <!-- 2. Your Plan -->
+            <button class="settings-item" onclick="navigateTo('screen-plan')">
+              <div class="settings-item-left">
+                <div class="settings-icon plan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Your Plan</h3>
+                  <p>Plans, billing, and protection</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+
+            <!-- 3. Notifications -->
+            <button class="settings-item" onclick="navigateTo('screen-notifications')">
+              <div class="settings-item-left">
+                <div class="settings-icon notif">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Notifications</h3>
+                  <p>Messages, reminders, updates</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+
+            <!-- 4. Access & Security -->
+            <button class="settings-item" onclick="navigateTo('screen-security')">
+              <div class="settings-item-left">
+                <div class="settings-icon security">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Access & Security</h3>
+                  <p>Password, sessions, sign out</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+
+            <!-- 5. Data & Voice Stewardship -->
+            <button class="settings-item" onclick="navigateTo('screen-data')">
+              <div class="settings-item-left">
+                <div class="settings-icon data">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Data & Voice Stewardship</h3>
+                  <p>Voice record, access, and removal</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+
+            <!-- 6. Support -->
+            <button class="settings-item" onclick="navigateTo('screen-support')">
+              <div class="settings-item-left">
+                <div class="settings-icon support">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div class="settings-item-text">
+                  <h3>Support</h3>
+                  <p>Help, contact, legal</p>
+                </div>
+              </div>
+              <div class="settings-chevron"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PROFILE SCREEN ==================== -->
+      <div class="screen" id="screen-profile">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Profile</h1>
+            <p class="subtitle">The person behind the voice.</p>
+          </div>
+
+          <!-- Name field -->
+          <div class="field-group">
+            <label class="field-label">Name</label>
+            <div class="field-input-wrap">
+              <input type="text" class="field-input" id="nameField" value="Margaret Chen" 
+                     onfocus="storeOriginal(this)" onblur="handleNameBlur(this)">
+            </div>
+            <div class="save-confirm" id="nameConfirm">Updated.</div>
+          </div>
+
+          <!-- Email field -->
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <div class="field-input-wrap">
+              <input type="email" class="field-input" id="emailField" value="margaret@example.com"
+                     onfocus="storeOriginal(this)" onblur="handleEmailBlur(this)">
+            </div>
+            <div class="save-confirm" id="emailConfirm">Updated.</div>
+            <div class="pending-badge" id="emailPending" style="display: none;">
+              <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>Verification pending</span>
+            </div>
+          </div>
+
+          <!-- Time zone -->
+          <div class="field-group">
+            <label class="field-label">Time Zone</label>
+            <select class="field-select" onchange="handleSelectSave('tzConfirm')">
+              <option>Eastern Time (ET)</option>
+              <option>Central Time (CT)</option>
+              <option>Mountain Time (MT)</option>
+              <option selected>Pacific Time (PT)</option>
+              <option>Alaska Time (AKT)</option>
+              <option>Hawaii Time (HT)</option>
+            </select>
+            <div class="save-confirm" id="tzConfirm">Updated.</div>
+          </div>
+
+          <!-- Language -->
+          <div class="field-group">
+            <label class="field-label">Language</label>
+            <select class="field-select" onchange="handleSelectSave('langConfirm')">
+              <option selected>English</option>
+              <option>Spanish</option>
+              <option>French</option>
+              <option>Mandarin</option>
+              <option>Japanese</option>
+              <option>Korean</option>
+            </select>
+            <div class="save-confirm" id="langConfirm">Updated.</div>
+          </div>
+
+          <div class="info-card">
+            <p>This information helps us correctly associate your voice record with you.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== NOTIFICATIONS SCREEN ==================== -->
+      <div class="screen" id="screen-plan">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Your Plan</h1>
+            <p class="subtitle">Your voice is protected here.</p>
+          </div>
+
+          <!-- State Switcher (demo only — remove in production) -->
+          <div class="plan-state-switcher">
+            <button class="plan-state-btn active" onclick="switchPlanState('free')">Free</button>
+            <button class="plan-state-btn" onclick="switchPlanState('founding')">Founding</button>
+            <button class="plan-state-btn" onclick="switchPlanState('essential')">Essential</button>
+            <button class="plan-state-btn" onclick="switchPlanState('cancelled')">Cancelled</button>
+            <button class="plan-state-btn" onclick="switchPlanState('archive')">Archive</button>
+            <button class="plan-state-btn" onclick="switchPlanState('guardian')">Guardian</button>
+            <button class="plan-state-btn" onclick="switchPlanState('paused')">Paused</button>
+          </div>
+
+          <!-- ===== STATE A: FREE TIER ===== -->
+          <!-- Implementation note: Status line is conditional.
+               If message unused: "One message available. Your voice record is preserved."
+               If message created: "One message created. Your voice record is preserved."
+               Demo shows created state. Production must check message_count. -->
+          <div class="plan-state visible" id="plan-free">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">ESSENCE Free</div>
+              <div class="plan-card-status" id="freeStatusLine">
+                <span class="status-dot active"></span>One message created. Your voice record is preserved.
+              </div>
+              <div class="plan-card-reassurance">Your voice remains preserved here, regardless of your plan.</div>
+            </div>
+
+            <div class="plan-includes">
+              <h4>What's included</h4>
+              <div class="plan-includes-list">
+                <div class="plan-includes-item">
+                  <div class="check-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <span>Voice record creation</span>
+                </div>
+                <div class="plan-includes-item">
+                  <div class="check-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <span>One message, fully delivered</span>
+                </div>
+                <div class="plan-includes-item">
+                  <div class="check-icon"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <span>Up to three recipients</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="upgrade-card">
+              <h3>Unlock unlimited messages</h3>
+              <p>Create messages for birthdays, holidays, difficult days, and every moment that matters. Your voice is ready.</p>
+              <button class="btn btn-primary">See plans</button>
+              <button class="btn btn-secondary">Compare what's included</button>
+            </div>
+          </div>
+
+          <!-- ===== STATE B1: ESSENTIAL VOICE — FOUNDING MEMBER ===== -->
+          <div class="plan-state" id="plan-founding">
+            <div class="plan-card">
+              <div class="founding-badge">
+                <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.1 4.3 4.7.7-3.4 3.3.8 4.7L8 11.8 3.8 14l.8-4.7L1.2 6l4.7-.7L8 1z"/></svg>
+                Founding Member
+              </div>
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">Essential Voice</div>
+              <div class="plan-card-billing">$4.99 per month</div>
+              <div class="plan-card-status">Renews March 14, 2026</div>
+              <div class="plan-card-status">Payment method: Visa ending in 4242</div>
+              <div class="price-locked">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+                Founding Member pricing is locked in for you.
+              </div>
+              <div class="plan-card-reassurance">This plan supports continued message creation and care for your preserved voice.</div>
+            </div>
+
+            <div class="plan-actions">
+              <button class="plan-action-link">Switch to annual plan ($39/year)</button>
+              <button class="plan-action-link">Update payment method</button>
+              <button class="plan-action-link">View billing history</button>
+            </div>
+
+            <div class="plan-cancel-area">
+              <button class="plan-cancel-link" onclick="openSheet('cancelFoundingSheet')">Cancel plan</button>
+            </div>
+          </div>
+
+          <!-- ===== STATE B2: ESSENTIAL VOICE — FULL PRICE ===== -->
+          <div class="plan-state" id="plan-essential">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">Essential Voice</div>
+              <div class="plan-card-billing">$9.99 per month</div>
+              <div class="plan-card-status">Renews March 14, 2026</div>
+              <div class="plan-card-status">Payment method: Visa ending in 4242</div>
+              <div class="plan-card-reassurance">This plan supports continued message creation and care for your preserved voice.</div>
+            </div>
+
+            <div class="plan-actions">
+              <button class="plan-action-link">Switch to annual plan ($99/year)</button>
+              <button class="plan-action-link">Update payment method</button>
+              <button class="plan-action-link">View billing history</button>
+            </div>
+
+            <div class="plan-cancel-area">
+              <button class="plan-cancel-link" onclick="openSheet('cancelSheet')">Cancel plan</button>
+            </div>
+          </div>
+
+          <!-- ===== STATE C: CANCELLED, STILL ACTIVE ===== -->
+          <div class="plan-state" id="plan-cancelled">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">Essential Voice</div>
+              <div class="plan-card-status">
+                <span class="status-dot ending"></span>Active until April 14, 2026. Your plan will not renew.
+              </div>
+              <div class="plan-card-reassurance">Your voice record and existing messages remain safely preserved and viewable.</div>
+            </div>
+
+            <div class="plan-reactivate">
+              <button class="btn btn-primary" onclick="reactivatePlan()">Reactivate plan</button>
+              <p>Pick up right where you left off.</p>
+            </div>
+          </div>
+
+          <!-- ===== STATE D: FAMILY ARCHIVE ===== -->
+          <div class="plan-state" id="plan-archive">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">Family Archive</div>
+              <div class="plan-card-billing">$12.99 per month</div>
+              <div class="plan-card-status">Renews March 14, 2026</div>
+
+              <div class="plan-profiles-row">
+                <span>3 of 5 voice profiles in use</span>
+                <div class="plan-profiles-bar">
+                  <div class="plan-profiles-fill" style="width: 60%;"></div>
+                </div>
+              </div>
+
+              <div class="plan-card-reassurance">Your family's voices are preserved together.</div>
+            </div>
+
+            <div class="plan-actions">
+              <button class="plan-action-link">Manage voice profiles</button>
+              <button class="plan-action-link">Update payment method</button>
+              <button class="plan-action-link">View billing history</button>
+              <button class="plan-action-link">Switch to annual plan ($129.99/year)</button>
+            </div>
+
+            <div class="plan-cancel-area">
+              <button class="plan-cancel-link" onclick="openSheet('downgradeArchiveSheet')">Switch to Essential Voice</button>
+            </div>
+          </div>
+
+          <!-- ===== STATE E: FAMILY GUARDIAN ===== -->
+          <div class="plan-state" id="plan-guardian">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">Family Guardian</div>
+              <div class="plan-card-billing">$29.99 per month</div>
+              <div class="plan-card-status">Renews March 14, 2026</div>
+
+              <div class="plan-profiles-row">
+                <span>7 of 12 voice profiles protected</span>
+                <div class="plan-profiles-bar">
+                  <div class="plan-profiles-fill" style="width: 58%;"></div>
+                </div>
+              </div>
+
+              <div class="plan-card-reassurance">Your family's voices are protected under your care.</div>
+            </div>
+
+            <div class="plan-actions">
+              <button class="plan-action-link">Ambassador dashboard</button>
+              <button class="plan-action-link">Manage voice profiles</button>
+              <button class="plan-action-link">Update payment method</button>
+              <button class="plan-action-link">View billing history</button>
+              <button class="plan-action-link">Switch to annual plan ($299.99/year)</button>
+            </div>
+
+            <div class="plan-cancel-area">
+              <button class="plan-cancel-link" onclick="openSheet('downgradeGuardianSheet')">Switch to a smaller plan</button>
+            </div>
+          </div>
+
+          <!-- ===== STATE F: PAUSED (grief/inactivity) ===== -->
+          <div class="plan-state" id="plan-paused">
+            <div class="plan-card">
+              <div class="plan-card-label">Current Plan</div>
+              <div class="plan-card-name">ESSENCE</div>
+              <div class="plan-card-status">
+                <span class="status-dot" style="background: var(--ash);"></span>Account paused
+              </div>
+              <div class="plan-card-reassurance">Your voice record and messages are here, safe and waiting. There is no time limit.</div>
+            </div>
+
+            <div class="plan-reactivate">
+              <button class="btn btn-primary">Choose a plan</button>
+              <p>Whenever you are ready.</p>
+            </div>
+          </div>
+
+          <!-- Persistent Reassurance (All Tiers) -->
+          <div class="persistent-reassurance" style="margin-top: 24px;">
+            <p>You do not need to actively manage your plan for your voice to remain protected.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="screen-notifications">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Notifications</h1>
+            <p class="subtitle">Choose how ESSENCE stays in touch.</p>
+          </div>
+
+          <!-- Group 1: Your Messages -->
+          <div class="toggle-group" id="tg-messages">
+            <span class="toggle-group-label">Your messages</span>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Message delivered</div>
+                <div class="toggle-desc">Know when a message reaches its recipient.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-messages')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Scheduled reminders</div>
+                <div class="toggle-desc">A quiet reminder before a scheduled message goes out.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-messages')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Group 2: Your Voice Record -->
+          <div class="toggle-group" id="tg-voice">
+            <span class="toggle-group-label">Your voice record</span>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Recording reminders</div>
+                <!-- Implementation note: Description is conditional.
+                     If voice record in progress: "Gentle prompts to continue building your voice record."
+                     If voice record complete: "Occasional prompts if you ever choose to refresh or update your voice record." -->
+                <div class="toggle-desc">Gentle prompts to continue building your voice record.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-voice')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Voice record milestones</div>
+                <div class="toggle-desc">A small moment of recognition when you reach a milestone.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-voice')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Group 3: Moments That Matter -->
+          <div class="toggle-group" id="tg-moments">
+            <span class="toggle-group-label">Moments that matter</span>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Birthday and occasion reminders</div>
+                <div class="toggle-desc">We will let you know when a recipient's birthday or special date is coming up.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-moments')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Seasonal prompts</div>
+                <div class="toggle-desc">Occasional invitations around holidays and meaningful times of year.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-moments')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Group 4: From Us -->
+          <div class="toggle-group" id="tg-fromus">
+            <span class="toggle-group-label">From us</span>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Product updates</div>
+                <div class="toggle-desc">New features and improvements, shared sparingly.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="checkGroupState('tg-fromus')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Tips and guidance</div>
+                <div class="toggle-desc">Suggestions for getting the most from your voice record.</div>
+              </div>
+              <label class="toggle-switch">
+                <!-- Default: Off per spec -->
+                <input type="checkbox" onchange="checkGroupState('tg-fromus')">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="screen-footer">
+            <p>We reach out only when it matters. Most weeks, you will hear very little from us.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="screen-security">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Access & Security</h1>
+            <p class="subtitle">Your account is secure.</p>
+          </div>
+
+          <span class="security-group-label" style="margin-top: 0;">Login details</span>
+
+          <!-- Change Email -->
+          <div class="security-card">
+            <h3>Change email</h3>
+            <p>Update the email address you use to sign in.</p>
+            <!-- Implementation note: Email updates here and in Profile share the same verification flow and state. -->
+            <button class="btn btn-outline" onclick="showSecurityEmailEdit()">Update email</button>
+            <div class="password-form" id="securityEmailForm">
+              <div class="field-group">
+                <label class="field-label">New email address</label>
+                <input type="email" class="field-input" id="secEmailField" placeholder="Enter new email">
+              </div>
+              <p style="font-size: 13px; color: var(--graphite); margin-bottom: 14px;">A verification link will be sent to your new address.</p>
+              <button class="btn btn-primary" style="font-size: 14px; padding: 12px;" onclick="sendSecurityEmailVerification()">Send verification</button>
+              <div class="save-confirm" id="secEmailConfirm">Updated.</div>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="security-card">
+            <h3>Change password</h3>
+            <p>Set a new password for your account.</p>
+            <button class="btn btn-outline" id="showPwBtn" onclick="showPasswordForm()">Update password</button>
+            <div class="password-form" id="passwordForm">
+              <div class="field-group">
+                <label class="field-label">Current password</label>
+                <input type="password" class="field-input" placeholder="Enter current password">
+              </div>
+              <div class="field-group">
+                <label class="field-label">New password</label>
+                <input type="password" class="field-input" id="newPwField" oninput="checkPwLength()">
+                <div class="password-helper" id="pwHelper">At least 8 characters.</div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Confirm new password</label>
+                <input type="password" class="field-input">
+              </div>
+              <button class="btn btn-primary" style="font-size: 14px; padding: 12px;" onclick="confirmPasswordChange()">Update password</button>
+              <div class="save-confirm" id="pwConfirm">Your password has been updated.</div>
+            </div>
+          </div>
+
+          <span class="security-group-label">Session management</span>
+
+          <!-- Sign Out Other Devices -->
+          <div class="security-card">
+            <h3>Sign out other devices</h3>
+            <p>If you would like extra peace of mind, you can sign out of all other devices.</p>
+            <button class="btn btn-outline" onclick="openSheet('signoutOtherSheet')">Sign out other devices</button>
+          </div>
+
+          <!-- Sign Out This Device -->
+          <div class="signout-area">
+            <button class="signout-btn" onclick="openSheet('signoutSheet')">Sign out</button>
+          </div>
+
+          <div class="screen-footer">
+            <p>Your account is protected by encrypted authentication. You do not need to take any extra steps to keep your voice safe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="screen-data">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Data & Voice Stewardship</h1>
+            <p class="subtitle">How your voice is preserved, managed, and cared for. This section also exists for the difficult moments — illness, loss, or simply planning ahead.</p>
+          </div>
+
+          <!-- Our Stewardship Promise -->
+          <div class="promise-card">
+            <h3>Our promise to you</h3>
+            <div class="promise-list">
+              <div class="promise-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L6 14"/><path d="M2 8h12"/></svg>
+                <span>Your voice is never sold, licensed, or shared with third parties.</span>
+              </div>
+              <div class="promise-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L6 14"/><path d="M2 8h12"/></svg>
+                <span>Your recordings are never used to train public models.</span>
+              </div>
+              <div class="promise-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L6 14"/><path d="M2 8h12"/></svg>
+                <span>No message is ever created or sent without your explicit intent.</span>
+              </div>
+              <div class="promise-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L6 14"/><path d="M2 8h12"/></svg>
+                <span>You can download or remove your voice at any time, for any reason.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice Record -->
+          <span class="stewardship-section-label">Voice record</span>
+
+          <div class="voice-status-card">
+            <div class="voice-status-label">Voice Record</div>
+            <div class="voice-status-line">
+              <span class="vs-dot preserved"></span>
+              Preserved
+            </div>
+            <div class="voice-status-desc">Your voice is fully shaped and safely stored.</div>
+          </div>
+
+          <div class="lifecycle-card">
+            <h3>What happens to your voice</h3>
+            <div class="lifecycle-row">
+              <span class="lifecycle-label">Preserved</span>
+              <span class="lifecycle-desc">Your voice is stored securely and ready for messages. This is the normal state.</span>
+            </div>
+            <div class="lifecycle-row">
+              <span class="lifecycle-label">Paused</span>
+              <span class="lifecycle-desc">If your plan ends or your account is inactive, your voice remains stored. You simply cannot create new messages until you return.</span>
+            </div>
+            <div class="lifecycle-row">
+              <span class="lifecycle-label">Inactive</span>
+              <span class="lifecycle-desc">If years pass with no activity, your voice and messages are still here. We do not delete voices due to inactivity.</span>
+            </div>
+            <div class="lifecycle-row">
+              <span class="lifecycle-label">Removed</span>
+              <span class="lifecycle-desc">Only if you explicitly choose to delete it. Removal is permanent and immediate.</span>
+            </div>
+          </div>
+
+          <div class="stewardship-card">
+            <h3>Refresh or update voice record</h3>
+            <p>If your voice has changed, or you would like to record again, you can create a new version of your voice record.</p>
+            <p>Your existing voice record remains preserved unless you choose to replace it.</p>
+            <button class="btn-outline">Refresh voice record</button>
+          </div>
+
+          <!-- Your Messages -->
+          <span class="stewardship-section-label">Your messages</span>
+
+          <div class="stewardship-card">
+            <h3>Manage messages</h3>
+            <p>View and manage the messages created with your preserved voice.</p>
+            <!-- Implementation note: 'View messages' navigates to the existing Message Archive. No separate message list is built within Settings. -->
+            <button class="btn-outline">View messages</button>
+          </div>
+
+          <!-- Data Access -->
+          <span class="stewardship-section-label">Data access</span>
+
+          <div class="stewardship-card">
+            <h3>Download your data</h3>
+            <p>Request a personal copy of everything ESSENCE holds for you — your original recordings, the messages created from them, and your account information.</p>
+            <p>This is yours to keep as a personal backup, independent of your account.</p>
+            <button class="btn-outline" id="downloadBtn" onclick="requestDataDownload()">Request download</button>
+            <div class="save-confirm" id="downloadConfirm">Your request has been received. We will send your files to your email, usually within one business day.</div>
+          </div>
+
+          <!-- Voice Record Removal -->
+          <div class="danger-zone">
+            <span class="stewardship-section-label">Removal</span>
+
+            <div class="danger-card">
+              <h3>Delete voice record</h3>
+              <p>Remove the preserved voice that represents you. Your original recordings and the messages created from them will be permanently deleted.</p>
+              <p>Your ESSENCE account and profile will remain. You can create a new voice record in the future if you choose.</p>
+              <button class="btn-danger" onclick="openSheet('deleteVoiceSheet')">Delete voice record</button>
+            </div>
+
+            <!-- Account Removal -->
+            <div class="danger-card" style="margin-top: 20px;">
+              <h3>Delete account</h3>
+              <p>End your relationship with ESSENCE entirely. This removes your profile, your voice record if one exists, and all associated data.</p>
+              <p>This is a permanent and complete departure.</p>
+              <button class="btn-danger" onclick="openSheet('deleteAccountSheet')">Delete account</button>
+            </div>
+          </div>
+
+          <div class="screen-footer" style="margin-top: 40px;">
+            <p>You remain in control at every step.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="screen-support">
+        <div class="screen-inner">
+          <div class="screen-header">
+            <div class="back-row" onclick="navigateBack()">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14L6 9l5-5"/></svg>
+              <span>Settings</span>
+            </div>
+            <h1>Support</h1>
+            <p class="subtitle">We are here when you need us.</p>
+          </div>
+
+          <!-- Contact Support -->
+          <div class="support-card">
+            <h3>Get in touch</h3>
+            <p>Send us a message and a real person will read it.</p>
+            <button class="btn-outline">Contact support</button>
+            <div class="response-time">We typically respond within one business day.</div>
+          </div>
+
+          <!-- Help Center -->
+          <div class="support-card">
+            <h3>Help Center</h3>
+            <p>Answers to common questions about your voice record, messages, and account.</p>
+            <button class="btn-outline" style="margin-bottom: 16px;">Visit Help Center</button>
+            <div class="help-topics">
+              <button class="help-topic-link">How ESSENCE works</button>
+              <button class="help-topic-link">Your voice record</button>
+              <button class="help-topic-link">Creating and managing messages</button>
+              <button class="help-topic-link">Plans and billing</button>
+              <button class="help-topic-link">Privacy and stewardship</button>
+            </div>
+          </div>
+
+          <!-- Legal & Privacy -->
+          <div class="support-card">
+            <h3>Legal & Privacy</h3>
+            <p>Our commitments to you, written clearly.</p>
+            <div class="legal-links">
+              <button class="legal-link">Privacy policy</button>
+              <button class="legal-link">Terms of service</button>
+            </div>
+            <p style="margin-top: 12px; margin-bottom: 0; font-size: 13px; color: var(--ash);">These documents are written to be understood, not just accepted.</p>
+          </div>
+
+          <!-- About ESSENCE -->
+          <div class="about-section">
+            <div class="about-version">ESSENCE 1.0.0 (2026.02.1)</div>
+            <button class="copy-device-link" onclick="copyDeviceInfo()">Copy device info</button>
+            <div class="save-confirm" id="deviceCopyConfirm" style="text-align: center;">Copied.</div>
+            <div class="about-helper">Include this when contacting support so we can help you faster.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== EMAIL VERIFICATION SHEET ===== -->
+      <div class="sheet-overlay" id="emailSheet">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Confirm your email</h3>
+          <p>We will send a verification link to your new email address.</p>
+          <p style="font-weight: 500; color: var(--charcoal);" id="newEmailDisplay">new@example.com</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmEmailChange()">Send verification</button>
+            <button class="btn btn-secondary" onclick="cancelEmailChange()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CANCEL PLAN SHEET — FOUNDING MEMBER ===== -->
+      <div class="sheet-overlay" id="cancelFoundingSheet" onclick="closeSheetFromOverlay(event, 'cancelFoundingSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>About your plan</h3>
+          <p>If you cancel, your current plan stays active until April 14, 2026. After that, message creation and editing will be paused. Your existing messages remain viewable.</p>
+          <p>Your Founding Member pricing is preserved. If you return, you will still pay $4.99 per month.</p>
+          <p>You can come back anytime. Nothing is lost.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmCancel()">Confirm cancellation</button>
+            <button class="btn btn-secondary" onclick="closeSheet('cancelFoundingSheet')">Keep my plan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CANCEL PLAN SHEET — FULL PRICE ===== -->
+      <div class="sheet-overlay" id="cancelSheet" onclick="closeSheetFromOverlay(event, 'cancelSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>About your plan</h3>
+          <p>If you cancel, your current plan stays active until April 14, 2026. After that, message creation and editing will be paused. Your existing messages remain viewable.</p>
+          <p>You can come back anytime. Nothing is lost.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmCancel()">Confirm cancellation</button>
+            <button class="btn btn-secondary" onclick="closeSheet('cancelSheet')">Keep my plan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DOWNGRADE FROM ARCHIVE SHEET ===== -->
+      <div class="sheet-overlay" id="downgradeArchiveSheet" onclick="closeSheetFromOverlay(event, 'downgradeArchiveSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Changing your plan</h3>
+          <p>If you switch to Essential Voice, additional family voice profiles will remain saved but cannot be edited or expanded. No recordings will be deleted.</p>
+          <p>Your existing messages remain viewable by all current recipients.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmDowngradeToEssential('downgradeArchiveSheet')">Switch plan</button>
+            <button class="btn btn-secondary" onclick="closeSheet('downgradeArchiveSheet')">Keep Family Archive</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DOWNGRADE FROM GUARDIAN SHEET ===== -->
+      <div class="sheet-overlay" id="downgradeGuardianSheet" onclick="closeSheetFromOverlay(event, 'downgradeGuardianSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Changing your plan</h3>
+          <p>If you switch plans, family members you are currently protecting will retain their voice records and messages. They will not lose access to what has already been created.</p>
+          <p>Voice profiles beyond your new plan's limit will remain saved but cannot be expanded.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmDowngradeToEssential('downgradeGuardianSheet')">Switch to Essential Voice</button>
+            <button class="btn btn-secondary" onclick="closeSheet('downgradeGuardianSheet')">Keep Family Guardian</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SIGN OUT OTHER DEVICES SHEET ===== -->
+      <div class="sheet-overlay" id="signoutOtherSheet" onclick="closeSheetFromOverlay(event, 'signoutOtherSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Sign out other devices</h3>
+          <p>This will end all other active sessions. Your voice record is not affected.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmSignoutOther()">Sign out</button>
+            <button class="btn btn-secondary" onclick="closeSheet('signoutOtherSheet')">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SIGN OUT THIS DEVICE SHEET ===== -->
+      <div class="sheet-overlay" id="signoutSheet" onclick="closeSheetFromOverlay(event, 'signoutSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Sign out</h3>
+          <p>You can sign back in at any time. Your voice record remains safely preserved.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="confirmSignout()">Sign out</button>
+            <button class="btn btn-secondary" onclick="closeSheet('signoutSheet')">Stay signed in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DELETE VOICE RECORD SHEET (Multi-Step) ===== -->
+      <div class="sheet-overlay" id="deleteVoiceSheet" onclick="closeSheetFromOverlay(event, 'deleteVoiceSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+
+          <!-- Step 1: Explanation -->
+          <div class="sheet-step active" id="delVoiceStep1">
+            <h3>About removing your voice</h3>
+            <p>Removing your voice record permanently deletes the recordings and the messages created from them. Once completed, this cannot be undone.</p>
+            <div style="margin-top: 20px;">
+              <button class="btn btn-primary" onclick="goDeleteVoiceStep(2)">Continue</button>
+              <button class="btn btn-secondary" onclick="closeDeleteVoice()">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Acknowledgement -->
+          <div class="sheet-step" id="delVoiceStep2">
+            <h3>About removing your voice</h3>
+            <label class="sheet-checkbox">
+              <input type="checkbox" id="delVoiceCheck" onchange="toggleDeleteVoiceBtn()">
+              <span>I understand that my preserved voice and messages will be permanently removed.</span>
+            </label>
+            <div style="margin-top: 20px;">
+              <button class="btn btn-danger-solid" id="delVoiceConfirmBtn" disabled onclick="goDeleteVoiceStep(3)">Confirm removal</button>
+              <button class="btn btn-secondary" onclick="goDeleteVoiceStep(1)">Go back</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Completion -->
+          <div class="sheet-step" id="delVoiceStep3">
+            <h3>Your voice record has been removed.</h3>
+            <p>No copies are retained.</p>
+            <p>You can create a new voice record at any time from your home screen.</p>
+            <div style="margin-top: 20px;">
+              <button class="btn btn-primary" onclick="closeDeleteVoice()">Done</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== DELETE ACCOUNT SHEET ===== -->
+      <div class="sheet-overlay" id="deleteAccountSheet" onclick="closeSheetFromOverlay(event, 'deleteAccountSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>About deleting your account</h3>
+          <p>Deleting your account permanently removes all associated data, including your profile, voice record, and messages. This action cannot be undone.</p>
+          <p>If you still have an active voice record, we recommend removing it separately first.</p>
+          <label class="sheet-checkbox">
+            <input type="checkbox" id="delAccountCheck" onchange="toggleDeleteAccountBtn()">
+            <span>I understand that my account and all associated data will be permanently removed.</span>
+          </label>
+          <div style="margin-top: 20px;">
+            <button class="btn btn-danger-solid" id="delAccountBtn" disabled onclick="closeSheet('deleteAccountSheet')">Permanently delete account</button>
+            <button class="btn btn-secondary" onclick="closeDeleteAccount()">Keep account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ===== NAVIGATION =====
+    let currentScreen = 'screen-main';
+    let screenHistory = ['screen-main'];
+
+    function navigateTo(screenId) {
+      const current = document.getElementById(currentScreen);
+      const next = document.getElementById(screenId);
+      if (!current || !next) return;
+
+      current.classList.remove('active');
+      current.classList.add('slide-out-left');
+      next.classList.add('active');
+
+      setTimeout(() => {
+        current.classList.remove('slide-out-left');
+      }, 400);
+
+      screenHistory.push(screenId);
+      currentScreen = screenId;
+
+      // Scroll new screen to top
+      next.scrollTop = 0;
+    }
+
+    function navigateBack() {
+      if (screenHistory.length <= 1) return;
+
+      const current = document.getElementById(currentScreen);
+      screenHistory.pop();
+      const prevId = screenHistory[screenHistory.length - 1];
+      const prev = document.getElementById(prevId);
+
+      current.classList.remove('active');
+      current.classList.add('slide-out-right');
+      prev.classList.remove('slide-out-left');
+      prev.classList.add('active');
+
+      setTimeout(() => {
+        current.classList.remove('slide-out-right');
+      }, 400);
+
+      currentScreen = prevId;
+    }
+
+    // ===== AUTO-SAVE BEHAVIOR =====
+    let originalValues = {};
+
+    function storeOriginal(el) {
+      originalValues[el.id] = el.value;
+    }
+
+    function showSaveConfirm(confirmId) {
+      const el = document.getElementById(confirmId);
+      el.classList.add('visible');
+      setTimeout(() => {
+        el.classList.remove('visible');
+      }, 1500);
+    }
+
+    // Name field: revert if empty, otherwise auto-save
+    function handleNameBlur(el) {
+      const val = el.value.trim();
+      if (!val) {
+        // Revert + show helper
+        el.value = originalValues[el.id] || 'Margaret Chen';
+        const confirm = document.getElementById('nameConfirm');
+        confirm.textContent = 'A name helps identify your voice record and messages.';
+        confirm.style.color = '#B8943A';
+        confirm.style.fontWeight = '400';
+        confirm.style.fontStyle = 'italic';
+        confirm.classList.add('visible');
+        setTimeout(() => {
+          confirm.classList.remove('visible');
+          setTimeout(() => {
+            confirm.textContent = 'Updated.';
+            confirm.style.color = '#7A9684';
+            confirm.style.fontWeight = '500';
+            confirm.style.fontStyle = 'normal';
+          }, 400);
+        }, 2500);
+        return;
+      }
+      if (val !== originalValues[el.id]) {
+        showSaveConfirm('nameConfirm');
+      }
+    }
+
+    // Email field: show verification sheet if changed
+    let pendingEmail = null;
+
+    function handleEmailBlur(el) {
+      const val = el.value.trim();
+      if (!val || val === originalValues[el.id]) return;
+
+      // Show verification sheet
+      pendingEmail = val;
+      document.getElementById('newEmailDisplay').textContent = val;
+      document.getElementById('emailSheet').classList.add('open');
+      // Revert field to original until verified
+      el.value = originalValues[el.id];
+    }
+
+    function confirmEmailChange() {
+      document.getElementById('emailSheet').classList.remove('open');
+      // Show pending badge
+      document.getElementById('emailPending').style.display = 'inline-flex';
+      document.getElementById('emailPending').querySelector('span').textContent = 'Verification sent. Check ' + pendingEmail;
+      // After "verification" (simulated 3s)
+      setTimeout(() => {
+        document.getElementById('emailField').value = pendingEmail;
+        document.getElementById('emailPending').style.display = 'none';
+        showSaveConfirm('emailConfirm');
+        pendingEmail = null;
+      }, 3000);
+    }
+
+    function cancelEmailChange() {
+      document.getElementById('emailSheet').classList.remove('open');
+      pendingEmail = null;
+    }
+
+    // Close sheet on overlay click
+    document.getElementById('emailSheet').addEventListener('click', function(e) {
+      if (e.target === this) cancelEmailChange();
+    });
+
+    // Select fields: auto-save on change
+    function handleSelectSave(confirmId) {
+      showSaveConfirm(confirmId);
+    }
+
+    // ===== PLAN STATE MANAGEMENT =====
+    // States: free, founding, essential, cancelled, archive, guardian, paused
+    const planStates = ['free', 'founding', 'essential', 'cancelled', 'archive', 'guardian', 'paused'];
+
+    function switchPlanState(state) {
+      // Hide all states
+      planStates.forEach(s => {
+        const el = document.getElementById('plan-' + s);
+        if (el) el.classList.remove('visible');
+      });
+      // Show selected
+      const target = document.getElementById('plan-' + state);
+      if (target) target.classList.add('visible');
+      // Update switcher buttons
+      document.querySelectorAll('.plan-state-btn').forEach(btn => {
+        btn.classList.remove('active');
+        const label = btn.textContent.trim().toLowerCase();
+        if (label === state) btn.classList.add('active');
+      });
+    }
+
+    // ===== SHEET MANAGEMENT =====
+    function openSheet(sheetId) {
+      document.getElementById(sheetId).classList.add('open');
+    }
+
+    function closeSheet(sheetId) {
+      document.getElementById(sheetId).classList.remove('open');
+    }
+
+    function closeSheetFromOverlay(event, sheetId) {
+      if (event.target === event.currentTarget) {
+        closeSheet(sheetId);
+      }
+    }
+
+    // Cancel plan → switch to cancelled state
+    // Works for both Founding and Full Price cancel sheets
+    function confirmCancel() {
+      closeSheet('cancelFoundingSheet');
+      closeSheet('cancelSheet');
+      switchPlanState('cancelled');
+    }
+
+    // Downgrade to Essential from Archive or Guardian
+    // V2.1 rule: Founding Member pricing reinstates on downgrade
+    function confirmDowngradeToEssential(sheetId) {
+      closeSheet(sheetId);
+      // In production, check if user is Founding Member and route to 'founding' state
+      // For demo, route to full-price Essential
+      switchPlanState('essential');
+    }
+
+    // Reactivate → switch back to essential active
+    function reactivatePlan() {
+      // In production, check Founding Member status and route accordingly
+      switchPlanState('essential');
+    }
+
+    // ===== NOTIFICATION TOGGLE GROUPS =====
+    // When all toggles in a group are off, dim the group label
+    function checkGroupState(groupId) {
+      const group = document.getElementById(groupId);
+      const toggles = group.querySelectorAll('input[type="checkbox"]');
+      const allOff = Array.from(toggles).every(t => !t.checked);
+      if (allOff) {
+        group.classList.add('all-off');
+      } else {
+        group.classList.remove('all-off');
+      }
+    }
+
+    // ===== SECURITY: EMAIL EDIT =====
+    function showSecurityEmailEdit() {
+      const form = document.getElementById('securityEmailForm');
+      form.classList.toggle('visible');
+    }
+
+    function sendSecurityEmailVerification() {
+      const field = document.getElementById('secEmailField');
+      if (!field.value.trim()) return;
+      // Shares same verification flow as Profile email change
+      showSaveConfirm('secEmailConfirm');
+      document.getElementById('securityEmailForm').classList.remove('visible');
+      field.value = '';
+    }
+
+    // ===== SECURITY: PASSWORD =====
+    function showPasswordForm() {
+      const form = document.getElementById('passwordForm');
+      const btn = document.getElementById('showPwBtn');
+      form.classList.toggle('visible');
+      if (form.classList.contains('visible')) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = '';
+      }
+    }
+
+    function checkPwLength() {
+      const field = document.getElementById('newPwField');
+      const helper = document.getElementById('pwHelper');
+      if (field.value.length >= 8) {
+        helper.style.color = '#7A9684';
+      } else {
+        helper.style.color = 'var(--ash)';
+      }
+    }
+
+    function confirmPasswordChange() {
+      showSaveConfirm('pwConfirm');
+      setTimeout(() => {
+        document.getElementById('passwordForm').classList.remove('visible');
+        document.getElementById('showPwBtn').style.display = '';
+      }, 1800);
+    }
+
+    // ===== SECURITY: SIGN OUT =====
+    function confirmSignoutOther() {
+      closeSheet('signoutOtherSheet');
+      // Brief confirmation — spec says "Clean and done"
+      const card = document.querySelector('#screen-security .security-card:nth-of-type(3)');
+      if (card) {
+        const btn = card.querySelector('.btn-outline');
+        const origText = btn.textContent;
+        btn.textContent = 'All other sessions signed out.';
+        btn.style.color = '#7A9684';
+        btn.style.borderColor = '#7A9684';
+        btn.style.pointerEvents = 'none';
+        setTimeout(() => {
+          btn.textContent = origText;
+          btn.style.color = '';
+          btn.style.borderColor = '';
+          btn.style.pointerEvents = '';
+        }, 2500);
+      }
+    }
+
+    function confirmSignout() {
+      // In production, this would actually sign out
+      closeSheet('signoutSheet');
+    }
+
+    // ===== DATA & VOICE STEWARDSHIP =====
+    function requestDataDownload() {
+      const btn = document.getElementById('downloadBtn');
+      btn.textContent = 'Request sent';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.5';
+      showSaveConfirm('downloadConfirm');
+      setTimeout(() => {
+        btn.textContent = 'Request download';
+        btn.style.pointerEvents = '';
+        btn.style.opacity = '';
+      }, 3000);
+    }
+
+    // Multi-step voice record deletion
+    function goDeleteVoiceStep(step) {
+      document.querySelectorAll('#deleteVoiceSheet .sheet-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('delVoiceStep' + step).classList.add('active');
+      // Reset checkbox when going back to step 1
+      if (step === 1) {
+        document.getElementById('delVoiceCheck').checked = false;
+        toggleDeleteVoiceBtn();
+      }
+    }
+
+    function toggleDeleteVoiceBtn() {
+      const checked = document.getElementById('delVoiceCheck').checked;
+      document.getElementById('delVoiceConfirmBtn').disabled = !checked;
+    }
+
+    function closeDeleteVoice() {
+      closeSheet('deleteVoiceSheet');
+      // Reset to step 1 after close animation
+      setTimeout(() => {
+        goDeleteVoiceStep(1);
+      }, 400);
+    }
+
+    // ===== SUPPORT =====
+    function copyDeviceInfo() {
+      const info = 'ESSENCE 1.0.0 (2026.02.1) | iOS 18.3 | iPhone 15 Pro';
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(info).catch(() => {});
+      }
+      showSaveConfirm('deviceCopyConfirm');
+    }
+
+    // ===== DELETE ACCOUNT =====
+    function toggleDeleteAccountBtn() {
+      const checked = document.getElementById('delAccountCheck').checked;
+      document.getElementById('delAccountBtn').disabled = !checked;
+    }
+
+    function closeDeleteAccount() {
+      closeSheet('deleteAccountSheet');
+      setTimeout(() => {
+        document.getElementById('delAccountCheck').checked = false;
+        toggleDeleteAccountBtn();
+      }, 400);
+    }
+  </script>
+</body>
+</html>

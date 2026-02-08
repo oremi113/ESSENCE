@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE - Your Voice, Always There</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       ESSENCE CINEMATIC SUBSCRIPTION FLOW v2
+       4-Scene Emotional Structure / 12 Screens
+       Warm Luxury + Modern Dignity Hybrid
+       ============================================ */
+
+    /* Reset */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* MINERAL & WARMTH Core Palette */
+      --cream: #F7F3EC;
+      --cream-warm: #FBF8F4;
+      --stone: #F4F2F0;
+      --oat: #F5F0EA;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      --honey-deep: #E0D4BC;
+      
+      /* ESSENCE Gold (Derived - 12% more saturated for halo) */
+      --gold-accent: #DCC9A3;
+      --gold-glow: rgba(232, 220, 200, 0.35);
+      --gold-halo: rgba(232, 220, 200, 0.40);
+      --gold-shimmer: rgba(232, 220, 200, 0.15);
+      
+      /* Text Colors */
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      --ash: #ADA9A5;
+      --divider: #D9D6D2;
+      
+      /* Mineral Accent */
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      
+      /* Typography */
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      
+      /* Shadows - Warm Luxury */
+      --shadow-warm: 0 8px 32px rgba(28, 26, 24, 0.08);
+      --shadow-warm-deep: 0 16px 48px rgba(28, 26, 24, 0.12);
+      
+      /* Shadows - Modern Dignity (sharper) */
+      --shadow-sharp: 0 4px 16px rgba(28, 26, 24, 0.10);
+      
+      /* Easing - Updated per spec */
+      --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-drift: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #1A1715;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================
+       IPHONE PROTOTYPE FRAME
+       ============================================ */
+
+    .prototype-wrapper {
+      width: 390px;
+      height: 844px;
+      background: var(--cream);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 12px #1A1715,
+        0 0 0 14px var(--mineral),
+        0 50px 100px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .phone-frame {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 54px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+      background: var(--cream);
+      position: relative;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .status-bar::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #1A1715;
+      border-radius: 20px;
+    }
+
+    .status-indicators {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    /* ============================================
+       SCROLL CONTAINER WITH SNAP
+       ============================================ */
+
+    .scroll-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      position: relative;
+      /* Disable overscroll */
+      overscroll-behavior: none;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ============================================
+       SCREEN BASE STYLES
+       ============================================ */
+
+    .screen {
+      min-height: 100%;
+      height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ============================================
+       SCENE BACKGROUNDS
+       ============================================ */
+
+    /* Scene 1 & 2: Warm Luxury */
+    .screen--warm {
+      background: var(--cream);
+    }
+
+    /* Scene 2: Imagination - with vignette */
+    .screen--imagination {
+      background: var(--cream);
+    }
+
+    .screen--imagination::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(28, 26, 24, 0.06) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Scene 3: Modern Dignity */
+    .screen--dignity {
+      background: var(--stone);
+      justify-content: flex-start;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      overflow-y: auto;
+    }
+
+    /* Scene 3.1: Moments That Matter - Warm Cinematic */
+    .screen--moments {
+      background: var(--cream);
+      justify-content: flex-start;
+      padding-top: 32px;
+      padding-bottom: 40px;
+      overflow-y: auto;
+    }
+
+    .texture-overlay--moments {
+      opacity: 0.10;
+    }
+
+    /* Mini Breath Stone - resting state */
+    .mini-stone {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 500ms var(--ease-out-cubic), transform 500ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .mini-stone {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mini-stone__glow {
+      position: absolute;
+      inset: -8px;
+      background: radial-gradient(circle, rgba(232, 220, 200, 0.5) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .mini-stone__core {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 30%, #F8F0DC 0%, #D8CAB0 50%, #AEA090 100%);
+      border-radius: 50%;
+      box-shadow: 
+        0 2px 8px rgba(0,0,0,0.08),
+        inset 0 -2px 4px rgba(0,0,0,0.05),
+        inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+
+    /* Moments screen headline - warm charcoal, centered */
+    .headline--moments {
+      color: var(--charcoal);
+      font-size: 28px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* Moments screen subhead - mineral */
+    .subhead--moments {
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--mineral);
+      margin-bottom: 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 400ms var(--ease-out-cubic), transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .subhead--moments {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 600ms;
+    }
+
+    /* Moment Cards Container */
+    .moment-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 24px;
+      align-items: stretch;
+    }
+
+    /* Individual Moment Card - left-aligned content */
+    .moment-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      box-shadow: 
+        0 2px 8px rgba(0,0,0,0.04),
+        0 1px 2px rgba(0,0,0,0.02);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+      text-align: left;
+    }
+
+    /* Staggered card animations - 80ms apart */
+    .screen.visible .moment-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 700ms; }
+    .screen.visible .moment-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 780ms; }
+    .screen.visible .moment-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 860ms; }
+    .screen.visible .moment-card:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 940ms; }
+    .screen.visible .moment-card:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 1020ms; }
+
+    .moment-card__icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--mineral);
+      opacity: 0;
+      transition: opacity 200ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .moment-card:nth-child(1) .moment-card__icon { opacity: 1; transition-delay: 740ms; }
+    .screen.visible .moment-card:nth-child(2) .moment-card__icon { opacity: 1; transition-delay: 820ms; }
+    .screen.visible .moment-card:nth-child(3) .moment-card__icon { opacity: 1; transition-delay: 900ms; }
+    .screen.visible .moment-card:nth-child(4) .moment-card__icon { opacity: 1; transition-delay: 980ms; }
+    .screen.visible .moment-card:nth-child(5) .moment-card__icon { opacity: 1; transition-delay: 1060ms; }
+
+    .moment-card__content {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .moment-card__title {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+
+    .moment-card__line {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(28, 26, 24, 0.65);
+      line-height: 1.5;
+    }
+
+    /* Emotional coda before reassurance */
+    .moments-coda {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-style: italic;
+      color: var(--mineral);
+      text-align: center;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 400ms var(--ease-out-cubic), transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .moments-coda {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 1150ms;
+    }
+
+    /* Tech reassurance on moments screen */
+    .screen--moments .tech-reassurance {
+      margin-top: 4px;
+      margin-bottom: 0;
+    }
+
+    /* Value screen headline - the ONLY black element */
+    /* EXACT SPEC - NO INTERPRETATION */
+    .screen--dignity .headline {
+      color: #111111;
+      font-size: 28px;
+      margin-bottom: 0; /* Subhead has margin-top: 16px */
+    }
+
+    /* Pricing screen - centered layout */
+    .screen--pricing {
+      justify-content: center;
+      padding-top: 60px;
+    }
+
+    /* Pricing screen staggered animations */
+    .screen--pricing .emotional-bridge {
+      transition-delay: 600ms;
+    }
+
+    .screen--pricing .pricing-card {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+      transition: 
+        opacity 450ms var(--ease-out-cubic),
+        transform 450ms var(--ease-out-cubic);
+    }
+
+    .screen--pricing.visible .pricing-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition-delay: 900ms;
+    }
+
+    .screen--pricing .btn-group {
+      transition-delay: 1300ms;
+    }
+
+    .screen--pricing .cancel-reassurance {
+      transition-delay: 1500ms;
+    }
+
+    /* Scene 4: Warm Luxury returns */
+    .screen--close {
+      background: var(--cream);
+    }
+
+    /* Bridge screen */
+    .screen--bridge {
+      min-height: 60%;
+      height: 60%;
+      background: linear-gradient(
+        180deg,
+        var(--cream) 0%,
+        var(--oat) 100%
+      );
+    }
+
+    /* ============================================
+       CONTENT WRAPPER
+       ============================================ */
+
+    .screen__content {
+      width: 100%;
+      max-width: 342px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ============================================
+       TYPOGRAPHY (Updated for readability)
+       ============================================ */
+
+    /* Headline Serif - Warm Luxury */
+    /* Now uses line-by-line reveal system */
+    .headline {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--charcoal);
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+
+    /* Headline line-by-line animation */
+    .headline-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .headline-line {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered timing - total reveal under 1.2s */
+    .screen.visible .headline-line:nth-child(1) { transition-delay: 0ms; }
+    .screen.visible .headline-line:nth-child(2) { transition-delay: 250ms; }
+    .screen.visible .headline-line:nth-child(3) { transition-delay: 500ms; }
+
+    /* Subhead - Warm Luxury (italic serif) */
+    /* Appears 450ms after headline completes */
+    .subhead {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.55;
+      color: var(--graphite);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic),
+        transform 400ms var(--ease-out-cubic);
+    }
+
+    /* 3 lines = 500ms + 450ms buffer = 950ms delay */
+    .screen.visible .subhead {
+      opacity: 0.9;
+      transform: translateY(0);
+      transition-delay: 950ms;
+    }
+
+    /* For screens with 2-line headlines, use faster subhead */
+    .screen.visible .subhead--fast {
+      transition-delay: 700ms;
+    }
+
+    /* Adjust body chunk timing for 2-line headline screens */
+    .screen.visible .subhead--fast ~ .body-copy .body-chunk:nth-child(1) { 
+      transition-delay: 1100ms; 
+    }
+    .screen.visible .subhead--fast ~ .body-copy .body-chunk:nth-child(2) { 
+      transition-delay: 1450ms; 
+    }
+    .screen.visible .subhead--fast ~ .body-copy .body-chunk:nth-child(3) { 
+      transition-delay: 1800ms; 
+    }
+
+    /* Subhead - Modern Dignity (sans) */
+    /* EXACT SPEC - NO INTERPRETATION */
+    .subhead--dignity {
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #7A7A7A;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+
+    .screen.visible .subhead--dignity {
+      opacity: 1;
+    }
+
+    /* Body Copy - Improved readability */
+    .body-copy {
+      font-family: var(--font-sans);
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.75;
+      color: #555555; /* Darker than graphite for better readability */
+      max-width: 70ch;
+      margin-bottom: 32px;
+    }
+
+    /* Body copy sentence chunks */
+    .body-chunk {
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+      margin-bottom: 0.5em;
+    }
+
+    .body-chunk:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Staggered body chunks - starts after subhead (950ms + 400ms) */
+    .screen.visible .body-chunk:nth-child(1) { 
+      opacity: 0.95; 
+      transform: translateY(0); 
+      transition-delay: 1350ms; 
+    }
+    .screen.visible .body-chunk:nth-child(2) { 
+      opacity: 0.95; 
+      transform: translateY(0); 
+      transition-delay: 1700ms; 
+    }
+    .screen.visible .body-chunk:nth-child(3) { 
+      opacity: 0.95; 
+      transform: translateY(0); 
+      transition-delay: 2050ms; 
+    }
+
+    /* Key phrase highlighting - subtle emphasis */
+    .emphasis {
+      color: var(--charcoal); /* Darker tint, not heavier weight */
+    }
+
+    /* "Already Done" reframe - top of Scene 3 */
+    /* EXACT SPEC - NO INTERPRETATION */
+    .already-done {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: #5A5A5A;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic),
+        transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .already-done {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Value anchor - "One subscription. Unlimited moments." */
+    .value-anchor {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic) 700ms,
+        transform 400ms var(--ease-out-cubic) 700ms;
+    }
+
+    .screen.visible .value-anchor {
+      opacity: 0.9;
+      transform: translateY(0);
+    }
+
+    /* Pricing comparison - greeting card line */
+    /* Pricing hook - the killer line */
+    .pricing-hook {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--charcoal);
+      text-align: center;
+      max-width: 280px;
+      margin: 32px auto 28px auto;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 450ms var(--ease-out-cubic),
+        transform 450ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .pricing-hook {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 800ms;
+    }
+
+    /* Greeting card comparison - removed, now pricing-hook */
+    .pricing-comparison {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-style: italic;
+      color: #555555;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Pricing math - 40 cents per moment */
+    .pricing-math {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--mineral);
+      line-height: 1.5;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--divider);
+    }
+
+    /* Cancel reassurance - under CTA */
+    .cancel-reassurance {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: #555555;
+      text-align: center;
+      margin: 8px 0;
+      opacity: 0;
+      transition: opacity 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .cancel-reassurance {
+      opacity: 1;
+      transition-delay: 1400ms;
+    }
+
+    .screen--dignity.visible .cancel-reassurance {
+      transition-delay: 1000ms;
+    }
+
+    /* Tech anxiety reassurance */
+    /* EXACT SPEC - NO INTERPRETATION */
+    .tech-reassurance {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 400;
+      color: #A8A8A8;
+      line-height: 1.5;
+      text-align: center;
+      margin-top: 24px;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic),
+        transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .tech-reassurance {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 700ms;
+    }
+
+    /* 4-step summary */
+    .steps-summary {
+      width: 100%;
+      margin: 20px 0;
+      padding: 20px;
+      background: var(--oat);
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic),
+        transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .steps-summary {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 600ms;
+    }
+
+    .steps-title {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mineral);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .steps-list {
+      list-style: none;
+      counter-reset: steps;
+      margin: 0;
+      padding: 0;
+    }
+
+    .steps-list li {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: #555555;
+      line-height: 1.5;
+      padding: 6px 0 6px 28px;
+      position: relative;
+      counter-increment: steps;
+    }
+
+    .steps-list li::before {
+      content: counter(steps);
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 20px;
+      height: 20px;
+      background: var(--mineral);
+      color: var(--cream);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Identity line before final CTA */
+    .identity-line {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-style: italic;
+      color: var(--charcoal);
+      text-align: center;
+      margin: 8px 0 24px 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 500ms var(--ease-out-cubic),
+        transform 500ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .identity-line {
+      opacity: 0.95;
+      transform: translateY(0);
+      transition-delay: 2200ms;
+    }
+
+    /* Emotional bridge - pricing screen */
+    .emotional-bridge {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-style: italic;
+      color: #555555;
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 400ms var(--ease-out-cubic),
+        transform 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .emotional-bridge {
+      opacity: 0.9;
+      transform: translateY(0);
+      transition-delay: 850ms;
+    }
+
+    /* Larger CTA for better touch targets */
+    .btn-primary--large {
+      padding: 20px 36px;
+      font-size: 17px;
+    }
+
+    /* Pulsing CTA animation */
+    .btn-primary--pulse {
+      animation: ctaPulse 2.5s ease-in-out infinite;
+      animation-delay: 1.5s;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(28, 26, 24, 0.15);
+      }
+      50% { 
+        transform: scale(1.03);
+        box-shadow: 0 6px 28px rgba(28, 26, 24, 0.22);
+      }
+    }
+
+    /* Pause animation on hover */
+    .btn-primary--pulse:hover {
+      animation-play-state: paused;
+      transform: scale(1.02);
+    }
+
+    /* Extra cancel reassurance line */
+    .cancel-extra {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--ash);
+    }
+
+    /* For dignity scenes - faster timing since no stone animation */
+    .screen--dignity .body-chunk:nth-child(1) { transition-delay: 800ms; }
+    .screen--dignity .body-chunk:nth-child(2) { transition-delay: 1150ms; }
+    .screen--dignity .body-chunk:nth-child(3) { transition-delay: 1500ms; }
+
+    /* ============================================
+       BREATH STONE CANVAS CONTAINER
+       ============================================ */
+
+    .breath-stone-wrapper {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      transition: 
+        opacity 600ms var(--ease-out-cubic),
+        transform 600ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .breath-stone-wrapper {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Stone fade out for Scene 3 */
+    .breath-stone-wrapper.hidden {
+      opacity: 0 !important;
+      transform: scale(0.9) !important;
+      transition: 
+        opacity 550ms linear,
+        transform 550ms var(--ease-out-cubic);
+    }
+
+    #breathStoneCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ============================================
+       SPARKLE DUST (Scene 2 - Imagination)
+       ============================================ */
+
+    .sparkle-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--gold-accent);
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    .screen.visible .sparkle {
+      animation: sparkleFloat 8s linear infinite;
+    }
+
+    .sparkle:nth-child(1) { left: 20%; bottom: 30%; animation-delay: 0s; }
+    .sparkle:nth-child(2) { left: 75%; bottom: 25%; animation-delay: 2s; }
+    .sparkle:nth-child(3) { left: 45%; bottom: 20%; animation-delay: 4s; }
+    .sparkle:nth-child(4) { left: 60%; bottom: 35%; animation-delay: 6s; }
+
+    @keyframes sparkleFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+      }
+      10% {
+        opacity: 0.15;
+      }
+      90% {
+        opacity: 0.15;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(1);
+      }
+    }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-top: 32px;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+    }
+
+    /* Button appears after body copy - timing varies by screen content */
+    .screen.visible .btn-group {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 2200ms; /* After 3 body chunks */
+    }
+
+    /* Faster button reveal for screens with less body content */
+    .screen.visible .btn-group--fast {
+      transition-delay: 1600ms;
+    }
+
+    /* Dignity screens have faster overall timing */
+    .screen--dignity.visible .btn-group {
+      transition-delay: 1200ms;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 18px 32px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--cream-warm);
+      background: var(--mineral);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 
+        background 200ms var(--ease-out-cubic),
+        transform 200ms var(--ease-out-cubic),
+        box-shadow 200ms var(--ease-out-cubic);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary:hover {
+      background: var(--mineral-dark);
+      transform: scale(1.02);
+      box-shadow: var(--shadow-warm);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.99);
+    }
+
+    /* Final CTA pulse animation */
+    .btn-primary--final {
+      animation: ctaPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+    }
+
+    .btn-primary--final:hover {
+      animation: none;
+      transform: scale(1.02);
+    }
+
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      padding: 16px 32px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--mineral);
+      background: transparent;
+      border: 1.5px solid var(--divider);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 
+        background 200ms var(--ease-out-cubic),
+        border-color 200ms var(--ease-out-cubic);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-secondary:hover {
+      background: var(--oat);
+      border-color: var(--sand);
+    }
+
+    /* Text link with underline animation */
+    .btn-text {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--mineral);
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      padding: 8px 0;
+      margin-top: 8px;
+    }
+
+    .btn-text::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--gold-accent);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 300ms var(--ease-out-cubic);
+    }
+
+    .btn-text:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .btn-continue {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--mineral);
+      background: var(--oat);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 
+        background 200ms var(--ease-out-cubic),
+        transform 200ms var(--ease-out-cubic);
+    }
+
+    .btn-continue:hover {
+      background: var(--sand);
+      transform: translateY(-2px);
+    }
+
+    .btn-continue svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 200ms var(--ease-out-cubic);
+    }
+
+    .btn-continue:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ============================================
+       SCROLL AFFORDANCE - Simple Bouncing Arrow
+       ============================================ */
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 400ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .scroll-hint {
+      animation: fadeInHint 400ms var(--ease-out-cubic) 1.8s forwards;
+    }
+
+    .screen.scrolled .scroll-hint {
+      opacity: 0 !important;
+      animation: none;
+    }
+
+    @keyframes fadeInHint {
+      to { opacity: 0.6; }
+    }
+
+    .scroll-hint__arrow {
+      width: 36px;
+      height: 36px;
+      color: var(--mineral);
+      animation: bounceArrow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounceArrow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* Bridge screen - faster appearance */
+    .screen--bridge.visible .scroll-hint {
+      animation: fadeInHint 400ms var(--ease-out-cubic) 0.8s forwards;
+    }
+
+    /* ============================================
+       PRICING CARD (Scene 3 - Modern Dignity)
+       ============================================ */
+
+    .pricing-card {
+      width: 100%;
+      background: linear-gradient(
+        135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(252, 249, 244, 0.95) 100%
+      );
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(232, 220, 200, 0.3);
+      margin-bottom: 32px;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: 
+        opacity 450ms var(--ease-out-cubic) 100ms,
+        transform 450ms var(--ease-out-cubic) 100ms;
+    }
+
+    /* Subtle warm glow behind card */
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(232, 220, 200, 0.15) 0%,
+        transparent 70%
+      );
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 600ms var(--ease-out-cubic) 400ms;
+    }
+
+    .screen.visible .pricing-card {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .screen.visible .pricing-card::before {
+      opacity: 1;
+    }
+
+    .pricing-amount {
+      font-family: var(--font-sans);
+      font-size: 48px;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .pricing-period {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--mineral);
+      margin-bottom: 32px;
+      letter-spacing: 0.01em;
+    }
+
+    .pricing-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--divider);
+      margin-bottom: 20px;
+      opacity: 0;
+      transition: opacity 350ms var(--ease-out-cubic) 200ms;
+    }
+
+    .screen.visible .pricing-divider {
+      opacity: 1;
+    }
+
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+    }
+
+    .pricing-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: 
+        opacity 200ms var(--ease-out-cubic),
+        transform 200ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .pricing-feature:nth-child(1) { transition-delay: 250ms; opacity: 1; transform: translateX(0); }
+    .screen.visible .pricing-feature:nth-child(2) { transition-delay: 350ms; opacity: 1; transform: translateX(0); }
+    .screen.visible .pricing-feature:nth-child(3) { transition-delay: 450ms; opacity: 1; transform: translateX(0); }
+    .screen.visible .pricing-feature:nth-child(4) { transition-delay: 550ms; opacity: 1; transform: translateX(0); }
+
+    .pricing-feature__check {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--mineral);
+      margin-top: 1px;
+    }
+
+    .pricing-note {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--ash);
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--divider);
+    }
+
+    /* ============================================
+       VALUE LIST (Scene 2 - Warm Luxury)
+       ============================================ */
+
+    .value-list {
+      list-style: none;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    /* List items: EXACT SPEC - NO INTERPRETATION */
+    .value-item {
+      font-family: var(--font-sans);
+      font-size: 17px;
+      font-weight: 400;
+      color: #5A5A5A;
+      line-height: 1.7;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(227, 227, 227, 0.8); /* #E3E3E3 at 0.8 opacity */
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .value-item:nth-child(1) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
+    .screen.visible .value-item:nth-child(2) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
+    .screen.visible .value-item:nth-child(3) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
+    .screen.visible .value-item:nth-child(4) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
+    .screen.visible .value-item:nth-child(5) { transition-delay: 600ms; opacity: 1; transform: translateY(0); }
+
+    .value-item:last-child {
+      border-bottom: none;
+    }
+
+    /* ============================================
+       TESTIMONIALS (Scene 4 - with tilt)
+       ============================================ */
+
+    .testimonials {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .testimonial-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: var(--shadow-warm);
+      text-align: left;
+      opacity: 0;
+      transform: translateY(20px) rotate(0deg);
+      transition: 
+        opacity 350ms var(--ease-out-cubic),
+        transform 350ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .testimonial-card {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg);
+    }
+
+    .screen.visible .testimonial-card:nth-child(1) { 
+      transition-delay: 150ms;
+    }
+    .screen.visible .testimonial-card:nth-child(2) { 
+      transition-delay: 300ms;
+    }
+    .screen.visible .testimonial-card:nth-child(3) { 
+      transition-delay: 450ms;
+    }
+
+    /* Parallax tilt on scroll - handled via JS */
+    .testimonial-card.tilt-left {
+      transform: rotate(-0.8deg);
+    }
+    .testimonial-card.tilt-right {
+      transform: rotate(0.8deg);
+    }
+
+    .testimonial-quote {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-style: italic;
+      color: var(--charcoal);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-waveform {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 18px;
+    }
+
+    .waveform-bar {
+      width: 2.5px;
+      background: var(--gold-accent);
+      border-radius: 2px;
+      opacity: 0.15;
+      animation: waveformPulse 4s ease-in-out infinite;
+    }
+
+    .waveform-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+    .waveform-bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+    .waveform-bar:nth-child(3) { height: 8px; animation-delay: 0.3s; }
+    .waveform-bar:nth-child(4) { height: 14px; animation-delay: 0.45s; }
+    .waveform-bar:nth-child(5) { height: 10px; animation-delay: 0.6s; }
+    .waveform-bar:nth-child(6) { height: 6px; animation-delay: 0.75s; }
+
+    @keyframes waveformPulse {
+      0%, 100% { 
+        transform: scaleY(1); 
+        opacity: 0.15;
+      }
+      50% { 
+        transform: scaleY(1.4); 
+        opacity: 0.25;
+      }
+    }
+
+    .testimonial-name {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--charcoal);
+    }
+
+    /* ============================================
+       BRIDGE SCREEN
+       ============================================ */
+
+    .bridge-text {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--charcoal);
+      opacity: 0;
+      transition: opacity 700ms var(--ease-out-cubic);
+    }
+
+    .screen.visible .bridge-text {
+      opacity: 0.75;
+    }
+
+    /* ============================================
+       CONFIRMATION OVERLAY
+       ============================================ */
+
+    .confirmation-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: 
+        opacity 550ms var(--ease-out-cubic),
+        visibility 550ms;
+    }
+
+    .confirmation-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .confirmation-overlay .headline,
+    .confirmation-overlay .subhead,
+    .confirmation-overlay .body-copy,
+    .confirmation-overlay .btn-group {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .confirmation-overlay .breath-stone-wrapper {
+      opacity: 1;
+      transform: scale(1);
+      margin-bottom: 40px;
+    }
+
+    /* ============================================
+       PAPER TEXTURE OVERLAY
+       ============================================ */
+
+    .texture-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.08;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* ============================================
+       AMBIENT BACKGROUND MOTION
+       ============================================ */
+
+    .ambient-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(
+        ellipse at 30% 20%,
+        var(--gold-shimmer) 0%,
+        transparent 50%
+      );
+      animation: ambientDrift 20s linear infinite;
+    }
+
+    @keyframes ambientDrift {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(0.3%, 0.2%); }
+      50% { transform: translate(0, 0.3%); }
+      75% { transform: translate(-0.2%, 0.1%); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* Only show ambient on warm screens */
+    .screen--dignity .ambient-bg {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="prototype-wrapper">
+    <div class="phone-frame">
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-indicators">
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Scroll Container -->
+      <div class="scroll-container" id="scrollContainer">
+
+        <!-- ==========================================
+             SCENE 1: RECOGNITION
+             "That's my voice. It's real."
+             ========================================== -->
+
+        <!-- Screen 1.1: Hero Stone + Headline -->
+        <section class="screen screen--warm" data-scene="recognition" data-stone-state="recognition">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <div class="breath-stone-wrapper" id="stoneWrapper">
+              <canvas id="breathStoneCanvas" width="320" height="320"></canvas>
+            </div>
+            <h1 class="headline">
+              <span class="headline-line">Your voice.</span>
+              <span class="headline-line">Clear, warm,</span>
+              <span class="headline-line">unmistakably yours.</span>
+            </h1>
+            <p class="subhead">You just heard something rare. A voice that sounds like you because it comes from you.</p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 1.2: Playback Remembrance -->
+        <section class="screen screen--warm" data-scene="recognition" data-stone-state="recognition-deep">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">Take a breath.</span>
+              <span class="headline-line">Let it settle.</span>
+            </h1>
+            <p class="body-copy">
+              <span class="body-chunk">What you created is <span class="emphasis">real</span>.</span>
+              <span class="body-chunk">It carries the tone, the warmth, <span class="emphasis">the presence</span> that the people in your life know and love.</span>
+            </p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 2: IMAGINATION
+             "Someone I love needs this."
+             ========================================== -->
+
+        <!-- Screen 2.1: Future Moment Visualization -->
+        <section class="screen screen--imagination" data-scene="imagination" data-stone-state="imagination">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="sparkle-container">
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+          </div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">Imagine who might</span>
+              <span class="headline-line">need to hear this.</span>
+            </h1>
+            <p class="subhead subhead--fast">A birthday. A moment of encouragement. A holiday. A milestone. A simple hello.</p>
+            <p class="body-copy">
+              <span class="body-chunk">Your voice carries comfort, guidance, laughter, and <span class="emphasis">connection</span>.</span>
+              <span class="body-chunk">Picture someone you love. Picture the moment they will need to hear from you.</span>
+            </p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 2.2: Relational Shift -->
+        <section class="screen screen--imagination" data-scene="imagination" data-stone-state="imagination-active">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="sparkle-container">
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+          </div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">Your voice can do</span>
+              <span class="headline-line">something meaningful.</span>
+            </h1>
+            <p class="subhead subhead--fast">Not someday. Today. Right now.</p>
+            <p class="body-copy">
+              <span class="body-chunk">You preserved your voice so you can <span class="emphasis">show up</span> for the people who matter.</span>
+              <span class="body-chunk">A message for your daughter. A blessing for your grandchild. A moment of hope for someone who needs it.</span>
+            </p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 2.3: Bridge -->
+        <section class="screen screen--bridge" data-scene="bridge" data-stone-state="bridge">
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <p class="bridge-text">Your voice. Always there.</p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 2.4: First Message Offer -->
+        <section class="screen screen--warm" data-scene="imagination" data-stone-state="first-message">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">Create your first message</span>
+              <span class="headline-line">in your preserved voice.</span>
+            </h1>
+            <p class="subhead subhead--fast">It takes two minutes. Choose one person. Choose one moment.</p>
+            <p class="body-copy">
+              <span class="body-chunk">This is your <span class="emphasis">free message</span>.</span>
+              <span class="body-chunk">A chance to feel the impact your voice can have right now.</span>
+            </p>
+            <div class="btn-group">
+              <button class="btn-primary">Create my first message</button>
+              <button class="btn-secondary" data-scroll-next>Continue without creating</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 3: PRICING (Modern Dignity)
+             "I understand the value. This feels clear."
+             ========================================== -->
+
+        <!-- Screen 3.1: Value Build - Moments That Matter -->
+        <section class="screen screen--moments" data-scene="pricing" data-stone-state="hidden">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay texture-overlay--moments"></div>
+          <div class="screen__content">
+            <h1 class="headline headline--moments">
+              <span class="headline-line">Your voice stays ready</span>
+              <span class="headline-line">for the moments that matter.</span>
+            </h1>
+            
+            <div class="moment-cards">
+              <div class="moment-card">
+                <svg class="moment-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v6l4 2"/>
+                </svg>
+                <div class="moment-card__content">
+                  <span class="moment-card__title">Birthday</span>
+                  <span class="moment-card__line">A voice they'll replay every year</span>
+                </div>
+              </div>
+              <div class="moment-card">
+                <svg class="moment-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <div class="moment-card__content">
+                  <span class="moment-card__title">Encouragement</span>
+                  <span class="moment-card__line">A few words that lift a heavy day</span>
+                </div>
+              </div>
+              <div class="moment-card">
+                <svg class="moment-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <div class="moment-card__content">
+                  <span class="moment-card__title">Holiday</span>
+                  <span class="moment-card__line">Warmth that's better than any card</span>
+                </div>
+              </div>
+              <div class="moment-card">
+                <svg class="moment-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div class="moment-card__content">
+                  <span class="moment-card__title">Wisdom</span>
+                  <span class="moment-card__line">Your voice when they need guidance</span>
+                </div>
+              </div>
+              <div class="moment-card">
+                <svg class="moment-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <div class="moment-card__content">
+                  <span class="moment-card__title">Check-in</span>
+                  <span class="moment-card__line">A simple "thinking of you"</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="tech-reassurance">If you can talk, you can use ESSENCE.</p>
+          </div>
+          <div class="scroll-hint">
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 3.2: Pricing Card -->
+        <section class="screen screen--dignity screen--pricing" data-scene="pricing" data-stone-state="hidden">
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">The simplest way to</span>
+              <span class="headline-line">keep your voice ready.</span>
+            </h1>
+            
+            <p class="pricing-hook">Less than a greeting card — but your voice, not someone else's words.</p>
+            
+            <div class="pricing-card">
+              <div class="pricing-amount">$4.99</div>
+              <div class="pricing-period">per month</div>
+              
+              <ul class="pricing-features">
+                <li class="pricing-feature">
+                  <svg class="pricing-feature__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Unlimited messages
+                </li>
+                <li class="pricing-feature">
+                  <svg class="pricing-feature__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Your voice stays ready
+                </li>
+                <li class="pricing-feature">
+                  <svg class="pricing-feature__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Cancel anytime
+                </li>
+              </ul>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn-primary btn-primary--large btn-primary--pulse" id="activateBtn">Activate Protection</button>
+              <button class="btn-text" data-scroll-next>Maybe later</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 4: CLOSE
+             "I'm ready."
+             ========================================== -->
+
+        <!-- Screen 4.1: Social Proof -->
+        <section class="screen screen--close" data-scene="close" data-stone-state="close">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <h1 class="headline">
+              <span class="headline-line">Trusted by people who</span>
+              <span class="headline-line">want to stay present.</span>
+            </h1>
+            
+            <div class="testimonials" id="testimonials">
+              <div class="testimonial-card">
+                <p class="testimonial-quote">"I recorded a message for my granddaughter's 16th birthday. She played it 11 times that day."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                  </div>
+                  <span class="testimonial-name">Linda, 62</span>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <p class="testimonial-quote">"Hearing my dad's voice again on a hard day meant everything to me."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                  </div>
+                  <span class="testimonial-name">Michael, 34</span>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <p class="testimonial-quote">"I use ESSENCE for simple moments. A check-in. A laugh. A reminder that I'm here."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                  </div>
+                  <span class="testimonial-name">Robert, 56</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="body-copy" style="margin-bottom: 0;">Real people. Real moments. Real connection.</p>
+          </div>
+          <div class="scroll-hint">
+            
+            <svg class="scroll-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Screen 4.2: Final CTA -->
+        <section class="screen screen--close" data-scene="close" data-stone-state="final">
+          <div class="ambient-bg"></div>
+          <div class="texture-overlay"></div>
+          <div class="screen__content">
+            <div class="breath-stone-wrapper" id="finalStoneWrapper">
+              <canvas id="finalStoneCanvas" width="320" height="320"></canvas>
+            </div>
+            <h1 class="headline">
+              <span class="headline-line">Your voice can be there</span>
+              <span class="headline-line">when it matters.</span>
+            </h1>
+            <p class="subhead subhead--fast">All it takes is one step.</p>
+            <p class="body-copy">
+              <span class="body-chunk">This is how you <span class="emphasis">stay connected</span>.</span>
+              <span class="body-chunk">This is how you show up for the people who love you.</span>
+              <span class="body-chunk">This is how your voice <span class="emphasis">continues to matter</span>.</span>
+            </p>
+            <p class="identity-line">You're the kind of person who leaves something meaningful behind.</p>
+            <div class="btn-group">
+              <button class="btn-primary btn-primary--large btn-primary--final" id="activateBtnFinal">Activate Protection</button>
+              <p class="cancel-reassurance">Cancel anytime. Your free message is yours to keep forever.</p>
+              <button class="btn-secondary">Maybe later</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Confirmation Overlay -->
+      <div class="confirmation-overlay" id="confirmationOverlay">
+        <div class="screen__content">
+          <div class="breath-stone-wrapper">
+            <canvas id="confirmationStoneCanvas" width="280" height="280"></canvas>
+          </div>
+          <h1 class="headline">Your voice is ready.</h1>
+          <p class="subhead">You can now create unlimited meaningful messages.</p>
+          <p class="body-copy">Take your time. Be thoughtful. Create as moments arise. Your voice is now part of the moments that matter.</p>
+          <div class="btn-group">
+            <button class="btn-primary">Create a message now</button>
+            <button class="btn-secondary" id="closeConfirmation">Go to Home</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // BREATH STONE CANVAS RENDERER
+    // Full Perlin noise, ceramic texture, artisan veining
+    // ============================================
+
+    class BreathStone {
+      constructor(canvas, options = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.size = options.size || 160;
+        this.centerX = canvas.width / 2;
+        this.centerY = canvas.height / 2;
+        this.baseRadius = (Math.min(canvas.width, canvas.height) / 2) - 40;
+        
+        // Animation state
+        this.time = 0;
+        this.breathPhase = 0;
+        this.state = options.initialState || 'recognition';
+        this.isHidden = false;
+        
+        // Perlin noise
+        this.perm = this.generatePermutation();
+        
+        // PRE-CALCULATE organic edge shape (static, doesn't animate)
+        this.edgeOffsets = this.generateStaticEdge();
+        
+        // Pre-generate texture particles (static)
+        this.textureParticles = this.generateTextureParticles();
+        
+        // Pre-generate veining (static)
+        this.veining = this.generateVeining();
+        
+        // State configurations (per spec)
+        this.states = {
+          'recognition': {
+            glowIntensity: 0.35,
+            breathDuration: 7000, // 7 seconds
+            breathAmplitude: 0.03,
+            shimmer: 0,
+            haloRadius: 30,
+            stoneScale: 1.0
+          },
+          'recognition-deep': {
+            glowIntensity: 0.40,
+            breathDuration: 7000,
+            breathAmplitude: 0.03,
+            shimmer: 0.05,
+            haloRadius: 32,
+            stoneScale: 1.0
+          },
+          'imagination': {
+            glowIntensity: 0.50, // +15% brighter per spec
+            breathDuration: 9000, // Slows to 9 seconds
+            breathAmplitude: 0.035,
+            shimmer: 0.12,
+            haloRadius: 35,
+            stoneScale: 1.0
+          },
+          'imagination-active': {
+            glowIntensity: 0.55,
+            breathDuration: 9000,
+            breathAmplitude: 0.04,
+            shimmer: 0.18,
+            haloRadius: 38,
+            stoneScale: 1.0
+          },
+          'bridge': {
+            glowIntensity: 0.30,
+            breathDuration: 8000,
+            breathAmplitude: 0.02,
+            shimmer: 0,
+            haloRadius: 25,
+            stoneScale: 0.95
+          },
+          'first-message': {
+            glowIntensity: 0.45,
+            breathDuration: 7000,
+            breathAmplitude: 0.03,
+            shimmer: 0.08,
+            haloRadius: 30,
+            stoneScale: 1.0
+          },
+          'hidden': {
+            glowIntensity: 0,
+            breathDuration: 7000,
+            breathAmplitude: 0,
+            shimmer: 0,
+            haloRadius: 0,
+            stoneScale: 0.8
+          },
+          'close': {
+            glowIntensity: 0.25,
+            breathDuration: 7000,
+            breathAmplitude: 0.025,
+            shimmer: 0,
+            haloRadius: 28,
+            stoneScale: 0.95
+          },
+          'final': {
+            glowIntensity: 0.65, // Brightest - clearly different from recognition
+            breathDuration: 7000,
+            breathAmplitude: 0.045,
+            shimmer: 0.25,
+            haloRadius: 42,
+            stoneScale: 1.05 // Slightly larger
+          },
+          'confirmation': {
+            glowIntensity: 0.70,
+            breathDuration: 6000,
+            breathAmplitude: 0.04,
+            shimmer: 0.30,
+            haloRadius: 45,
+            stoneScale: 1.0
+          }
+        };
+        
+        this.currentConfig = { ...this.states[this.state] };
+        this.targetConfig = { ...this.states[this.state] };
+        
+        this.animate();
+      }
+      
+      // Generate static organic edge (called once at init)
+      generateStaticEdge() {
+        const segments = 72;
+        const offsets = [];
+        for (let i = 0; i <= segments; i++) {
+          const angle = (i / segments) * Math.PI * 2;
+          const noiseVal = this.noise(
+            Math.cos(angle) * 2,
+            Math.sin(angle) * 2
+          );
+          offsets.push(noiseVal * 2.5); // Subtle organic variation
+        }
+        return offsets;
+      }
+      
+      // Generate static texture particles
+      generateTextureParticles() {
+        const particles = [];
+        for (let i = 0; i < 200; i++) {
+          particles.push({
+            x: Math.random(),
+            y: Math.random(),
+            size: Math.random() * 1.2 + 0.4,
+            light: Math.random() > 0.5
+          });
+        }
+        return particles;
+      }
+      
+      // Generate static veining
+      generateVeining() {
+        const veins = [];
+        for (let i = 0; i < 5; i++) {
+          const vein = {
+            startX: (Math.random() - 0.5),
+            startY: (Math.random() - 0.5),
+            points: []
+          };
+          let vx = 0, vy = 0;
+          for (let j = 0; j < 8; j++) {
+            vx += (Math.random() - 0.5) * 0.15;
+            vy += (Math.random() - 0.5) * 0.15;
+            vein.points.push({ x: vx, y: vy });
+          }
+          veins.push(vein);
+        }
+        return veins;
+      }
+      
+      generatePermutation() {
+        const p = [];
+        for (let i = 0; i < 256; i++) p[i] = i;
+        for (let i = 255; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [p[i], p[j]] = [p[j], p[i]];
+        }
+        return [...p, ...p];
+      }
+      
+      fade(t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+      }
+      
+      lerp(a, b, t) {
+        return a + t * (b - a);
+      }
+      
+      grad(hash, x, y) {
+        const h = hash & 3;
+        const u = h < 2 ? x : y;
+        const v = h < 2 ? y : x;
+        return ((h & 1) ? -u : u) + ((h & 2) ? -2 * v : 2 * v);
+      }
+      
+      noise(x, y) {
+        const X = Math.floor(x) & 255;
+        const Y = Math.floor(y) & 255;
+        x -= Math.floor(x);
+        y -= Math.floor(y);
+        const u = this.fade(x);
+        const v = this.fade(y);
+        const A = this.perm[X] + Y;
+        const B = this.perm[X + 1] + Y;
+        return this.lerp(
+          this.lerp(this.grad(this.perm[A], x, y), this.grad(this.perm[B], x - 1, y), u),
+          this.lerp(this.grad(this.perm[A + 1], x, y - 1), this.grad(this.perm[B + 1], x - 1, y - 1), u),
+          v
+        );
+      }
+      
+      setState(newState) {
+        if (this.states[newState]) {
+          this.state = newState;
+          this.targetConfig = { ...this.states[newState] };
+          this.isHidden = newState === 'hidden';
+        }
+      }
+      
+      animate() {
+        // Smooth interpolation of config values
+        const lerpSpeed = 0.03;
+        for (const key in this.targetConfig) {
+          this.currentConfig[key] = this.lerp(
+            this.currentConfig[key],
+            this.targetConfig[key],
+            lerpSpeed
+          );
+        }
+        
+        // Update time and breath phase (smooth sinusoidal)
+        this.time += 16;
+        const breathSpeed = 1 / (this.currentConfig.breathDuration / 1000);
+        this.breathPhase += 0.016 * breathSpeed;
+        
+        this.draw();
+        requestAnimationFrame(() => this.animate());
+      }
+      
+      draw() {
+        const ctx = this.ctx;
+        const { glowIntensity, breathAmplitude, shimmer, haloRadius, breathDuration, stoneScale } = this.currentConfig;
+        
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        if (this.isHidden || glowIntensity < 0.01) return;
+        
+        // Smooth sinusoidal breath (no jitter)
+        const breathCycle = (Math.sin(this.breathPhase * Math.PI * 2) + 1) / 2;
+        const scale = stoneScale * (1 + breathCycle * breathAmplitude);
+        const currentRadius = this.baseRadius * scale;
+        const opacity = 0.9 + breathCycle * 0.1;
+        
+        ctx.globalAlpha = opacity;
+        
+        // Golden halo
+        const haloSize = currentRadius + haloRadius;
+        const haloGradient = ctx.createRadialGradient(
+          this.centerX, this.centerY, currentRadius * 0.6,
+          this.centerX, this.centerY, haloSize
+        );
+        haloGradient.addColorStop(0, `rgba(232, 220, 200, ${glowIntensity})`);
+        haloGradient.addColorStop(0.5, `rgba(232, 220, 200, ${glowIntensity * 0.5})`);
+        haloGradient.addColorStop(1, 'rgba(232, 220, 200, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(this.centerX, this.centerY, haloSize, 0, Math.PI * 2);
+        ctx.fillStyle = haloGradient;
+        ctx.fill();
+        
+        // Stone body with STATIC organic edge (no jitter)
+        ctx.save();
+        ctx.beginPath();
+        
+        const segments = this.edgeOffsets.length - 1;
+        for (let i = 0; i <= segments; i++) {
+          const angle = (i / segments) * Math.PI * 2;
+          const radiusOffset = currentRadius + this.edgeOffsets[i];
+          const x = this.centerX + Math.cos(angle) * radiusOffset;
+          const y = this.centerY + Math.sin(angle) * radiusOffset;
+          
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.clip();
+        
+        // 7-stop mineral gradient
+        const stoneGradient = ctx.createRadialGradient(
+          this.centerX - currentRadius * 0.3,
+          this.centerY - currentRadius * 0.3,
+          0,
+          this.centerX,
+          this.centerY,
+          currentRadius * 1.2
+        );
+        stoneGradient.addColorStop(0, '#F8F0DC');
+        stoneGradient.addColorStop(0.12, '#EFE6D0');
+        stoneGradient.addColorStop(0.28, '#E5D8C0');
+        stoneGradient.addColorStop(0.45, '#D8CAB0');
+        stoneGradient.addColorStop(0.62, '#C4B8A0');
+        stoneGradient.addColorStop(0.78, '#AEA090');
+        stoneGradient.addColorStop(1, '#7D827E');
+        
+        ctx.fillStyle = stoneGradient;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Static ceramic texture particles
+        ctx.globalAlpha = 0.025;
+        for (const p of this.textureParticles) {
+          ctx.fillStyle = p.light ? '#FBF8F4' : '#1C1A18';
+          ctx.beginPath();
+          ctx.arc(
+            p.x * this.canvas.width,
+            p.y * this.canvas.height,
+            p.size,
+            0, Math.PI * 2
+          );
+          ctx.fill();
+        }
+        ctx.globalAlpha = opacity;
+        
+        // Static artisan veining
+        ctx.globalAlpha = 0.035;
+        ctx.strokeStyle = '#8A7A6A';
+        ctx.lineWidth = 0.5;
+        for (const vein of this.veining) {
+          ctx.beginPath();
+          const startX = this.centerX + vein.startX * currentRadius;
+          const startY = this.centerY + vein.startY * currentRadius;
+          ctx.moveTo(startX, startY);
+          for (const pt of vein.points) {
+            ctx.lineTo(
+              startX + pt.x * currentRadius,
+              startY + pt.y * currentRadius
+            );
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = opacity;
+        
+        // Inner shadow
+        const innerShadow = ctx.createRadialGradient(
+          this.centerX + currentRadius * 0.2,
+          this.centerY + currentRadius * 0.2,
+          currentRadius * 0.3,
+          this.centerX,
+          this.centerY,
+          currentRadius
+        );
+        innerShadow.addColorStop(0, 'rgba(28, 26, 24, 0)');
+        innerShadow.addColorStop(0.7, 'rgba(28, 26, 24, 0.06)');
+        innerShadow.addColorStop(1, 'rgba(28, 26, 24, 0.15)');
+        ctx.fillStyle = innerShadow;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Highlight gloss
+        const highlight = ctx.createRadialGradient(
+          this.centerX - currentRadius * 0.35,
+          this.centerY - currentRadius * 0.35,
+          0,
+          this.centerX - currentRadius * 0.35,
+          this.centerY - currentRadius * 0.35,
+          currentRadius * 0.5
+        );
+        highlight.addColorStop(0, 'rgba(251, 248, 244, 0.4)');
+        highlight.addColorStop(0.5, 'rgba(251, 248, 244, 0.12)');
+        highlight.addColorStop(1, 'rgba(251, 248, 244, 0)');
+        ctx.fillStyle = highlight;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Shimmer (slow, smooth oscillation)
+        if (shimmer > 0) {
+          const shimmerCycle = (Math.sin(this.time * 0.001) + 1) / 2;
+          ctx.globalAlpha = shimmer * shimmerCycle * 0.3;
+          
+          const shimmerGrad = ctx.createRadialGradient(
+            this.centerX - currentRadius * 0.15,
+            this.centerY - currentRadius * 0.15,
+            0,
+            this.centerX,
+            this.centerY,
+            currentRadius
+          );
+          shimmerGrad.addColorStop(0, '#DCC9A3');
+          shimmerGrad.addColorStop(0.4, 'rgba(220, 201, 163, 0.2)');
+          shimmerGrad.addColorStop(1, 'rgba(220, 201, 163, 0)');
+          ctx.fillStyle = shimmerGrad;
+          ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // ============================================
+    // INITIALIZE STONES
+    // ============================================
+
+    const scrollContainer = document.getElementById('scrollContainer');
+    const screens = document.querySelectorAll('.screen');
+    const stoneWrapper = document.getElementById('stoneWrapper');
+    const finalStoneWrapper = document.getElementById('finalStoneWrapper');
+    
+    // Main stone (Screen 1)
+    const mainCanvas = document.getElementById('breathStoneCanvas');
+    const mainStone = new BreathStone(mainCanvas, { initialState: 'recognition' });
+    
+    // Final stone (Screen 4.2)
+    const finalCanvas = document.getElementById('finalStoneCanvas');
+    const finalStone = new BreathStone(finalCanvas, { initialState: 'final' });
+    
+    // Confirmation stone
+    const confirmCanvas = document.getElementById('confirmationStoneCanvas');
+    const confirmStone = new BreathStone(confirmCanvas, { initialState: 'confirmation' });
+
+    // ============================================
+    // INTERSECTION OBSERVER
+    // ============================================
+
+    let currentScreenIndex = 0;
+
+    const screenObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          entry.target.classList.add('visible');
+          
+          const stoneState = entry.target.dataset.stoneState;
+          const scene = entry.target.dataset.scene;
+          
+          // Update main stone state
+          if (stoneState) {
+            mainStone.setState(stoneState);
+            
+            // Show/hide stone wrapper based on scene
+            if (stoneState === 'hidden') {
+              stoneWrapper.classList.add('hidden');
+            } else if (scene === 'recognition') {
+              stoneWrapper.classList.remove('hidden');
+            }
+          }
+          
+          // Track screen index for testimonial tilt
+          currentScreenIndex = Array.from(screens).indexOf(entry.target);
+        }
+      });
+    }, {
+      root: scrollContainer,
+      threshold: 0.5
+    });
+
+    screens.forEach(screen => screenObserver.observe(screen));
+
+    // Initialize first screen
+    setTimeout(() => {
+      // Reset scroll to top
+      scrollContainer.scrollTop = 0;
+      screens[0].classList.add('visible');
+    }, 100);
+
+    // ============================================
+    // SCROLL HINT LOGIC
+    // ============================================
+
+    let scrollTimeout;
+    let hasScrolled = false;
+
+    scrollContainer.addEventListener('scroll', () => {
+      if (!hasScrolled) {
+        hasScrolled = true;
+      }
+      
+      screens.forEach(s => s.classList.add('scrolled'));
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const current = screens[currentScreenIndex];
+        if (current) current.classList.remove('scrolled');
+      }, 3000);
+    });
+
+    // ============================================
+    // TESTIMONIAL TILT ON SCROLL
+    // ============================================
+
+    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    
+    scrollContainer.addEventListener('scroll', () => {
+      const scrollTop = scrollContainer.scrollTop;
+      
+      testimonialCards.forEach((card, i) => {
+        const offset = scrollTop * 0.001;
+        const direction = i % 2 === 0 ? 1 : -1;
+        const rotation = Math.sin(offset + i) * 0.8 * direction;
+        card.style.transform = `rotate(${rotation}deg)`;
+      });
+    });
+
+    // ============================================
+    // CONTINUE BUTTONS
+    // ============================================
+
+    document.querySelectorAll('[data-scroll-next]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const currentScreen = btn.closest('.screen');
+        const nextScreen = currentScreen.nextElementSibling;
+        
+        if (nextScreen && nextScreen.classList.contains('screen')) {
+          nextScreen.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // ============================================
+    // ACTIVATE BUTTONS
+    // ============================================
+
+    const confirmationOverlay = document.getElementById('confirmationOverlay');
+    
+    document.querySelectorAll('#activateBtn, #activateBtnFinal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        confirmationOverlay.classList.add('active');
+      });
+    });
+
+    document.getElementById('closeConfirmation').addEventListener('click', () => {
+      confirmationOverlay.classList.remove('active');
+    });
+
+    // ============================================
+    // TOUCH FEEDBACK
+    // ============================================
+
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('touchstart', function() {
+        this.style.opacity = '0.9';
+      }, { passive: true });
+      
+      btn.addEventListener('touchend', function() {
+        this.style.opacity = '';
+      }, { passive: true });
+    });
+  </script>
+
+</body>
+</html>

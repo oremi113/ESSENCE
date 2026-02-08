@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE - First Breath Stone Moment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       ESSENCE - FIRST BREATH STONE MOMENT v2
+       Warm Mineral / Ceremonial / Boomer-Friendly
+       ============================================ */
+
+    /* Reset */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* MINERAL & WARMTH Core Palette */
+      --cream: #F7F3EC;
+      --cream-warm: #FBF8F4;
+      --stone: #F4F2F0;
+      --oat: #F5F0EA;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      --honey-deep: #E0D4BC;
+      
+      /* Warm Dark Backgrounds (NOT pure black) */
+      --dark-warm-top: #1A1715;
+      --dark-warm-bottom: #26221F;
+      --dark-surface: #2A2520;
+      --dark-elevated: #322D28;
+      
+      /* Stone Colors - Pearl/Mineral Pink/Gold */
+      --pearl: #F5F0EA;
+      --pearl-warm: #EDE7DD;
+      --mineral-pink: #E8D8D0;
+      --mineral-pink-deep: #D4C4BC;
+      --gold-soft: #E8DCC8;
+      --gold-accent: #DCC9A3;
+      --gold-glow: rgba(232, 220, 200, 0.35);
+      --gold-halo: rgba(232, 220, 200, 0.12);
+      
+      /* Text Colors - Warm tones, not bright white */
+      --text-warm: #F5F0EA;
+      --text-warm-secondary: rgba(245, 240, 234, 0.75);
+      --text-warm-muted: rgba(245, 240, 234, 0.55);
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      
+      /* Mineral Accent */
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      
+      /* Typography */
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      
+      /* Shadows */
+      --shadow-warm: 0 8px 32px rgba(28, 26, 24, 0.08);
+      --shadow-inner-soft: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 60px rgba(232, 220, 200, 0.3);
+      
+      /* Easing - Slower, more ceremonial */
+      --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-drift: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-breathe: cubic-bezier(0.45, 0, 0.55, 1);
+      --ease-ceremonial: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #0F0E0D;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================
+       IPHONE PROTOTYPE FRAME
+       ============================================ */
+
+    .prototype-wrapper {
+      width: 390px;
+      height: 844px;
+      background: var(--dark-warm-top);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 12px #1A1715,
+        0 0 0 14px var(--mineral),
+        0 50px 100px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    /* Responsive scaling for smaller screens */
+    @media (max-height: 900px) {
+      .prototype-wrapper {
+        transform: scale(0.85);
+        transform-origin: center center;
+      }
+    }
+
+    @media (max-height: 750px) {
+      .prototype-wrapper {
+        transform: scale(0.72);
+      }
+    }
+
+    .phone-frame {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 54px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-warm);
+      position: relative;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    /* Dynamic Island */
+    .status-bar::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 101;
+    }
+
+    .status-indicators {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    /* Home Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: rgba(245, 240, 234, 0.25);
+      border-radius: 3px;
+      z-index: 1000;
+    }
+
+    /* ============================================
+       SCREEN CONTENT AREA
+       ============================================ */
+
+    .screen-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s var(--ease-ceremonial);
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Soft vignette overlay for all screens */
+    .vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 40%,
+        rgba(0, 0, 0, 0.08) 100%
+      );
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* ============================================
+       WARM BACKGROUND GRADIENT
+       ============================================ */
+
+    .warm-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        var(--dark-warm-top) 0%,
+        var(--dark-warm-bottom) 100%
+      );
+    }
+
+    /* Golden vertical gradient for depth */
+    .golden-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(232, 220, 200, 0.03) 50%,
+        rgba(232, 220, 200, 0.05) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ============================================
+       WARM HALO BEHIND STONE
+       ============================================ */
+
+    .warm-halo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(
+        circle,
+        rgba(232, 220, 200, 0.12) 0%,
+        rgba(232, 220, 200, 0.06) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ============================================
+       TYPOGRAPHY - Boomer Friendly
+       Larger, warmer, more spacing
+       ============================================ */
+
+    .screen-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--text-warm);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .screen-subtitle {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--text-warm-secondary);
+      line-height: 1.65;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+
+    /* Increased spacing between elements */
+    .text-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    /* ============================================
+       SCREEN 1 - FORMING
+       Warm, quiet, gentle particles
+       ============================================ */
+
+    .screen-forming {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 36px;
+    }
+
+    .forming-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .particle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .forming-glow {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(232, 220, 200, 0.18) 0%,
+        rgba(232, 220, 200, 0.08) 50%,
+        transparent 70%
+      );
+      position: relative;
+      z-index: 3;
+      animation: pulseGlow 5s var(--ease-breathe) infinite;
+    }
+
+    .forming-glow::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 220, 200, 0.18);
+      animation: ringPulse 5s var(--ease-breathe) infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { 
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% { 
+        transform: scale(1.06);
+        opacity: 1;
+      }
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { 
+        transform: scale(1);
+        opacity: 0.25;
+      }
+      50% { 
+        transform: scale(1.12);
+        opacity: 0.5;
+      }
+    }
+
+    .forming-text {
+      text-align: center;
+      margin-top: 56px;
+      z-index: 10;
+    }
+
+    /* ============================================
+       SCREEN 2 - CRYSTALLIZATION
+       Simpler, calmer, fewer fragments
+       ============================================ */
+
+    .screen-crystallize {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 36px;
+    }
+
+    .crystal-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .crystal-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    .crystal-text {
+      position: absolute;
+      bottom: 80px;
+      left: 36px;
+      right: 36px;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .crystal-text p {
+      font-size: 16px;
+      color: var(--text-warm-secondary);
+      font-style: italic;
+      opacity: 0;
+      animation: fadeInText 2s var(--ease-ceremonial) 0.8s forwards;
+    }
+
+    @keyframes fadeInText {
+      to { opacity: 1; }
+    }
+
+    /* ============================================
+       SCREEN 3 - PRESERVED
+       Ceremonial reveal with dimmed bg
+       ============================================ */
+
+    .screen-preserved {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 36px;
+    }
+
+    .screen-preserved .warm-bg {
+      background: linear-gradient(
+        180deg,
+        var(--dark-warm-top) 0%,
+        #1E1A17 50%,
+        var(--dark-warm-bottom) 100%
+      );
+      /* Slightly dimmed for ceremony */
+      opacity: 0.95;
+    }
+
+    .preserved-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .stone-canvas {
+      width: 200px;
+      height: 200px;
+      z-index: 4;
+    }
+
+    .preserved-text {
+      margin-top: 48px;
+    }
+
+    /* ============================================
+       SCREEN 4 - DETAIL VIEW
+       Enlarged, spotlight, dignified chips
+       ============================================ */
+
+    .screen-detail {
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 36px 40px;
+    }
+
+    .detail-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+    }
+
+    .detail-canvas {
+      width: 260px;
+      height: 260px;
+      z-index: 4;
+    }
+
+    .detail-spotlight {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(
+        circle,
+        rgba(232, 220, 200, 0.10) 0%,
+        rgba(232, 220, 200, 0.04) 50%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .detail-title {
+      margin-bottom: 28px;
+      z-index: 10;
+    }
+
+    /* Dignified metadata chips - softer, clearer */
+    .metadata-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 36px;
+      z-index: 10;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(245, 240, 234, 0.06);
+      border: 1px solid rgba(245, 240, 234, 0.08);
+      border-radius: 24px;
+      font-size: 13px;
+      color: var(--text-warm-secondary);
+    }
+
+    .chip-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+      stroke-width: 1.5;
+    }
+
+    /* ============================================
+       SCREEN 5 - VALIDATION
+       Gentle rotation, warm gradient
+       ============================================ */
+
+    .screen-validation {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 36px;
+    }
+
+    .screen-validation .warm-bg {
+      background: linear-gradient(
+        180deg,
+        #262220 0%,
+        #2E2924 40%,
+        #34302A 100%
+      );
+    }
+
+    .validation-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .validation-canvas {
+      width: 160px;
+      height: 160px;
+      z-index: 4;
+    }
+
+    .validation-text {
+      margin-top: 56px;
+      max-width: 290px;
+    }
+
+    /* ============================================
+       CTA BUTTONS - Tactile, warm, clear
+       ============================================ */
+
+    .cta-area {
+      padding: 28px 36px 36px;
+      background: transparent;
+      position: relative;
+      z-index: 100;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 18px 24px;
+      background: var(--honey);
+      color: var(--charcoal);
+      border: none;
+      border-radius: 16px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.35s var(--ease-out-cubic);
+      box-shadow: 
+        0 4px 20px rgba(232, 220, 200, 0.20),
+        var(--shadow-inner-soft);
+    }
+
+    .btn-primary:hover {
+      background: var(--honey-deep);
+      transform: translateY(-1px);
+      box-shadow: 
+        0 6px 24px rgba(232, 220, 200, 0.30),
+        var(--shadow-inner-soft);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* ============================================
+       SCREEN NAVIGATION
+       ============================================ */
+
+    .nav-controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .nav-btn {
+      padding: 12px 24px;
+      background: rgba(245, 240, 234, 0.08);
+      color: var(--text-warm-secondary);
+      border: 1px solid rgba(245, 240, 234, 0.12);
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(245, 240, 234, 0.12);
+      color: var(--text-warm);
+    }
+
+    .nav-btn.active {
+      background: var(--honey);
+      color: var(--charcoal);
+      border-color: var(--honey);
+    }
+
+    .screen-indicator {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(245, 240, 234, 0.06);
+      border-radius: 10px;
+    }
+
+    .screen-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(245, 240, 234, 0.25);
+      transition: all 0.35s ease;
+    }
+
+    .screen-dot.active {
+      background: var(--honey);
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- iPhone Prototype Frame -->
+  <div class="prototype-wrapper">
+    <div class="phone-frame">
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-indicators">
+          <span>●●●●○</span>
+          <span>WiFi</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Screen Content -->
+      <div class="screen-content">
+        
+        <!-- SCREEN 1: Forming -->
+        <div class="screen screen-forming active" id="screen1">
+          <div class="warm-bg"></div>
+          <div class="golden-gradient"></div>
+          <div class="vignette"></div>
+          <div class="warm-halo"></div>
+          
+          <div class="forming-container">
+            <canvas class="particle-canvas" id="particleCanvas1"></canvas>
+            <div class="forming-glow"></div>
+            <div class="forming-text text-group">
+              <h2 class="screen-title">Your first Breath Stone<br>is forming</h2>
+              <p class="screen-subtitle">This takes just a moment.<br>What you shared is being honored.</p>
+            </div>
+          </div>
+          <div class="cta-area">
+            <button class="btn-primary" onclick="goToScreen(2)">Continue</button>
+          </div>
+        </div>
+
+        <!-- SCREEN 2: Crystallization -->
+        <div class="screen screen-crystallize" id="screen2">
+          <div class="warm-bg"></div>
+          <div class="golden-gradient"></div>
+          <div class="vignette"></div>
+          <div class="warm-halo"></div>
+          
+          <div class="crystal-container">
+            <canvas class="crystal-canvas" id="crystalCanvas"></canvas>
+            <div class="crystal-text">
+              <p class="screen-subtitle">We're carefully preserving your voice.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCREEN 3: Preserved -->
+        <div class="screen screen-preserved" id="screen3">
+          <div class="warm-bg"></div>
+          <div class="golden-gradient"></div>
+          <div class="vignette"></div>
+          <div class="warm-halo" style="transform: translate(-50%, -50%);"></div>
+          
+          <div class="preserved-container">
+            <canvas class="stone-canvas" id="stoneCanvas1"></canvas>
+            <div class="preserved-text text-group">
+              <h2 class="screen-title">Your voice has been preserved</h2>
+              <p class="screen-subtitle">This is your first Breath Stone.<br>It marks the beginning of your archive.</p>
+            </div>
+          </div>
+          <div class="cta-area">
+            <button class="btn-primary" onclick="goToScreen(4)">See My Stone</button>
+          </div>
+        </div>
+
+        <!-- SCREEN 4: Detail View -->
+        <div class="screen screen-detail" id="screen4">
+          <div class="warm-bg"></div>
+          <div class="golden-gradient"></div>
+          <div class="vignette"></div>
+          <div class="detail-spotlight"></div>
+          
+          <div class="detail-container">
+            <h2 class="screen-title detail-title">Breath Stone Details</h2>
+            <canvas class="detail-canvas" id="detailCanvas"></canvas>
+            <div class="metadata-chips">
+              <div class="chip">
+                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v6l4 2"/>
+                </svg>
+                <span>Recorded Warmup</span>
+              </div>
+              <div class="chip">
+                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span>Emotion Capture</span>
+              </div>
+              <div class="chip">
+                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>Saved Securely</span>
+              </div>
+            </div>
+          </div>
+          <div class="cta-area">
+            <button class="btn-primary" onclick="goToScreen(5)">Continue</button>
+          </div>
+        </div>
+
+        <!-- SCREEN 5: Emotional Validation -->
+        <div class="screen screen-validation" id="screen5">
+          <div class="warm-bg"></div>
+          <div class="golden-gradient"></div>
+          <div class="vignette"></div>
+          <div class="warm-halo" style="width: 250px; height: 250px;"></div>
+          
+          <div class="validation-container">
+            <canvas class="validation-canvas" id="validationCanvas"></canvas>
+            <div class="validation-text text-group">
+              <h2 class="screen-title">What you said matters</h2>
+              <p class="screen-subtitle">You're creating something meaningful<br>for the people you love.</p>
+            </div>
+          </div>
+          <div class="cta-area">
+            <button class="btn-primary">Continue</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Home Indicator -->
+      <div class="home-indicator"></div>
+
+    </div>
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="nav-controls">
+    <button class="nav-btn active" onclick="goToScreen(1)">1</button>
+    <button class="nav-btn" onclick="goToScreen(2)">2</button>
+    <button class="nav-btn" onclick="goToScreen(3)">3</button>
+    <button class="nav-btn" onclick="goToScreen(4)">4</button>
+    <button class="nav-btn" onclick="goToScreen(5)">5</button>
+    <div class="screen-indicator">
+      <div class="screen-dot active" id="dot1"></div>
+      <div class="screen-dot" id="dot2"></div>
+      <div class="screen-dot" id="dot3"></div>
+      <div class="screen-dot" id="dot4"></div>
+      <div class="screen-dot" id="dot5"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // PERLIN NOISE CLASS
+    // ============================================
+    class PerlinNoise {
+      constructor() {
+        this.gradients = {};
+        this.memory = {};
+      }
+
+      rand_vect() {
+        const theta = Math.random() * 2 * Math.PI;
+        return { x: Math.cos(theta), y: Math.sin(theta) };
+      }
+
+      dot_prod_grid(x, y, vx, vy) {
+        let g_vect;
+        const d_vect = { x: x - vx, y: y - vy };
+        const grid_key = `${vx},${vy}`;
+        
+        if (this.gradients[grid_key]) {
+          g_vect = this.gradients[grid_key];
+        } else {
+          g_vect = this.rand_vect();
+          this.gradients[grid_key] = g_vect;
+        }
+        
+        return d_vect.x * g_vect.x + d_vect.y * g_vect.y;
+      }
+
+      smootherstep(x) {
+        return 6 * x ** 5 - 15 * x ** 4 + 10 * x ** 3;
+      }
+
+      interp(x, a, b) {
+        return a + this.smootherstep(x) * (b - a);
+      }
+
+      get(x, y) {
+        const key = `${Math.round(x * 1000)},${Math.round(y * 1000)}`;
+        if (this.memory[key]) return this.memory[key];
+
+        const xf = Math.floor(x);
+        const yf = Math.floor(y);
+        const tl = this.dot_prod_grid(x, y, xf, yf);
+        const tr = this.dot_prod_grid(x, y, xf + 1, yf);
+        const bl = this.dot_prod_grid(x, y, xf, yf + 1);
+        const br = this.dot_prod_grid(x, y, xf + 1, yf + 1);
+        const xt = this.interp(x - xf, tl, tr);
+        const xb = this.interp(x - xf, bl, br);
+        const v = this.interp(y - yf, xt, xb);
+        
+        this.memory[key] = v;
+        return v;
+      }
+    }
+
+    const noise = new PerlinNoise();
+
+    // ============================================
+    // SCREEN NAVIGATION
+    // ============================================
+    let currentScreen = 1;
+    let autoTransitionTimer = null;
+
+    function goToScreen(screenNum) {
+      // Clear any auto transition
+      if (autoTransitionTimer) {
+        clearTimeout(autoTransitionTimer);
+        autoTransitionTimer = null;
+      }
+
+      // Update screens
+      document.querySelectorAll('.screen').forEach((s, i) => {
+        s.classList.toggle('active', i + 1 === screenNum);
+      });
+
+      // Update nav buttons
+      document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === screenNum - 1);
+      });
+
+      // Update dots
+      document.querySelectorAll('.screen-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === screenNum - 1);
+      });
+
+      currentScreen = screenNum;
+
+      // Screen 2 auto-transitions to Screen 3 (with pause for ceremony)
+      if (screenNum === 2) {
+        autoTransitionTimer = setTimeout(() => {
+          goToScreen(3);
+        }, 5500); // Slower, more ceremonial
+      }
+    }
+
+    // ============================================
+    // PARTICLE SYSTEM (Screen 1)
+    // Reduced count, slower drift
+    // ============================================
+    function initParticles() {
+      const canvas = document.getElementById('particleCanvas1');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const container = canvas.parentElement;
+      
+      function resize() {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const particles = [];
+      const particleCount = 26; // Reduced by ~35%
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + Math.random() * 100,
+          size: Math.random() * 2 + 0.5,
+          speed: Math.random() * 0.22 + 0.08, // Slower by ~20%
+          opacity: Math.random() * 0.35 + 0.08,
+          drift: Math.random() * 0.4 - 0.2
+        });
+      }
+
+      function animate(timestamp) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.y -= p.speed;
+          p.x += p.drift + Math.sin(timestamp * 0.0008 + p.x * 0.008) * 0.15;
+
+          if (p.y < -10) {
+            p.y = canvas.height + 10;
+            p.x = Math.random() * canvas.width;
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(232, 220, 200, ${p.opacity})`;
+          ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate(0);
+    }
+
+    // ============================================
+    // CRYSTALLIZATION ANIMATION (Screen 2)
+    // Simpler, calmer, fade sooner
+    // ============================================
+    function initCrystallization() {
+      const canvas = document.getElementById('crystalCanvas');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const container = canvas.parentElement;
+      
+      function resize() {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const fragments = [];
+      const fragmentCount = 16; // Reduced from 24
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 - 40;
+      const targetRadius = 70;
+
+      // Create fragments at random positions
+      for (let i = 0; i < fragmentCount; i++) {
+        const angle = (i / fragmentCount) * Math.PI * 2;
+        const startDistance = 180 + Math.random() * 80;
+        fragments.push({
+          startX: centerX + Math.cos(angle) * startDistance,
+          startY: centerY + Math.sin(angle) * startDistance,
+          targetX: centerX + Math.cos(angle) * (targetRadius + Math.random() * 8),
+          targetY: centerY + Math.sin(angle) * (targetRadius + Math.random() * 8),
+          x: 0,
+          y: 0,
+          size: Math.random() * 5 + 2,
+          progress: 0,
+          delay: Math.random() * 0.25,
+          opacity: 0.25 + Math.random() * 0.35
+        });
+      }
+
+      let startTime = null;
+      const duration = 4000; // Slower, more ceremonial
+      let hasPaused = false;
+      let pauseStart = null;
+      const pauseDuration = 500; // Half second pause
+
+      function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = timestamp - startTime;
+        
+        // Add pause at 85% for ceremony
+        if (elapsed > duration * 0.85 && !hasPaused) {
+          hasPaused = true;
+          pauseStart = timestamp;
+        }
+        
+        if (hasPaused && pauseStart && timestamp - pauseStart < pauseDuration) {
+          elapsed = duration * 0.85;
+        } else if (hasPaused && pauseStart) {
+          elapsed = duration * 0.85 + (timestamp - pauseStart - pauseDuration);
+        }
+        
+        const progress = Math.min(elapsed / duration, 1);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw forming stone core
+        const coreOpacity = Math.min(progress * 1.4, 1);
+        const coreRadius = targetRadius * Math.min(progress * 1.15, 1);
+        
+        // Warm halo glow (Soft Fjord style)
+        const haloGradient = ctx.createRadialGradient(
+          centerX, centerY, 0,
+          centerX, centerY, coreRadius * 3
+        );
+        haloGradient.addColorStop(0, `rgba(232, 220, 200, ${0.12 * coreOpacity})`);
+        haloGradient.addColorStop(0.4, `rgba(232, 220, 200, ${0.06 * coreOpacity})`);
+        haloGradient.addColorStop(1, 'transparent');
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, coreRadius * 3, 0, Math.PI * 2);
+        ctx.fillStyle = haloGradient;
+        ctx.fill();
+
+        // Main stone body (organic shape)
+        if (coreRadius > 10) {
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          
+          // Generate organic silhouette (reduced distortion)
+          const segments = 48;
+          ctx.beginPath();
+          for (let i = 0; i <= segments; i++) {
+            const angle = (i / segments) * Math.PI * 2;
+            const noiseVal = noise.get(
+              Math.cos(angle) * 0.18 + timestamp * 0.00008,
+              Math.sin(angle) * 0.18 + timestamp * 0.00008
+            );
+            const r = coreRadius * (1 + noiseVal * 0.05); // Reduced from 0.08
+            const x = Math.cos(angle) * r;
+            const y = Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          
+          // Stone fill - warm mineral tones
+          const stoneGradient = ctx.createRadialGradient(
+            -coreRadius * 0.3, -coreRadius * 0.3, 0,
+            0, 0, coreRadius * 1.2
+          );
+          stoneGradient.addColorStop(0, `rgba(245, 240, 234, ${coreOpacity})`);
+          stoneGradient.addColorStop(0.5, `rgba(232, 216, 208, ${coreOpacity})`);
+          stoneGradient.addColorStop(1, `rgba(212, 196, 188, ${coreOpacity})`);
+          
+          ctx.fillStyle = stoneGradient;
+          ctx.fill();
+          
+          ctx.restore();
+        }
+
+        // Draw fragments - fade out sooner
+        fragments.forEach(f => {
+          const adjustedProgress = Math.max(0, (progress - f.delay) / (1 - f.delay));
+          const eased = 1 - Math.pow(1 - adjustedProgress, 3);
+          
+          f.x = f.startX + (f.targetX - f.startX) * eased;
+          f.y = f.startY + (f.targetY - f.startY) * eased;
+          
+          // Fade fragments 25% sooner
+          const fadeProgress = Math.min(eased * 1.33, 1);
+          const fragOpacity = f.opacity * (1 - fadeProgress);
+          
+          if (fragOpacity > 0.03) {
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, f.size * (1 - eased * 0.6), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(232, 220, 200, ${fragOpacity})`;
+            ctx.fill();
+          }
+        });
+
+        // Chime-like glow pulse when stone finalizes
+        if (progress > 0.9) {
+          const pulsePhase = (progress - 0.9) / 0.1;
+          const pulseOpacity = Math.sin(pulsePhase * Math.PI) * 0.25;
+          
+          const pulseGradient = ctx.createRadialGradient(
+            centerX, centerY, coreRadius * 0.8,
+            centerX, centerY, coreRadius * 1.8
+          );
+          pulseGradient.addColorStop(0, `rgba(232, 220, 200, ${pulseOpacity})`);
+          pulseGradient.addColorStop(1, 'transparent');
+          
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, coreRadius * 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = pulseGradient;
+          ctx.fill();
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate(0);
+    }
+
+    // ============================================
+    // BREATH STONE RENDERER
+    // Calmer, slower, reduced amplitude
+    // ============================================
+    function createBreathStone(canvasId, config = {}) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+      
+      const centerX = canvas.offsetWidth / 2;
+      const centerY = canvas.offsetHeight / 2;
+      const baseRadius = config.radius || 60;
+      const amplitude = config.amplitude || 0.045; // Reduced default
+      const breathSpeed = config.breathSpeed || 5000; // Slower default
+      const glowIntensity = config.glow || 0.20;
+      const rotate = config.rotate || false;
+      const rotateSpeed = config.rotateSpeed || 0.00003; // Very slow rotation
+
+      function getBreathScale(timestamp) {
+        const cycle = breathSpeed;
+        const phase = (timestamp % cycle) / cycle;
+        
+        let breathCurve;
+        if (phase < 0.35) {
+          breathCurve = phase / 0.35;
+        } else if (phase < 0.42) {
+          breathCurve = 1;
+        } else {
+          breathCurve = 1 - ((phase - 0.42) / 0.58);
+        }
+        
+        breathCurve = breathCurve * breathCurve * (3 - 2 * breathCurve);
+        
+        // Reduced micro variance
+        const microVariance1 = Math.sin(timestamp * 0.00025) * 0.05;
+        const microVariance2 = Math.sin(timestamp * 0.0006) * 0.025;
+        
+        return 1 + (breathCurve * amplitude) + microVariance1 + microVariance2;
+      }
+
+      function generateSilhouette(radius, segments, timestamp) {
+        const points = [];
+        for (let i = 0; i <= segments; i++) {
+          const angle = (i / segments) * Math.PI * 2;
+          const noiseVal = noise.get(
+            Math.cos(angle) * 0.15 + timestamp * 0.00008,
+            Math.sin(angle) * 0.15 + timestamp * 0.00008
+          );
+          const r = radius * (1 + noiseVal * 0.04); // Reduced distortion
+          points.push({
+            x: Math.cos(angle) * r,
+            y: Math.sin(angle) * r
+          });
+        }
+        return points;
+      }
+
+      function draw(timestamp) {
+        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+        
+        const breathScale = getBreathScale(timestamp);
+        const currentRadius = baseRadius * breathScale;
+        
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        
+        // Very slow rotation for validation screen
+        if (rotate) {
+          ctx.rotate(timestamp * rotateSpeed);
+        }
+
+        // Warm halo glow (Soft Fjord style)
+        const haloGradient = ctx.createRadialGradient(
+          0, 0, currentRadius * 0.3,
+          0, 0, currentRadius * 2.8
+        );
+        haloGradient.addColorStop(0, `rgba(232, 220, 200, ${glowIntensity * 0.5})`);
+        haloGradient.addColorStop(0.35, `rgba(232, 220, 200, ${glowIntensity * 0.2})`);
+        haloGradient.addColorStop(1, 'transparent');
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, currentRadius * 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = haloGradient;
+        ctx.fill();
+
+        // Inner glow
+        const innerGlow = ctx.createRadialGradient(
+          0, 0, currentRadius * 0.2,
+          0, 0, currentRadius * 1.4
+        );
+        innerGlow.addColorStop(0, `rgba(232, 220, 200, ${glowIntensity * 0.4})`);
+        innerGlow.addColorStop(0.5, `rgba(232, 220, 200, ${glowIntensity * 0.15})`);
+        innerGlow.addColorStop(1, 'transparent');
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, currentRadius * 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = innerGlow;
+        ctx.fill();
+
+        // Stone body
+        const points = generateSilhouette(currentRadius, 48, timestamp);
+        
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+
+        // Stone gradient - warm mineral tones
+        const stoneGrad = ctx.createRadialGradient(
+          -currentRadius * 0.3, -currentRadius * 0.3, 0,
+          0, 0, currentRadius * 1.2
+        );
+        stoneGrad.addColorStop(0, '#F5F0EA');
+        stoneGrad.addColorStop(0.4, '#E8D8D0');
+        stoneGrad.addColorStop(0.7, '#DCC9A3');
+        stoneGrad.addColorStop(1, '#D4C4BC');
+        
+        ctx.fillStyle = stoneGrad;
+        ctx.fill();
+
+        // Internal veins - subtle
+        ctx.save();
+        ctx.clip();
+        
+        for (let i = 0; i < 3; i++) {
+          const veinAngle = (i / 3) * Math.PI * 2 + timestamp * 0.00003;
+          const veinX = Math.cos(veinAngle) * currentRadius * 0.25;
+          const veinY = Math.sin(veinAngle) * currentRadius * 0.25;
+          
+          const veinGrad = ctx.createRadialGradient(
+            veinX, veinY, 0,
+            veinX, veinY, currentRadius * 0.45
+          );
+          veinGrad.addColorStop(0, 'rgba(212, 196, 188, 0.3)');
+          veinGrad.addColorStop(1, 'transparent');
+          
+          ctx.beginPath();
+          ctx.arc(veinX, veinY, currentRadius * 0.45, 0, Math.PI * 2);
+          ctx.fillStyle = veinGrad;
+          ctx.fill();
+        }
+        
+        ctx.restore();
+
+        // Surface highlight
+        const highlightGrad = ctx.createRadialGradient(
+          -currentRadius * 0.4, -currentRadius * 0.4, 0,
+          -currentRadius * 0.2, -currentRadius * 0.2, currentRadius * 0.55
+        );
+        highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.30)');
+        highlightGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
+        highlightGrad.addColorStop(1, 'transparent');
+        
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = highlightGrad;
+        ctx.fill();
+
+        // Subtle sparkle effect (Screen 4)
+        if (config.sparkle) {
+          const sparklePhase = (timestamp * 0.0005) % (Math.PI * 2);
+          const sparkleX = Math.cos(sparklePhase) * currentRadius * 0.55;
+          const sparkleY = Math.sin(sparklePhase) * currentRadius * 0.35;
+          const sparkleOpacity = 0.4 + Math.sin(timestamp * 0.002) * 0.2;
+          
+          ctx.beginPath();
+          ctx.arc(sparkleX, sparkleY, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${sparkleOpacity})`;
+          ctx.fill();
+        }
+
+        // Single gentle ripple (Screen 3)
+        if (config.ripple) {
+          const ripplePhase = (timestamp % 6000) / 6000; // Slower
+          const rippleRadius = currentRadius * (0.4 + ripplePhase * 0.6);
+          const rippleOpacity = (1 - ripplePhase) * 0.15; // Gentler
+          
+          ctx.beginPath();
+          ctx.arc(0, 0, rippleRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(232, 220, 200, ${rippleOpacity})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+
+        requestAnimationFrame(draw);
+      }
+
+      draw(0);
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize all canvases
+      initParticles();
+      initCrystallization();
+      
+      // Screen 3: Preserved stone - calm, gentle
+      createBreathStone('stoneCanvas1', {
+        radius: 68,
+        amplitude: 0.045,
+        breathSpeed: 5500,
+        glow: 0.25,
+        ripple: true
+      });
+      
+      // Screen 4: Detail view stone - larger, subtle
+      createBreathStone('detailCanvas', {
+        radius: 85,
+        amplitude: 0.04,
+        breathSpeed: 6000,
+        glow: 0.28,
+        sparkle: true
+      });
+      
+      // Screen 5: Validation stone - very slow rotation
+      createBreathStone('validationCanvas', {
+        radius: 55,
+        amplitude: 0.05,
+        breathSpeed: 5000,
+        glow: 0.22,
+        rotate: true,
+        rotateSpeed: 0.000025 // Extremely slow
+      });
+    });
+  </script>
+
+</body>
+</html>

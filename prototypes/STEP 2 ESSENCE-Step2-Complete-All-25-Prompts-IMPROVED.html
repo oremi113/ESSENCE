@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<!--
+  ESSENCE Step 2: Voice Training Journey - COMPLETE & IMPROVED
+  All 25 prompts with full improvements from shortlist
+  Built: November 26, 2025
+  
+  STRUCTURE:
+  - Stage 1 (Prompts 1-5): Everyday Tone | 3-4 min
+  - Stage 2 (Prompts 6-17): Emotional Range | 5-6 min  
+  - Stage 3 (Prompts 18-25): Personal Essence | 3-4 min
+  Total: 25 prompts | 11-14 minutes
+  
+  IMPROVEMENTS APPLIED:
+  - Deeper Breath Stone inner glow gradient
+  - Slower idle rhythm (7000ms)
+  - Gentler luminance rolloff
+  - Smoother state transitions (1200ms)
+  - Softer capture button design
+  - Increased serif line heights
+  - Reduced paragraph width
+  - Cinematic stagger delays
+  - All screen-by-screen enhancements
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESSENCE - Complete Voice Training (All 25 Prompts - Improved)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --cream: #FBF8F4;
+      --oat: #F5F0EA;
+      --sand: #EBE4DC;
+      --honey: #E8DCC8;
+      
+      --charcoal: #1C1A18;
+      --graphite: #6B6B6B;
+      --ash: #ADA9A5;
+      
+      --mineral: #7A8088;
+      --mineral-dark: #656B73;
+      
+      --border: rgba(0, 0, 0, 0.06);
+      
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'SF Mono', Monaco, monospace;
+      
+      --ease-drift: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-breath: cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #1A1715;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .prototype-wrapper {
+      max-width: 420px;
+      width: 100%;
+      background: var(--oat);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow: 0 0 0 12px #1A1715, 0 0 0 14px var(--mineral), 0 40px 80px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .phone-frame {
+      width: 100%;
+      aspect-ratio: 390 / 844;
+      background: var(--cream);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
+      background: var(--cream);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .indicators {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .screen {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.8s var(--ease-drift);
+      background: var(--cream);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .screen.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .screen.active .screen-header,
+    .screen.active .breath-stone-container,
+    .screen.active .screen-footer,
+    .screen.active .recording-container,
+    .screen.active .checklist-container,
+    .screen.active .reflection-content {
+      animation: cinematicFadeIn 0.8s var(--ease-drift) forwards;
+      opacity: 0;
+    }
+
+    .screen.active .screen-header {
+      animation-delay: 150ms;
+    }
+
+    .screen.active .breath-stone-container {
+      animation-delay: 200ms;
+    }
+
+    .screen.active .screen-footer,
+    .screen.active .recording-container,
+    .screen.active .checklist-container,
+    .screen.active .reflection-content {
+      animation-delay: 250ms;
+    }
+
+    @keyframes cinematicFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .screen-header {
+      padding: 24px 32px 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--graphite);
+      margin-bottom: 10px;
+    }
+
+    .screen-title {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 10px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+
+    .screen-subtitle {
+      font-size: 15px;
+      color: var(--graphite);
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .breath-stone-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 200px;
+      padding: 20px;
+    }
+
+    .breath-stone {
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%, 
+        #FCF4E4,
+        #F5ECD8 10%,
+        #EFE6D0 15%,
+        #E5D8C0 30%,
+        #D8CAB0 48%,
+        #C4B8A0 65%,
+        #AEA090 80%,
+        #7D827E 100%
+      );
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        inset -20px -20px 40px rgba(28, 26, 24, 0.15),
+        inset 20px 20px 40px rgba(251, 248, 244, 0.5);
+      position: relative;
+      transition: all 1.2s var(--ease-breath);
+    }
+
+    .breath-stone::before {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle, 
+        rgba(238, 212, 182, var(--glow-opacity)), 
+        rgba(238, 212, 182, calc(var(--glow-opacity) * 0.3)) 50%,
+        transparent 75%
+      );
+      animation: breathe-glow var(--cycle-time) var(--ease-breath) infinite;
+    }
+
+    .breath-stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      animation: breathe-stone var(--cycle-time) var(--ease-breath) infinite;
+    }
+
+    .breath-stone.idle {
+      width: 100px;
+      height: 100px;
+      --glow-opacity: 0.08;
+      --cycle-time: 7000ms;
+      --amplitude: 4%;
+    }
+
+    .breath-stone.ready {
+      width: 110px;
+      height: 110px;
+      --glow-opacity: 0.14;
+      --cycle-time: 5000ms;
+      --amplitude: 6%;
+    }
+
+    .breath-stone.calming {
+      width: 105px;
+      height: 105px;
+      --glow-opacity: 0.10;
+      --cycle-time: 4800ms;
+      --amplitude: 4%;
+    }
+
+    .breath-stone.focus {
+      width: 108px;
+      height: 108px;
+      --glow-opacity: 0.12;
+      --cycle-time: 3200ms;
+      --amplitude: 5%;
+    }
+
+    .breath-stone.guidance {
+      width: 112px;
+      height: 112px;
+      --glow-opacity: 0.16;
+      --cycle-time: 2000ms;
+      --amplitude: 6%;
+    }
+
+    .breath-stone.recording {
+      width: 135px;
+      height: 135px;
+      --glow-opacity: 0.32;
+      --cycle-time: 4500ms;
+      --amplitude: 8%;
+    }
+
+    .breath-stone.working {
+      width: 110px;
+      height: 110px;
+      --glow-opacity: 0.25;
+      --cycle-time: 3500ms;
+      --amplitude: 5%;
+    }
+
+    .breath-stone.celebrate {
+      width: 120px;
+      height: 120px;
+      --glow-opacity: 0.35;
+      --cycle-time: 5000ms;
+      --amplitude: 7%;
+    }
+
+    .breath-stone.playback {
+      width: 130px;
+      height: 130px;
+      --glow-opacity: 0.28;
+      --cycle-time: 4200ms;
+      --amplitude: 7%;
+    }
+
+    @keyframes breathe-glow {
+      0%, 100% { 
+        transform: scale(1); 
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(calc(1 + var(--amplitude))); 
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes breathe-stone {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(calc(1 + (var(--amplitude) * 0.5))); }
+    }
+
+    .breath-stone.shimmer-active::after {
+      animation: shimmer-pulse-enhanced 1240ms ease-out;
+    }
+
+    @keyframes shimmer-pulse-enhanced {
+      0%, 50%, 100% {
+        opacity: 0;
+        transform: scale(0.8);
+        background: radial-gradient(circle, rgba(232, 220, 200, 0.4), transparent 60%);
+      }
+      20%, 70% {
+        opacity: 1;
+        transform: scale(1.3);
+        background: radial-gradient(circle, rgba(232, 220, 200, 0.7), transparent 70%);
+      }
+      35%, 85% {
+        opacity: 0;
+        transform: scale(1.6);
+        background: radial-gradient(circle, rgba(232, 220, 200, 0), transparent 80%);
+      }
+    }
+
+    .breath-stone.celebrate::before {
+      animation: breathe-glow var(--cycle-time) var(--ease-breath) infinite,
+                 light-specks 3s ease-out;
+    }
+
+    @keyframes light-specks {
+      0% { 
+        box-shadow: 0 0 0 0 rgba(232, 220, 200, 0);
+      }
+      50% {
+        box-shadow: 
+          -30px -20px 4px 1px rgba(232, 220, 200, 0.6),
+          20px -30px 4px 1px rgba(232, 220, 200, 0.5),
+          -20px 30px 4px 1px rgba(232, 220, 200, 0.4),
+          30px 20px 4px 1px rgba(232, 220, 200, 0.5),
+          0px -35px 4px 1px rgba(232, 220, 200, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(232, 220, 200, 0);
+      }
+    }
+
+    .breath-stone.bloom {
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 0 60px rgba(232, 220, 200, 0.3),
+        inset -20px -20px 40px rgba(28, 26, 24, 0.15),
+        inset 20px 20px 40px rgba(251, 248, 244, 0.5);
+    }
+
+    .breath-stone.stretch {
+      animation: gentle-stretch 4s ease-in-out infinite;
+    }
+
+    @keyframes gentle-stretch {
+      0%, 100% { transform: scale(1) scaleY(1); }
+      50% { transform: scale(1.03) scaleY(1.05); }
+    }
+
+    .breath-stone.two-step-glow::before {
+      animation: two-step-glow 3s ease-in-out;
+    }
+
+    @keyframes two-step-glow {
+      0% { opacity: 0.14; transform: scale(1); }
+      30% { opacity: 0.35; transform: scale(1.15); }
+      40% { opacity: 0.2; transform: scale(1.05); }
+      70% { opacity: 0.45; transform: scale(1.25); }
+      100% { opacity: 0.14; transform: scale(1); }
+    }
+
+    .btn-primary, .btn-secondary, .btn-link {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-family: var(--font-sans);
+    }
+
+    .btn-primary {
+      background: var(--mineral);
+      color: var(--cream);
+    }
+
+    .btn-primary:hover {
+      background: var(--mineral-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--graphite);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--ash);
+      color: var(--charcoal);
+    }
+
+    .btn-link {
+      background: transparent;
+      color: var(--graphite);
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .btn-link:hover {
+      color: var(--charcoal);
+    }
+
+    .screen-footer {
+      padding: 16px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .recording-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px 32px;
+      position: relative;
+    }
+
+    .prompt-text {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 48px;
+      max-width: 260px;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, rgba(251, 248, 244, 0.6), rgba(245, 240, 234, 0.8));
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .prompt-text::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: reflective-gloss 8s ease-in-out infinite;
+    }
+
+    @keyframes reflective-gloss {
+      0%, 100% { left: -100%; }
+      50% { left: 100%; }
+    }
+
+    .stage-2-prompt .prompt-text {
+      background: linear-gradient(135deg, rgba(235, 228, 220, 0.7), rgba(232, 220, 200, 0.9));
+    }
+
+    .stage-3-prompt .prompt-text {
+      border: 1px solid transparent;
+      background-image: 
+        linear-gradient(135deg, rgba(251, 248, 244, 0.6), rgba(245, 240, 234, 0.8)),
+        linear-gradient(135deg, rgba(122, 128, 136, 0.3), rgba(232, 220, 200, 0.3));
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+    }
+
+    .prompt-guidance {
+      font-size: 13px;
+      color: var(--ash);
+      text-align: center;
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    .recording-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: auto;
+    }
+
+    .rec-button {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--mineral);
+      border: 4px solid var(--cream);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.15),
+        0 0 0 0 rgba(122, 128, 136, 0.2);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s var(--ease-breath);
+    }
+
+    .rec-button:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 6px 24px rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(122, 128, 136, 0.25);
+    }
+
+    .rec-button::before {
+      content: '';
+      position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: var(--cream);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .recording-container.recording .rec-button {
+      background: linear-gradient(135deg, #C84545, #B83939);
+      box-shadow: 
+        0 4px 24px rgba(200, 69, 69, 0.4),
+        0 0 30px rgba(200, 69, 69, 0.3);
+      animation: recording-pulse-soft 2500ms ease-in-out infinite;
+    }
+
+    .recording-container.recording .rec-button::before {
+      border-radius: 6px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .rec-button.finished {
+      background: linear-gradient(135deg, #4A7A5B, #3E6A4D);
+      animation: none;
+    }
+
+    @keyframes recording-pulse-soft {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 
+          0 4px 24px rgba(200, 69, 69, 0.4),
+          0 0 30px rgba(200, 69, 69, 0.3);
+      }
+      50% { 
+        transform: scale(1.04);
+        box-shadow: 
+          0 6px 28px rgba(200, 69, 69, 0.5),
+          0 0 40px rgba(200, 69, 69, 0.4);
+      }
+    }
+
+    .rec-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ash);
+      transition: color 0.3s ease;
+      letter-spacing: 0.02em;
+    }
+
+    .recording-container.recording .rec-label {
+      color: #C84545;
+    }
+
+    .rec-label.saved {
+      color: #4A7A5B;
+    }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 40px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      margin-bottom: 24px;
+    }
+
+    .waveform.active {
+      opacity: 1;
+    }
+
+    .waveform-bar {
+      width: 3px;
+      background: var(--mineral);
+      border-radius: 2px;
+      height: 8px;
+      transform-origin: center;
+    }
+
+    .stage-2-prompt .waveform-bar {
+      animation-duration: 1.5s !important;
+    }
+
+    @keyframes waveform {
+      0%, 100% { height: 8px; }
+      50% { height: 28px; }
+    }
+
+    .timer {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ash);
+      letter-spacing: 0.05em;
+      margin-top: 20px;
+    }
+
+    .stage-map {
+      display: flex;
+      justify-content: space-between;
+      padding: 32px 32px 20px;
+      margin-bottom: 16px;
+    }
+
+    .stage-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      position: relative;
+    }
+
+    .stage-marker:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--sand);
+      z-index: -1;
+    }
+
+    .stage-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--sand);
+      color: var(--graphite);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .stage-marker.completed .stage-number {
+      background: var(--mineral);
+      color: var(--cream);
+    }
+
+    .stage-marker.current .stage-number {
+      background: var(--mineral-dark);
+      color: var(--cream);
+      transform: scale(1.15);
+    }
+
+    .stage-label {
+      font-size: 11px;
+      color: var(--graphite);
+      text-align: center;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+    }
+
+    .stage-marker.current .stage-label {
+      border-bottom-color: var(--mineral);
+    }
+
+    .checklist-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 32px;
+      gap: 20px;
+      background: linear-gradient(135deg, rgba(251, 248, 244, 0.5), rgba(245, 240, 234, 0.7));
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      margin: 0 16px;
+    }
+
+    .checklist-item-2 {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .checklist-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--mineral);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .checklist-icon::after {
+      content: '✓';
+      color: var(--cream);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .checklist-text {
+      font-size: 15px;
+      color: var(--charcoal);
+      line-height: 1.5;
+    }
+
+    .vertical-beam {
+      position: absolute;
+      width: 2px;
+      height: 200px;
+      background: linear-gradient(to bottom, transparent, rgba(232, 220, 200, 0.3), transparent);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .light-sweep {
+      position: absolute;
+      width: 120%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(232, 220, 200, 0.6), transparent);
+      top: 50%;
+      left: -60%;
+      transform-origin: center;
+      animation: rotating-sweep 3s linear infinite;
+    }
+
+    @keyframes rotating-sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .progress-ribbon {
+      position: absolute;
+      right: 8px;
+      top: 20%;
+      width: 3px;
+      height: 60%;
+      background: linear-gradient(to bottom, var(--mineral), transparent);
+      border-radius: 2px;
+      opacity: 0.4;
+    }
+
+    .reflection-content {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .reflection-quote {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      color: var(--charcoal);
+      line-height: 1.7;
+      text-align: center;
+      font-style: italic;
+      padding: 0 16px;
+    }
+
+    .reflection-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--sand);
+      margin: 0 auto;
+    }
+
+    .reflection-prompt {
+      font-size: 15px;
+      color: var(--graphite);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .reflection-subtext {
+      font-size: 14px;
+      color: var(--ash);
+      text-align: center;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .home-indicator {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream);
+      flex-shrink: 0;
+    }
+
+    .home-indicator::before {
+      content: '';
+      width: 134px;
+      height: 5px;
+      background: var(--charcoal);
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+
+    /* Screen-specific styles */
+    #screen-2-0 .breath-stone {
+      width: 121px;
+      height: 121px;
+    }
+
+    #screen-2-0 .screen-subtitle {
+      margin-top: 10px;
+    }
+
+    #screen-2-1 .breath-stone::before {
+      background: radial-gradient(
+        circle, 
+        rgba(238, 212, 182, 0.06),
+        rgba(238, 212, 182, 0.02) 50%,
+        transparent 75%
+      );
+    }
+
+    #screen-2-1 .breath-stone-container {
+      padding-top: 40px;
+    }
+
+    #screen-2-1 .breath-stone-container::after {
+      content: '11–14 minutes';
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: var(--ash);
+    }
+
+    #screen-2-6 .breath-stone {
+      width: 121px;
+      height: 121px;
+    }
+
+    #screen-2-9 {
+      background: linear-gradient(to bottom, #F9F6F2, var(--cream));
+    }
+
+    #screen-2-9 .screen-header {
+      padding-top: 32px;
+    }
+
+    #screen-2-9 .screen-subtitle {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-style: italic;
+    }
+
+    #screen-2-12 {
+      background: radial-gradient(circle at center, var(--cream), var(--oat));
+    }
+
+    #screen-2-12 .screen-header {
+      padding-top: 32px;
+    }
+
+    #screen-2-12 .screen-title {
+      font-weight: 600;
+    }
+
+    #screen-2-14 .stage-map {
+      opacity: 0.6;
+    }
+
+    #screen-2-14 .breath-stone {
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 0 60px rgba(232, 220, 200, 0.3),
+        inset -20px -20px 40px rgba(28, 26, 24, 0.15),
+        inset 20px 20px 40px rgba(251, 248, 244, 0.5);
+    }
+
+    .nav-helper {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: flex;
+      gap: 8px;
+      z-index: 10000;
+      flex-wrap: wrap;
+      max-width: 90vw;
+    }
+
+    .nav-helper button {
+      padding: 6px 12px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .nav-helper button:hover {
+      background: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-wrapper">
+    <div class="phone-frame">
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="indicators">
+          <span>📶</span>
+          <span>📡</span>
+          <span>🔋</span>
+        </div>
+      </div>
+
+      <!-- Navigation Helper -->
+      <div class="nav-helper">
+        <button onclick="goToScreen('2-0')">Start</button>
+        <button onclick="goToScreen('2-6')">S1</button>
+        <button onclick="goToScreen('2-7-1')">P1</button>
+        <button onclick="goToScreen('2-9')">S2</button>
+        <button onclick="goToScreen('2-10-6')">P6</button>
+        <button onclick="goToScreen('2-12')">S3</button>
+        <button onclick="goToScreen('2-13-18')">P18</button>
+        <button onclick="goToScreen('2-15')">Process</button>
+        <button onclick="goToScreen('2-16b')">Play</button>
+      </div>
+
+      <!-- SCREEN 2.0: ENTRY -->
+      <div id="screen-2-0" class="screen active">
+        <div class="screen-header">
+          <div class="label">STEP 2</div>
+          <h1 class="screen-title">Your Voice Journey</h1>
+          <p class="screen-subtitle">
+            25 moments that capture your full range
+          </p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker current">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="vertical-beam"></div>
+          <div class="breath-stone ready"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-1')">Begin voice training</button>
+          <button class="btn-link">I'll do this later</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.1: EMOTIONAL GROUNDING -->
+      <div id="screen-2-1" class="screen">
+        <div class="screen-header">
+          <div class="label">BEFORE WE BEGIN</div>
+          <h1 class="screen-title">25 Moments</h1>
+          <p class="screen-subtitle">
+            Each captures a different facet of who you are
+          </p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone idle"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-2')">I'm ready</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.2: MIC PERMISSION -->
+      <div id="screen-2-2" class="screen">
+        <div class="screen-header">
+          <div class="label">SETUP</div>
+          <h1 class="screen-title">Microphone Access</h1>
+          <p class="screen-subtitle">
+            We need permission to record your voice
+          </p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(122, 128, 136, 0.1), rgba(232, 220, 200, 0.2)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(232, 220, 200, 0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--mineral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-4')">Allow microphone</button>
+          <button class="btn-link" onclick="goToScreen('2-0')">Not now</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.4: CHECKLIST -->
+      <div id="screen-2-4" class="screen">
+        <div class="screen-header">
+          <div class="label">QUICK CHECK</div>
+          <h1 class="screen-title">You're all set</h1>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone guidance"></div>
+        </div>
+
+        <div class="checklist-container">
+          <div class="checklist-item-2">
+            <div class="checklist-icon"></div>
+            <div class="checklist-text">Quiet environment</div>
+          </div>
+          <div class="checklist-item-2">
+            <div class="checklist-icon"></div>
+            <div class="checklist-text">Phone at comfortable distance</div>
+          </div>
+          <div class="checklist-item-2">
+            <div class="checklist-icon"></div>
+            <div class="checklist-text">Speak naturally, like telling a story</div>
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button id="checklist-cta" class="btn-primary" onclick="goToScreen('2-5')" style="opacity: 0;">Begin</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.5: ENVIRONMENT CAPTURE -->
+      <div id="screen-2-5" class="screen">
+        <div class="screen-header">
+          <div class="label">PREPARING</div>
+          <h1 class="screen-title">Setting up your session</h1>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="light-sweep"></div>
+          <div class="progress-ribbon"></div>
+          <div class="breath-stone working"></div>
+        </div>
+
+        <div class="screen-footer" style="opacity: 0.6;">
+          <p style="text-align: center; font-size: 14px; color: var(--graphite);">This will only take a moment</p>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.6: STAGE 1 INTRO -->
+      <div id="screen-2-6" class="screen">
+        <div class="screen-header">
+          <div class="label">STAGE 1 OF 3</div>
+          <h1 class="screen-title">Everyday Tone</h1>
+          <p class="screen-subtitle">
+            Five moments that capture your natural voice
+          </p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker current">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone ready"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-7-1')">Begin Stage 1</button>
+        </div>
+      </div>
+
+      <!-- STAGE 1 PROMPTS (1-5) -->
+      
+      <!-- PROMPT 1 -->
+      <div id="screen-2-7-1" class="screen">
+        <div class="screen-header">
+          <div class="label">MOMENT 1 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">Good morning. My name is {userName}, and I am here in {city}. It is a beautiful moment to begin this. I feel relaxed and ready to hear how my voice will sound.</div>
+          <div class="prompt-guidance">Variations: afternoon, evening, late night</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 1 CELEBRATION -->
+      <div id="screen-2-7-1c" class="screen">
+        <div class="screen-header">
+          <h1 class="screen-title" style="font-weight: 400;">Beautiful</h1>
+          <p class="screen-subtitle">You opened the door. Your voice is here.</p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone celebrate shimmer-active"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-7-2')">Continue</button>
+        </div>
+      </div>
+
+      <!-- PROMPT 2 -->
+      <div id="screen-2-7-2" class="screen">
+        <div class="screen-header">
+          <div class="label">MOMENT 2 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">You know what always makes me smile? A really good cup of coffee in the morning. There is something about that first sip when it is hot and fresh. It makes everything feel right. It is the little things that make your day feel better.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 3 -->
+      <div id="screen-2-7-3" class="screen">
+        <div class="screen-header">
+          <div class="label">MOMENT 3 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">This week has been pretty good. I got out for a walk around {city}, and it felt nice. The weather was decent, and the fresh air cleared my head. Sometimes the quiet, simple days are exactly what we need.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 4 -->
+      <div id="screen-2-7-4" class="screen">
+        <div class="screen-header">
+          <div class="label">MOMENT 4 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">There is a spot in {city} that I really love. It is nothing fancy, just a quiet place where I can sit and think. When I am there, everything feels peaceful. Everyone needs a place like that to breathe and feel like themselves.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 5 -->
+      <div id="screen-2-7-5" class="screen">
+        <div class="screen-header">
+          <div class="label">MOMENT 5 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">If you are listening to this, I want you to know something. Whatever you are going through, you are doing better than you think. Life can be hard, but you are here and still showing up. Give yourself some credit. You have earned it.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.8: STAGE 1 COMPLETE -->
+      <div id="screen-2-8" class="screen">
+        <div class="screen-header">
+          <div class="label">MILESTONE</div>
+          <h1 class="screen-title" style="font-weight: 500;">Stage 1 Complete</h1>
+          <p class="screen-subtitle">You shaped the first five moments. Your voice record is beginning to form.</p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker completed">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker current">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone celebrate stretch"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-9')">Begin Stage 2</button>
+          <button class="btn-secondary">Pause for now</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.9: STAGE 2 INTRO -->
+      <div id="screen-2-9" class="screen">
+        <div class="screen-header">
+          <div class="label">STAGE 2 OF 3</div>
+          <h1 class="screen-title">Emotional Range</h1>
+          <p class="screen-subtitle">
+            Twelve moments that invite warmth and reflection
+          </p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker completed">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker current">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone ready"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-10-6')">Continue</button>
+        </div>
+      </div>
+
+      <!-- STAGE 2 PROMPTS (6-17) -->
+
+      <!-- PROMPT 6 -->
+      <div id="screen-2-10-6" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 6 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">I remember when I was a kid. Summer days felt endless and full of laughter. We did not have much, but we had each other. Those simple moments still stay with me.</div>
+          <div class="prompt-guidance">Speak from memory</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 7 -->
+      <div id="screen-2-10-7" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 7 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">There is someone in my life who has always been there for me. Through everything. They taught me what real loyalty looks like. I would not be who I am without them.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 8 -->
+      <div id="screen-2-10-8" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 8 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">What would I tell my younger self? Stop worrying so much about what people think. Do the things that make you happy. It really does all work out in the end.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 9 -->
+      <div id="screen-2-10-9" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 9 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">I remember doing something that scared me for years. My heart was pounding, but I did it anyway. That moment taught me that I am stronger than I realized.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 10 -->
+      <div id="screen-2-10-10" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 10 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">My perfect day is simple. Wake up without an alarm. A good cup of coffee. A walk around {city}. Dinner with people I love. Good food, good company, good conversation. That is all I need.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 11 -->
+      <div id="screen-2-10-11" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 11 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">I am grateful for the people who have stayed in my life. The ones who showed up during the hard times and the good ones. That kind of presence matters more than anything.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 12 -->
+      <div id="screen-2-10-12" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 12 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">Life taught me that I cannot control everything. I used to try. But letting go is sometimes the only way forward. It is scary, but it is freeing.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDPOINT CELEBRATION -->
+      <div id="screen-2-10-midpoint" class="screen">
+        <div class="screen-header">
+          <h1 class="screen-title" style="font-weight: 400;">You're halfway there</h1>
+          <p class="screen-subtitle">Your voice is unfolding beautifully</p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone celebrate shimmer-active"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-10-13')">Continue</button>
+        </div>
+      </div>
+
+      <!-- PROMPT 13 -->
+      <div id="screen-2-10-13" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 13 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">I remember being terrified before doing something new. My hands were shaking. My mind raced. But I did it, and it turned out okay. It taught me something important about courage.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 14 -->
+      <div id="screen-2-10-14" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 14 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">If you are having a rough day, I want you to know something. You do not have to be strong all the time. Tomorrow is a new start. You are stronger than you think.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 15 -->
+      <div id="screen-2-10-15" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 15 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">Here is what I have learned. What really matters is not the big stuff. It is the shared moments and the people who make life feel meaningful.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 16 -->
+      <div id="screen-2-10-16" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 16 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">I want you to know I believe in you. You might be doubting yourself right now. But I know what you are capable of. Keep going. You can do this.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 17 -->
+      <div id="screen-2-10-17" class="screen stage-2-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 17 OF 25</div>
+        </div>
+
+        <div class="recording-container">
+          <div class="prompt-text">Here is what I learned about love. It is not grand gestures. It is showing up. It is the quiet, everyday moments. That is where the real magic lives.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.5s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.11: STAGE 2 COMPLETE -->
+      <div id="screen-2-11" class="screen">
+        <div class="screen-header">
+          <div class="label">MILESTONE</div>
+          <h1 class="screen-title" style="font-weight: 400;">Stage 2 Complete</h1>
+          <p class="screen-subtitle">Your voice has gained depth and warmth. The final stage awaits.</p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker completed">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker completed">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker current">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone celebrate two-step-glow"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-12')">Begin Stage 3</button>
+          <button class="btn-secondary">Pause for now</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.12: STAGE 3 INTRO -->
+      <div id="screen-2-12" class="screen">
+        <div class="screen-header">
+          <div class="label">STAGE 3 OF 3</div>
+          <h1 class="screen-title">Personal Essence</h1>
+          <p class="screen-subtitle">
+            Eight final moments that capture your unique rhythm
+          </p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker completed">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker completed">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker current">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone ready"></div>
+        </div>
+
+        <div style="text-align: center; padding: 0 32px 24px; font-size: 14px; color: var(--graphite); font-style: italic;">
+          These moments add your signature
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-13-18')">Continue</button>
+        </div>
+      </div>
+
+      <!-- STAGE 3 PROMPTS (18-25) -->
+
+      <!-- PROMPT 18 -->
+      <div id="screen-2-13-18" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 18 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">I want you to know you are special to me. Whatever happens, remember that you matter. You are loved, and I am here for you.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 19 -->
+      <div id="screen-2-13-19" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 19 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">I hope we all slow down a little. Take time to enjoy the small things. Spend more time with the people we love. Life is short. I hope we all remember to live.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 20 -->
+      <div id="screen-2-13-20" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 20 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">When I think about home, it is not really a place. Home is the people you love. It is where you can be yourself. I feel lucky to have that.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 21 -->
+      <div id="screen-2-13-21" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 21 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">Here is something I wish someone told me. Be kind to others, yes. But be kind to yourself too. We are all doing the best we can.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 22 -->
+      <div id="screen-2-13-22" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 22 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">Let us count together. One to ten. Then ten back to one. This helps capture rhythm and clarity.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 23 -->
+      <div id="screen-2-13-23" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 23 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">Here is my information. You can reach me at five-five-five, two-one-two, three-four-five-six. My address is four twenty seven Oak Street, apartment two B, {city}. Today's date is {date}, around {time}.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 24 -->
+      <div id="screen-2-13-24" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 24 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">You know what always makes me laugh? When you trip over nothing and look around to see if anyone saw. We all do it. It is silly, but it is human.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPT 25 (FINAL) -->
+      <div id="screen-2-13-25" class="screen stage-3-prompt">
+        <div class="screen-header">
+          <div class="label">MOMENT 25 OF 25</div>
+        </div>
+
+        <div class="recording-container" style="padding-top: 48px;">
+          <div class="prompt-text">Alright, that is a wrap. Thank you for being here for this. I hope this brings you joy whenever you hear it. You are loved, valued, and doing better than you think. Take care of yourself. Bye for now.</div>
+          
+          <div class="waveform">
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.1s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.2s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.3s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.4s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.5s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.6s;"></div>
+            <div class="waveform-bar" style="animation: waveform 1.2s ease-in-out infinite; animation-delay: 0.7s;"></div>
+          </div>
+
+          <div class="recording-control" style="margin-top: 32px;">
+            <button class="rec-button" onclick="toggleRecording(this)"></button>
+            <div class="rec-label">Tap to begin</div>
+            <div class="timer" style="margin-top: 20px;">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.14: ALL COMPLETE -->
+      <div id="screen-2-14" class="screen">
+        <div class="screen-header">
+          <div class="label">YOUR JOURNEY</div>
+          <h1 class="screen-title">All 25 Moments Complete</h1>
+          <p class="screen-subtitle" style="font-style: italic;">You have shaped something that will endure</p>
+        </div>
+
+        <div class="stage-map">
+          <div class="stage-marker completed">
+            <div class="stage-number">1</div>
+            <div class="stage-label">Everyday</div>
+          </div>
+          <div class="stage-marker completed">
+            <div class="stage-number">2</div>
+            <div class="stage-label">Emotional</div>
+          </div>
+          <div class="stage-marker completed">
+            <div class="stage-number">3</div>
+            <div class="stage-label">Personal</div>
+          </div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone celebrate bloom"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-15')">Continue</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.15: MODEL SHAPING -->
+      <div id="screen-2-15" class="screen">
+        <div class="screen-header">
+          <div class="label">SHAPING YOUR VOICE</div>
+          <h1 class="screen-title">Creating your voice record</h1>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="light-sweep"></div>
+          <div class="breath-stone working"></div>
+        </div>
+
+        <div style="text-align: center; padding: 0 32px 32px; font-size: 14px; color: var(--graphite); line-height: 1.6;">
+          <p>Your 25 moments are being woven together</p>
+          <p style="margin-top: 12px; font-style: italic;">This will take about 6 seconds</p>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.16a: VOICE READY -->
+      <div id="screen-2-16a" class="screen">
+        <div class="screen-header">
+          <div class="label">YOUR VOICE</div>
+          <h1 class="screen-title">Your voice is ready</h1>
+          <p class="screen-subtitle">
+            Listen to what you have created
+          </p>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone ready"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary" onclick="goToScreen('2-16b')">Hear your voice</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.16b: FIRST PLAYBACK -->
+      <div id="screen-2-16b" class="screen">
+        <div class="screen-header">
+          <div class="label">THIS IS YOUR VOICE</div>
+        </div>
+
+        <div class="breath-stone-container">
+          <div class="breath-stone playback"></div>
+        </div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 32px; gap: 24px;">
+          <div style="background: var(--oat); padding: 24px; border-radius: 16px; text-align: left; border: 2px solid var(--sand);">
+            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--graphite); margin-bottom: 12px;">Your preserved voice says:</div>
+            <div style="font-family: var(--font-serif); font-size: 17px; line-height: 1.7; color: var(--charcoal);">"This is my voice. These twenty-five moments have shaped something I can share with the people I care about. When you hear this, know that I wanted my voice to stay with you."</div>
+          </div>
+
+          <div style="text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 14px; color: var(--graphite); margin-bottom: 8px;">00:18</div>
+            <div style="height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden;">
+              <div style="height: 100%; background: var(--mineral); width: 0%; animation: playbackProgress 18s linear;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button id="playback-continue" class="btn-primary" onclick="goToScreen('2-17')" style="opacity: 0.5;" disabled>Continue</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2.17: REFLECTION -->
+      <div id="screen-2-17" class="screen">
+        <div class="reflection-content">
+          <div class="reflection-quote">
+            "Your voice is now preserved. A keepsake that carries your warmth forward."
+          </div>
+
+          <div class="reflection-divider"></div>
+
+          <div class="reflection-prompt">
+            You can now create messages for the people you love, whenever the moment feels right.
+          </div>
+
+          <div class="reflection-subtext">
+            Your voice will be here, ready to speak
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn-primary">Create your first message</button>
+        </div>
+      </div>
+
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let currentScreen = 'screen-2-0';
+    let recordingTimer = null;
+    let recordingSeconds = 0;
+
+    // Navigation
+    function goToScreen(screenId) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(s => s.classList.remove('active'));
+      
+      const targetScreen = document.getElementById('screen-' + screenId) || document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+        currentScreen = screenId;
+
+        // Reset recording states
+        const containers = targetScreen.querySelectorAll('.recording-container');
+        containers.forEach(c => c.classList.remove('recording'));
+
+        // Trigger special animations
+        if (screenId === '2-4') {
+          setTimeout(() => runChecklistSequence(), 300);
+        } else if (screenId === '2-5') {
+          setTimeout(() => goToScreen('2-6'), 2500);
+        } else if (screenId === '2-15') {
+          setTimeout(() => goToScreen('2-16a'), 6000);
+        } else if (screenId === '2-16b') {
+          setTimeout(() => startPlayback(), 500);
+        }
+      }
+    }
+
+    // Recording toggle
+    function toggleRecording(button) {
+      const container = button.closest('.recording-container');
+      const label = container.querySelector('.rec-label');
+      const timer = container.querySelector('.timer');
+      const waveform = container.querySelector('.waveform');
+      const isRecording = container.classList.contains('recording');
+
+      if (!isRecording) {
+        // Start recording
+        container.classList.add('recording');
+        label.textContent = 'Recording...';
+        waveform.classList.add('active');
+        recordingSeconds = 0;
+        updateTimer(timer);
+        
+        recordingTimer = setInterval(() => {
+          recordingSeconds++;
+          updateTimer(timer);
+          
+          // Auto-stop at 60 seconds
+          if (recordingSeconds >= 60) {
+            finishRecording(button);
+          }
+        }, 1000);
+      } else {
+        // Stop recording
+        finishRecording(button);
+      }
+    }
+
+    function finishRecording(button) {
+      const container = button.closest('.recording-container');
+      const label = container.querySelector('.rec-label');
+      const waveform = container.querySelector('.waveform');
+      
+      container.classList.remove('recording');
+      clearInterval(recordingTimer);
+      button.classList.add('finished');
+      label.classList.add('saved');
+      label.textContent = 'Saved';
+
+      // Add shimmer effect to breath stone
+      const screen = button.closest('.screen');
+      const stone = screen.querySelector('.breath-stone');
+      if (stone) {
+        stone.classList.add('shimmer-active');
+        setTimeout(() => stone.classList.remove('shimmer-active'), 1240);
+      }
+      
+      setTimeout(() => {
+        waveform.classList.remove('active');
+        
+        // Auto-advance to next screen
+        const currentId = screen.id;
+        const match = currentId.match(/(\d+)-(\d+)(-(\d+))?/);
+        
+        if (match) {
+          const section = match[1];
+          const subsection = match[2];
+          const promptNum = match[4];
+          
+          if (promptNum) {
+            const num = parseInt(promptNum);
+            
+            // Special celebrations
+            if (num === 1) {
+              goToScreen(`2-7-1c`);
+            } else if (num === 5) {
+              goToScreen('2-8');
+            } else if (num === 12) {
+              goToScreen('2-10-midpoint');
+            } else if (num === 17) {
+              goToScreen('2-11');
+            } else if (num === 25) {
+              goToScreen('2-14');
+            } else {
+              // Regular progression
+              if (num < 5) {
+                goToScreen(`2-7-${num + 1}`);
+              } else if (num < 17) {
+                goToScreen(`2-10-${num + 1}`);
+              } else if (num < 25) {
+                goToScreen(`2-13-${num + 1}`);
+              }
+            }
+          }
+        }
+      }, 2000);
+    }
+
+    function updateTimer(timerEl) {
+      const mins = Math.floor(recordingSeconds / 60);
+      const secs = recordingSeconds % 60;
+      timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Checklist sequence
+    function runChecklistSequence() {
+      const items = document.querySelectorAll('.checklist-item-2');
+      const stone = document.querySelector('#screen-2-4 .breath-stone');
+      const cta = document.getElementById('checklist-cta');
+      
+      items.forEach((item, i) => {
+        setTimeout(() => {
+          item.style.opacity = '1';
+          item.style.transform = 'translateY(0)';
+          item.style.transition = 'opacity 400ms ease, transform 500ms cubic-bezier(0.25, 0.1, 0.25, 1)';
+        }, i * 400);
+      });
+
+      setTimeout(() => {
+        if (stone) {
+          stone.classList.add('shimmer-active');
+          setTimeout(() => stone.classList.remove('shimmer-active'), 1240);
+        }
+      }, 1200);
+
+      setTimeout(() => {
+        cta.style.opacity = '1';
+        cta.style.transition = 'opacity 600ms ease';
+      }, 2400);
+    }
+
+    // Playback
+    function startPlayback() {
+      const btn = document.getElementById('playback-continue');
+      
+      setTimeout(() => {
+        btn.style.opacity = '1';
+        btn.disabled = false;
+        btn.style.transition = 'opacity 600ms ease';
+      }, 18000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      goToScreen('2-0');
+    });
+  </script>
+
+  <style>
+    @keyframes playbackProgress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+  </style>
+</body>
+</html>
