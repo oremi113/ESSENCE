@@ -1,0 +1,59 @@
+# DECISIONS (ESSENCE)
+
+Last updated: 2026-02-09  
+Purpose: Lightweight log of technical decisions for ESSENCE.  
+Audience: You, future-you, and any developer brought in midstream.
+
+Rules:
+- Keep this short and honest.
+- Decisions can move from **Open → Closed**.
+- When closing a decision, briefly explain *why* (not just what).
+- This doc exists to prevent re-litigating the same questions later.
+
+---
+
+## Decision Index
+
+- D-001: Backend framework (Express vs Next.js route handlers)
+- D-002: Routing system (Wouter vs Next.js App Router)
+- D-003: Audio storage strategy (Base64 in DB vs Object Storage)
+- D-004: Auth system (Passport sessions vs Supabase Auth)
+- D-005: ORM choice (Drizzle vs Supabase client)
+- D-006: Upload strategy (Server-proxied vs Direct-to-storage)
+- D-007: Voice training trigger (Auto vs Manual)
+- D-008: Environment separation (Dev / Preview / Prod)
+- D-009: Analytics timing (Now vs Later)
+- D-010: Transcripts (Now vs Later)
+
+---
+
+## D-001: Backend framework
+**Decision:** Use Next.js App Router route handlers  
+**Status:** ✅ Closed  
+
+**Options considered:**
+- Keep Express backend
+- Migrate to Next.js route handlers
+
+**Rationale:**
+- Next.js route handlers provide the same server capabilities as Express
+- Simplifies deployment on Vercel
+- Reduces infrastructure surface area
+- Aligns backend with frontend framework
+
+**Consequences:**
+- Express middleware patterns must be adapted
+- Server logic becomes request-scoped (serverless)
+
+---
+
+## D-002: Routing system
+**Decision:** Use Next.js App Router  
+**Status:** ✅ Closed  
+
+**Options considered:**
+- Keep Wouter (SPA)
+- Migrate to Next.js App Router
+
+**Rationale:**
+- App Router aligns with modern Next.js and long-term su
