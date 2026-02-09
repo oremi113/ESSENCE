@@ -1,0 +1,217 @@
+# LAUNCH_CHECKLIST (ESSENCE)
+
+Last updated: 2026-02-09  
+Purpose: Define what “robust test build” means for ESSENCE before inviting testers.  
+Scope: Web app (Next.js + Supabase + ElevenLabs). Focus on reliability, safety, and debuggability, not feature completeness.
+
+How to use:
+- Mark each item done before expanding access.
+- If something is intentionally skipped, note why and the risk.
+
+---
+
+## 0) Release readiness (baseline)
+- [ ] App deploys successfully to Vercel (Production environment)
+- [ ] No secrets committed to repo (scan for `API_KEY`, `.env`, etc.)
+- [ ] `spec/STACK_INVENTORY.md` matches reality
+- [ ] `spec/ENVIRONMENT.md` matches deployed env vars
+- [ ] All critical routes are mapped in `spec/API_MAP.md`
+
+---
+
+## 1) Authentication and identity
+Goal: Users can sign up, sign in, and only see their own data.
+
+- [ ] Signup works (email/password) and creates a user successfully
+- [ ] Login works consistently across refreshes
+- [ ] Logout clears session
+- [ ] “Current user” endpoint (or Supabase session check) works
+- [ ] Protected routes reject unauthenticated access
+- [ ] Row Level Security (RLS) enabled and verified for:
+  - [ ] `profiles`
+  - [ ] `training_clips`
+  - [ ] `messages`
+  - [ ] `subscriptions` (if present)
+
+Verification tests:
+- [ ] User A cannot read User B’s profiles via direct API call
+- [ ] User A cannot write to User B’s profile_id (tamper test)
+- [ ] Anonymous user cannot create/read protected rows
+
+---
+
+## 2) Profiles (voice identities)
+Goal: Profiles CRUD is stable and correctly permissioned.
+
+- [ ] Create profile works
+- [ ] List profiles works
+- [ ] Edit profile safe fields works (name, relation, notes)
+- [ ] Delete profile works
+- [ ] Deleting profile triggers cleanup:
+  - [ ] DB rows removed (or soft-deleted intentionally)
+  - [ ] Storage files removed (if implemented)
+  - [ ] ElevenLabs voice deleted (if exists)
+
+Edge cases:
+- [ ] Deleting profile with no recordings succeeds
+- [ ] Deleting profile with recordings succeeds
+- [ ] Deleting profile with voice id succeeds even if ElevenLabs deletion fails (log warning, continue)
+
+---
+
+## 3) Voice training: record, upload, store, playback
+Goal: Recording pipeline works reliably for real users.
+
+### Mic permission and recording
+- [ ] Mic permission request screen is clear and resilient
+- [ ] Recording starts/stops reliably
+- [ ] Recording produces a valid audio file in supported browsers
+- [ ] Mobile Safari behavior tested (at least minimally)
+
+### Upload
+- [ ] Upload succeeds for at least 25 recordings
+- [ ] Upload rejects oversized payloads gracefully
+- [ ] Upload rejects unsupported MIME types gracefully
+- [ ] Upload failure shows a friendly retry path (no dead ends)
+
+### Storage + DB
+- [ ] Each clip stored in Storage (not DB) and referenced by `audio_storage_path`
+- [ ] Unique constraint enforced per profile/prompt_index (no duplicates)
+- [ ] Deleting a clip deletes DB row and removes the stored file (if enabled)
+
+### Playback
+- [ ] Playback works via signed URL
+- [ ] Signed URLs expire and re-sign correctly
+- [ ] Playback failures show a recoverable error state
+
+---
+
+## 4) Voice model creation (ElevenLabs)
+Goal: Voice creation is predictable, debuggable, and does not strand users.
+
+- [ ] Automatic voice creation triggers when training clips reach required count (25)
+- [ ] Voice creation status is visible in UI (training vs ready)
+- [ ] Retry voice creation endpoint exists and works
+- [ ] ElevenLabs 429 handling works (backoff/retry)
+- [ ] Failure state is recorded and shown with a human-readable message
+
+Edge cases:
+- [ ] If voice creation fails, user can retry without re-recording
+- [ ] If recordings drop below threshold, voice cleanup rules apply consistently
+- [ ] Dev fallback voice behavior (if used) is clearly labeled and restricted to development
+
+---
+
+## 5) TTS preview (no save)
+Goal: Users can preview generated speech safely.
+
+- [ ] Preview TTS endpoint returns playable audio
+- [ ] Character limit enforced (2000 chars)
+- [ ] Empty/invalid content returns a helpful error message
+- [ ] Preview does not persist a message record unless explicitly saved
+
+---
+
+## 6) Messages: create, save, list, playback
+Goal: Generated messages are stable and persist correctly.
+
+- [ ] Create message works (with audio generation server-side if needed)
+- [ ] Save stores:
+  - [ ] message text
+  - [ ] audio in Storage
+  - [ ] metadata in DB (duration, mime_type, storage path)
+- [ ] List messages works per profile
+- [ ] Playback works via signed URL
+- [ ] Delete message removes DB row and storage file
+
+Edge cases:
+- [ ] Message creation blocked if voice is not ready
+- [ ] If generation fails, message status becomes `failed` and is recoverable
+
+---
+
+## 7) Error states and UX fallbacks
+Goal: App never leaves users stuck.
+
+- [ ] Global “offline / network error” state exists
+- [ ] Loading states exist for:
+  - [ ] profile list
+  - [ ] training list
+  - [ ] playback
+  - [ ] generation
+- [ ] Empty states exist for:
+  - [ ] no profiles
+  - [ ] no recordings
+  - [ ] no messages
+- [ ] Server errors show a calm message + next action
+
+---
+
+## 8) Logging and debuggability
+Goal: When something fails, you can diagnose it quickly.
+
+- [ ] Server logs include request context:
+  - [ ] user_id (when available)
+  - [ ] profile_id / message_id (when relevant)
+  - [ ] route name
+- [ ] ElevenLabs failures log:
+  - [ ] status code
+  - [ ] request type (create voice vs TTS)
+  - [ ] retry attempts
+- [ ] Storage upload failures log:
+  - [ ] bucket + path
+  - [ ] size + mime_type
+
+Optional (recommended when testers expand):
+- [ ] Add error monitoring (Sentry or similar)
+- [ ] Add minimal analytics (PostHog) for funnel steps
+
+---
+
+## 9) Basic rate limiting and abuse prevention
+Goal: Prevent accidental runaway usage and protect vendor quotas.
+
+Minimum:
+- [ ] Rate limit TTS preview endpoint per user (simple in-memory or provider-level)
+- [ ] Rate limit message generation endpoint per user
+- [ ] Limit file upload size (server + platform)
+- [ ] Limit generation request payload length (text length already enforced)
+
+Recommended:
+- [ ] Add per-user daily caps for:
+  - [ ] preview generations
+  - [ ] message generations
+- [ ] Return friendly “try again later” errors on 429
+
+---
+
+## 10) QA smoke tests (must-pass)
+Run these on Production build before inviting testers:
+
+- [ ] Create account → create profile → record 1 clip → upload → playback
+- [ ] Complete all 25 clips → voice created → preview TTS works
+- [ ] Generate message → save → list → playback → delete
+- [ ] Delete profile → confirm files + voice cleanup behavior
+- [ ] User A cannot access User B’s data (tamper test)
+- [ ] Refresh during flow does not corrupt state (at least for profiles/messages)
+
+---
+
+## 11) Known limitations (write these down before testers)
+Document:
+- [ ] Supported browsers (minimum)
+- [ ] Audio format constraints
+- [ ] Expected delays (voice training time, generation time)
+- [ ] Anything still mocked or dev-only
+
+---
+
+## Definition of “Robust test build”
+You are ready to robustly test when:
+- Auth + RLS is verified
+- Recording upload + playback is reliable
+- Voice creation works (with retry)
+- Message generation and playback works
+- Error states are calm and recoverable
+- Logs are sufficient to debug failures quickly
+- Basic rate limiting prevents runaway vendor costs
